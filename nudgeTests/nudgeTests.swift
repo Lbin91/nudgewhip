@@ -75,12 +75,14 @@ private final class TestSystemLifecycleMonitor: SystemLifecycleMonitoring {
 private final class TestAlertPresenter: AlertPresenting {
     private(set) var showCount = 0
     private(set) var hideCount = 0
+    private(set) var shownStyles: [AlertVisualStyle] = []
     
-    func showPerimeterPulse() {
+    func show(style: AlertVisualStyle) {
         showCount += 1
+        shownStyles.append(style)
     }
     
-    func hidePerimeterPulse() {
+    func hide() {
         hideCount += 1
     }
 }
@@ -356,6 +358,7 @@ struct nudgeTests {
             )
         )
         #expect(presenter.showCount == 1)
+        #expect(presenter.shownStyles == [.perimeterPulse])
         
         alertManager.handle(
             snapshot: RuntimeSnapshot(
@@ -368,7 +371,8 @@ struct nudgeTests {
                 lastInputAt: nil
             )
         )
-        #expect(presenter.showCount == 1)
+        #expect(presenter.showCount == 2)
+        #expect(presenter.shownStyles == [.perimeterPulse, .strongVisualNudge])
         
         alertManager.handle(
             snapshot: RuntimeSnapshot(

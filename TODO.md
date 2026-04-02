@@ -33,7 +33,7 @@
 
 - [x] `nudge/Services/AlertManager.swift` 작성
 - [x] `perimeterPulse` 1차 시각 넛지 구현
-- [ ] `strongVisualNudge` 2차 시각 넛지 구현
+- [x] `strongVisualNudge` 2차 시각 넛지 구현
 - [ ] `ttsNudge` 3차 알림 구현
 - [ ] TTS 큐 중첩 금지 구현
 - [ ] 복귀 시 TTS 즉시 cancel 구현
@@ -157,5 +157,5 @@
 
 ## Current Next Slice
 
-- [ ] `strongVisualNudge` 최소 구현으로 2차 시각 알림 연결
 - [ ] `ttsNudge` 최소 구현으로 3차 복귀 음성 알림 연결
+- [ ] TTS 큐 중첩 금지 및 복귀 시 즉시 cancel 구현
