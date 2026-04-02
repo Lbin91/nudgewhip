@@ -127,11 +127,11 @@
 
 ### 4.8 break_suggestion
 
-- KR: `반복해서 멈추고 있네요. 잠시 휴식을 취해 보는 건 어떨까요?`
-- EN: `You keep pausing. How about taking a short break?`
+- KR: `반복해서 멈추고 있네요. 잠시 숨을 고르거나 민감도를 조정해 볼까요?`
+- EN: `You keep pausing. Want to take a breather or adjust sensitivity?`
 
-- KR: `집중이 자주 끊기고 있습니다. 휴식 모드로 전환해도 괜찮습니다.`
-- EN: `Focus keeps breaking. It is okay to switch to break mode.`
+- KR: `집중이 자주 끊기고 있습니다. 잠시 알림 강도를 낮춰도 괜찮습니다.`
+- EN: `Focus keeps breaking. It is okay to lower the alert intensity for a while.`
 
 - KR: `계속 멈춤이 발생하고 있어요. 잠시 쉬었다 오면 더 나을 수 있습니다.`
 - EN: `Pauses keep happening. Stepping away briefly might help.`
@@ -196,6 +196,7 @@
 - `recovery`는 입력 복귀 이벤트와 연결된다.
 - `break_ack`는 manual break 상태와 연결된다.
 - `break_suggestion`은 반복 오탐 감지 로직과 연결된다.
+- `break_suggestion`은 Free에서 break mode 진입을 직접 약속하지 않는다. 기본 동작은 민감도 조정, 알림 강도 완화, 도움말 안내다.
 - `streak_reward`, `level_up`는 `DailyStats` 및 `PetState`와 연결된다.
 - `remote_escalation`은 CloudKit sync 상태와 Pro entitlement와 연결된다.
 

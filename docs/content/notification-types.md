@@ -31,7 +31,7 @@
 | `strongVisualNudge` | 2차 시각 넛지 | 더 강한 테두리/오버레이 |
 | `ttsNudge` | 짧은 음성 넛지 | 시스템 음성 합성 |
 | `remoteEscalation` | Pro용 원격 에스컬레이션 | iOS companion notification |
-| `breakSuggestion` | 반복 오탐 완화 제안 | 메뉴바/설정 UI |
+| `breakSuggestion` | 반복 오탐 완화 안내 | 메뉴바/설정 UI |
 
 ### 3.2 Non-goals
 
@@ -62,6 +62,7 @@
 - `pausedWhitelist` 상태에서는 알림을 중단한다.
 - `suspendedSleepOrLock` 상태에서는 알림을 일시 중단하고 기준 시각을 재설정한다.
 - `limitedNoAX` 상태에서는 고정 권한 안내만 보여주고 idle 알림은 실행하지 않는다.
+- `breakSuggestion`은 `pausedManual` 진입을 보장하지 않는다. Free에서는 민감도 조정/조용한 구간 안내만 제공하고, Pro에서만 break shortcut을 추가할 수 있다.
 
 ## 5. Escalation Contract
 
@@ -132,13 +133,12 @@
 
 | Notification Type | Dialogue Slot | 캐릭터 감정 | 비고 |
 |---|---|---|---|
-| `perimeterPulse` | `idle_notice` | cheer (mild) | 1차 시각 넛지 |
-| `strongVisualNudge` | `strong_warning` | sad (mild) + cheer | 2차 강화 넛지 |
+| `perimeterPulse` | `idle_notice` | cheer (mild) | `GentleNudge`에 해당하는 1차 시각 넛지 |
+| `strongVisualNudge` | `strong_warning` | concern (mild) + cheer | `StrongNudge`에 해당하는 2차 강화 넛지 |
 | `ttsNudge` | `tts_line` | cheer (active) | 음성 보조 채널 |
-| `remoteEscalation` | `remote_escalation` | sad (mild) | iOS 원격 에스컬레이션 |
-| `breakSuggestion` | `break_suggestion` | sleep | 휴식 제안 |
+| `remoteEscalation` | `remote_escalation` | concern (mild) | iOS 원격 에스컬레이션 |
+| `breakSuggestion` | `break_suggestion` | sleep | 민감도 조정 또는 숨 고르기 제안 |
 | (복귀 감지 시) | `recovery_cheer` | happy (strong) | 복귀 축하 |
-| (GentleNudge) | `gentle_warning` | cheer (active) | 1.5차 경고 |
 
 - `recovery_cheer` 슬롯은 `dialogue-pool.md`의 `recovery` 슬롯에 대응하며, 복귀 감지 시 자동 발화한다.
-- `gentle_warning`은 `perimeterPulse`와 `strongVisualNudge` 사이의 선택적 중간 단계에서 사용한다.
+- `gentle_warning`은 별도 1.5차 단계가 아니라 `perimeterPulse`의 richer surface variation으로만 사용한다.

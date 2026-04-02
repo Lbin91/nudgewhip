@@ -126,6 +126,7 @@
 
 - push는 보장형이 아니다.
 - iOS 알림은 `alerting`이 일정 시간 지속된 뒤의 `RemoteEscalation`에서만 best-effort로 보낸다.
+- `RemoteEscalation`의 기본 전달 수단은 사용자 가시 알림이다. content-available 전용 silent push는 보조 최적화일 뿐, 단독 전달 경로로 가정하지 않는다.
 - silent push가 도착하지 않아도 iOS app은 최종 상태를 복구할 수 있어야 한다.
 
 ### 8.2 Fetch Policy

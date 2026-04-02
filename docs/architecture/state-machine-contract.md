@@ -65,6 +65,7 @@
 - `monitorStartFailed`
 
 - `accessibilityGranted`는 권한 부여와 모니터 재시작 성공을 모두 포괄한다. 별도의 `permissionsRecovered` 이벤트는 두지 않는다.
+- `accessibilityDenied`는 운영체제의 실시간 콜백이 아니라, 앱이 foreground 복귀나 권한 프롬프트 복귀 시점에 `AXIsProcessTrusted`를 재검사한 뒤 발행하는 합성 이벤트다.
 
 ### 4.3 Event Handling Rule
 
@@ -148,6 +149,7 @@
 ### 7.2 Timer Rules
 
 - polling timer는 사용하지 않는다.
+- 단, 이 금지는 idle detection deadline에 대한 규칙이다. 권한 상태는 앱 활성화 복귀나 제한된 재검사 경로에서 다시 확인할 수 있다.
 - 하나의 runtime state에 대해 동시에 중복 deadline을 두지 않는다.
 - state가 바뀌면 관련 timer는 cancel 후 재등록한다.
 - `sleepDetected` 또는 `screenLocked`에서 모든 deadline timer는 suspend 상태로 들어간다.
