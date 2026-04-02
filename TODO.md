@@ -5,13 +5,13 @@
 
 ## P0 (Spec 실행에 바로 필요한 문서)
 
-- [ ] `docs/localization/translation-status.md` 작성
-- [ ] `docs/content/notification-types.md` 작성
-- [ ] `docs/content/dialogue-pool.md` 작성
-- [ ] `docs/content/gamification-system.md` 작성
-- [ ] `docs/privacy/accessibility-and-data-disclosure.md` 작성
-- [ ] `docs/architecture/state-machine-contract.md` 작성
-- [ ] `docs/architecture/cloudkit-sync-contract.md` 작성
+- [x] `docs/localization/translation-status.md` 작성
+- [x] `docs/content/notification-types.md` 작성
+- [x] `docs/content/dialogue-pool.md` 작성
+- [x] `docs/content/gamification-system.md` 작성
+- [x] `docs/privacy/accessibility-and-data-disclosure.md` 작성
+- [x] `docs/architecture/state-machine-contract.md` 작성
+- [x] `docs/architecture/cloudkit-sync-contract.md` 작성
 
 ## P1 (Phase 1~2 구현 전 정렬 필요)
 
@@ -38,4 +38,10 @@
 - [x] `docs/app/spec.md` vNext 재작성
 - [x] `docs/localization/language-guide.md` 작성
 - [x] `docs/localization/glossary.md` 작성
-
+- [x] `docs/localization/translation-status.md` 작성
+- [x] `docs/content/notification-types.md` 작성
+- [x] `docs/content/dialogue-pool.md` 작성
+- [x] `docs/content/gamification-system.md` 작성
+- [x] `docs/privacy/accessibility-and-data-disclosure.md` 작성
+- [x] `docs/architecture/state-machine-contract.md` 작성
+- [x] `docs/architecture/cloudkit-sync-contract.md` 작성
