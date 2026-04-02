@@ -97,16 +97,16 @@
 
 ### 6. Localization Foundation
 
-- [ ] `nudge/Localizable.xcstrings` 생성
-- [ ] launch-scope 문자열을 전부 `.xcstrings`로 외부화
-- [ ] 하드코딩된 사용자 노출 문자열 제거
-- [ ] key naming을 `domain.surface.intent`로 통일
-- [ ] 모든 key에 comment 문맥 추가
-- [ ] 한국어(`ko`) 번역 입력
-- [ ] 영어(`en`) 번역 입력
+- [x] `nudge/Localizable.xcstrings` 생성
+- [x] launch-scope 문자열을 전부 `.xcstrings`로 외부화
+- [x] 하드코딩된 사용자 노출 문자열 제거
+- [x] key naming을 `domain.surface.intent`로 통일
+- [x] 모든 key에 comment 문맥 추가
+- [x] 한국어(`ko`) 번역 입력
+- [x] 영어(`en`) 번역 입력
 - [ ] TTS 핵심 문구 locale 매핑 구현
-- [ ] unsupported locale -> English fallback 구현
-- [ ] placeholder/key name 노출 방지
+- [x] unsupported locale -> English fallback 구현
+- [x] placeholder/key name 노출 방지
 
 ### 7. Free Stats and Summary
 
@@ -248,6 +248,6 @@
 
 - [x] `Item.swift` 제거 및 `Shared/Models` 기본 구조 생성
 - [x] `PermissionManager`, `IdleMonitor`, `RuntimeStateController` 스켈레톤 작성
-- [ ] `Localizable.xcstrings` 생성 및 메뉴바 핵심 문자열 외부화
+- [x] `Localizable.xcstrings` 생성 및 메뉴바 핵심 문자열 외부화
 - [ ] `MenuBarExtra` 기본 드롭다운을 실제 상태 기반 UI로 교체
 - [ ] idle detection + limitedNoAX + perimeter pulse까지 동작하는 최소 Free 루프 완성
