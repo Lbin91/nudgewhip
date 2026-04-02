@@ -15,16 +15,16 @@
 
 ## P1 (Phase 1~2 구현 전 정렬 필요)
 
-- [ ] `docs/content/character-design-brief.md` 작성
-- [ ] `docs/design/design-system.md` 작성
-- [ ] `docs/design/icon-spec.md` 작성
-- [ ] `docs/design/character-sprite-spec.md` 작성
-- [ ] `docs/design/landing-mockup.md` 작성
-- [ ] `docs/marketing/launch-plan.md` 작성
-- [ ] `docs/marketing/copywriting.md` 작성
-- [ ] `docs/marketing/funnel-strategy.md` 작성
-- [ ] `docs/marketing/competitive-analysis.md` 작성
-- [ ] `docs/web/i18n/README.md` 작성
+- [x] `docs/content/character-design-brief.md` 작성
+- [x] `docs/design/design-system.md` 작성
+- [x] `docs/design/icon-spec.md` 작성
+- [x] `docs/design/character-sprite-spec.md` 작성
+- [x] `docs/design/landing-mockup.md` 작성
+- [x] `docs/marketing/launch-plan.md` 작성
+- [x] `docs/marketing/copywriting.md` 작성
+- [x] `docs/marketing/funnel-strategy.md` 작성
+- [x] `docs/marketing/competitive-analysis.md` 작성
+- [x] `docs/web/i18n/README.md` 작성
 
 ## P2 (출시/운영 품질 강화)
 
@@ -45,3 +45,13 @@
 - [x] `docs/privacy/accessibility-and-data-disclosure.md` 작성
 - [x] `docs/architecture/state-machine-contract.md` 작성
 - [x] `docs/architecture/cloudkit-sync-contract.md` 작성
+- [x] `docs/content/character-design-brief.md` 작성
+- [x] `docs/design/design-system.md` 작성
+- [x] `docs/design/icon-spec.md` 작성
+- [x] `docs/design/character-sprite-spec.md` 작성
+- [x] `docs/design/landing-mockup.md` 작성
+- [x] `docs/marketing/launch-plan.md` 작성
+- [x] `docs/marketing/copywriting.md` 작성
+- [x] `docs/marketing/funnel-strategy.md` 작성
+- [x] `docs/marketing/competitive-analysis.md` 작성
+- [x] `docs/web/i18n/README.md` 작성
