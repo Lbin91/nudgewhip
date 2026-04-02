@@ -31,8 +31,8 @@
 
 ### B. Alert System MVP
 
-- [ ] `nudge/Services/AlertManager.swift` 작성
-- [ ] `perimeterPulse` 1차 시각 넛지 구현
+- [x] `nudge/Services/AlertManager.swift` 작성
+- [x] `perimeterPulse` 1차 시각 넛지 구현
 - [ ] `strongVisualNudge` 2차 시각 넛지 구현
 - [ ] `ttsNudge` 3차 알림 구현
 - [ ] TTS 큐 중첩 금지 구현
@@ -157,5 +157,5 @@
 
 ## Current Next Slice
 
-- [ ] `perimeterPulse` 최소 구현으로 Free 루프 첫 시각 넛지 완성
-- [ ] `AlertManager.swift` 작성 및 1차 알림 루프 연결
+- [ ] `strongVisualNudge` 최소 구현으로 2차 시각 알림 연결
+- [ ] `ttsNudge` 최소 구현으로 3차 복귀 음성 알림 연결

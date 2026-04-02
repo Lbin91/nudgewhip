@@ -20,6 +20,7 @@ final class IdleMonitor {
     let runtimeStateController: RuntimeStateController
     let eventMonitor: any EventMonitoring
     let lifecycleMonitor: any SystemLifecycleMonitoring
+    let alertManager: (any AlertManaging)?
     let idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
@@ -34,6 +35,7 @@ final class IdleMonitor {
         runtimeStateController: RuntimeStateController? = nil,
         eventMonitor: (any EventMonitoring)? = nil,
         lifecycleMonitor: (any SystemLifecycleMonitoring)? = nil,
+        alertManager: (any AlertManaging)? = nil,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
         cooldownDuration: TimeInterval = 60
@@ -42,6 +44,7 @@ final class IdleMonitor {
         self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
         self.eventMonitor = eventMonitor ?? SystemEventMonitor()
         self.lifecycleMonitor = lifecycleMonitor ?? SystemLifecycleMonitor()
+        self.alertManager = alertManager
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
@@ -59,6 +62,7 @@ final class IdleMonitor {
     func refreshPermission(promptIfNeeded: Bool = false, at date: Date = .now) {
         let permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: promptIfNeeded)
         runtimeStateController.handle(permissionState == .granted ? .accessibilityGranted : .accessibilityDenied, at: date)
+        scheduleAlertSync()
         
         if permissionState == .granted {
             startEventMonitoringIfNeeded()
@@ -75,6 +79,7 @@ final class IdleMonitor {
     func setAccessibilityPermission(_ state: AccessibilityPermissionState, at date: Date = .now) {
         permissionManager.accessibilityPermissionState = state
         runtimeStateController.handle(state == .granted ? .accessibilityGranted : .accessibilityDenied, at: date)
+        scheduleAlertSync()
         
         if state == .granted {
             startEventMonitoringIfNeeded()
@@ -93,6 +98,7 @@ final class IdleMonitor {
         
         lastInputAt = date
         runtimeStateController.handle(.userActivityDetected, at: date)
+        scheduleAlertSync()
         scheduleIdleDeadline(from: date)
         cancelAlertEscalationDeadline()
         
@@ -104,6 +110,7 @@ final class IdleMonitor {
     /// 수동 일시정지 토글. 활성 시 모든 데드라인 취소
     func setManualPause(_ enabled: Bool, at date: Date = .now) {
         runtimeStateController.handle(enabled ? .manualPauseEnabled : .manualPauseDisabled, at: date)
+        scheduleAlertSync()
         
         if enabled {
             cancelAllDeadlines()
@@ -115,6 +122,7 @@ final class IdleMonitor {
     /// 화이트리스트 앱 매칭 상태 설정
     func setWhitelistMatched(_ matched: Bool, at date: Date = .now) {
         runtimeStateController.handle(matched ? .whitelistMatched : .whitelistUnmatched, at: date)
+        scheduleAlertSync()
         
         if matched {
             cancelAllDeadlines()
@@ -126,6 +134,7 @@ final class IdleMonitor {
     /// 수면/잠금/사용자 전환 등 시스템 이벤트 처리
     func handleSystemEvent(_ event: NudgeRuntimeEvent, at date: Date = .now) {
         runtimeStateController.handle(event, at: date)
+        scheduleAlertSync()
         
         switch event {
         case .sleepDetected, .screenLocked, .fastUserSwitchingStarted:
@@ -142,6 +151,7 @@ final class IdleMonitor {
     func fireIdleDeadline(at date: Date = .now) {
         guard let idleDeadlineAt, date >= idleDeadlineAt else { return }
         runtimeStateController.handle(.idleDeadlineReached, at: date)
+        scheduleAlertSync()
         self.idleDeadlineAt = nil
         idleDeadlineWorkItem?.cancel()
         idleDeadlineWorkItem = nil
@@ -152,6 +162,7 @@ final class IdleMonitor {
     func fireAlertEscalationDeadline(at date: Date = .now) {
         guard let alertEscalationDeadlineAt, date >= alertEscalationDeadlineAt else { return }
         runtimeStateController.handle(.alertEscalationDeadlineReached, at: date)
+        scheduleAlertSync()
         self.alertEscalationDeadlineAt = nil
         alertEscalationWorkItem?.cancel()
         alertEscalationWorkItem = nil
@@ -162,6 +173,7 @@ final class IdleMonitor {
     func fireCooldownExpired(at date: Date = .now) {
         guard let cooldownDeadlineAt, date >= cooldownDeadlineAt else { return }
         runtimeStateController.handle(.cooldownExpired, at: date)
+        scheduleAlertSync()
         self.cooldownDeadlineAt = nil
         cooldownWorkItem?.cancel()
         cooldownWorkItem = nil
@@ -261,5 +273,13 @@ final class IdleMonitor {
     /// 시스템 lifecycle 모니터 정지
     private func stopLifecycleMonitoring() {
         lifecycleMonitor.stop()
+    }
+    
+    /// alert side effects는 이벤트 핸들러에서 바로 무겁게 수행하지 않도록 비동기로 동기화
+    private func scheduleAlertSync() {
+        let snapshot = runtimeStateController.snapshot
+        Task { @MainActor [alertManager] in
+            alertManager?.handle(snapshot: snapshot)
+        }
     }
 }

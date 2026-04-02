@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 final class NudgeAppController {
-    static let shared = NudgeAppController()
+    @MainActor static let shared = NudgeAppController()
     
     let menuBarViewModel: MenuBarViewModel
     private let onboardingCoordinator: OnboardingCoordinator
@@ -10,7 +10,8 @@ final class NudgeAppController {
     
     private init() {
         let permissionManager = PermissionManager()
-        let idleMonitor = IdleMonitor(permissionManager: permissionManager)
+        let alertManager = AlertManager()
+        let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager)
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
         self.menuBarViewModel = menuBarViewModel
         

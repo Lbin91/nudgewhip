@@ -71,6 +71,20 @@ private final class TestSystemLifecycleMonitor: SystemLifecycleMonitoring {
     }
 }
 
+@MainActor
+private final class TestAlertPresenter: AlertPresenting {
+    private(set) var showCount = 0
+    private(set) var hideCount = 0
+    
+    func showPerimeterPulse() {
+        showCount += 1
+    }
+    
+    func hidePerimeterPulse() {
+        hideCount += 1
+    }
+}
+
 @Suite(.serialized)
 struct nudgeTests {
 
@@ -322,6 +336,52 @@ struct nudgeTests {
         
         lifecycleMonitor.emit(.fastUserSwitchingEnded)
         #expect(runtimeController.snapshot.runtimeState == .monitoring)
+    }
+    
+    @MainActor
+    @Test
+    func alertManagerShowsAndHidesPerimeterPulseAcrossAlertLifecycle() {
+        let presenter = TestAlertPresenter()
+        let alertManager = AlertManager(presenter: presenter)
+        
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .idleDetected,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                suspended: false,
+                lastInputAt: nil
+            )
+        )
+        #expect(presenter.showCount == 1)
+        
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .strongNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                suspended: false,
+                lastInputAt: nil
+            )
+        )
+        #expect(presenter.showCount == 1)
+        
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .monitoring,
+                contentState: .recovery,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                suspended: false,
+                lastInputAt: nil
+            )
+        )
+        #expect(presenter.hideCount == 1)
     }
     
     @MainActor
