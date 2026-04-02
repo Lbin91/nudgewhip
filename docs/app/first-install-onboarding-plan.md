@@ -44,6 +44,7 @@
 - 상세 통계 및 게이미피케이션 설정
 - 세부 알림 강도/에스컬레이션 튜닝
 - break mode 고급 정책
+- 시스템 알림(UNUserNotificationCenter) 권한 요청 (자체 커스텀 오버레이 UI를 사용하므로 온보딩에서 의도적으로 생략함)
 
 ## 5. First-run information architecture
 
@@ -90,6 +91,8 @@ MVP는 **최대 4화면**으로 제한한다.
 수집할 항목:
 - Idle threshold
   - `3분`, `5분(추천)`, `10분`
+- 시작 시 로그인 자동 실행 (Launch on Login)
+  - `켜기(추천)` / `끄기`
 - TTS
   - `켜기` / `끄기`
 - Visual mode
@@ -98,7 +101,8 @@ MVP는 **최대 4화면**으로 제한한다.
 
 설계 원칙:
 - 고급 옵션은 숨긴다.
-- 사용자 피로를 줄이기 위해 3개 이상 묻지 않는다.
+- 한 화면에서 제어 수가 많아질 경우 `Idle threshold + Launch on Login`을 1차 그룹, `TTS + Visual mode`를 2차 그룹으로 시각적으로 분리한다.
+- 한 화면에서 “결정해야 하는 질문 수”는 4개를 넘기지 않는다.
 - 기본값은 즉시 usable 해야 한다.
 
 ### Screen 4 — Completion
@@ -120,7 +124,8 @@ MVP는 **최대 4화면**으로 제한한다.
 표시 내용:
 - `제한 모드로 시작`
 - 무엇이 제한되는지 설명
-  - 실제 전역 입력 감지가 완전하지 않음
+  - 백그라운드 전역 키보드/마우스 입력 감지가 불가능함
+  - 따라서 무입력 감지와 자동 복귀 루프는 완전하게 동작하지 않음
 - Primary CTA: `메뉴바에서 계속`
 - Secondary CTA: `권한 다시 설정`
 
@@ -139,6 +144,7 @@ MVP는 **최대 4화면**으로 제한한다.
 
 - onboarding completed 여부
 - 마지막으로 본 onboarding 버전
+- launch at login 선택값 (`SMAppService` 상태와 동일한 device-local flag)
 
 최초 설치에서 저장하지 않을 값:
 
@@ -162,6 +168,7 @@ MVP는 **최대 4화면**으로 제한한다.
 - “실시간 보장”, “감시”, “추적” 같은 과장/위협 표현 금지
 - 권한 거부 시에도 앱이 계속 실행됨을 명시
 - 고지 문구는 `String Catalog (.xcstrings)` 단일 소스로 관리
+- onboarding 권한 문구는 `docs/privacy/accessibility-and-data-disclosure.md`의 의미를 축약하되 새로운 주장(수집/전송/추적)을 추가하지 않는다.
 
 ## 8. UX rules
 
@@ -171,8 +178,28 @@ MVP는 **최대 4화면**으로 제한한다.
 - KR/EN 모두 2줄 래핑 허용
 - 제한 모드도 실패가 아니라 “부분 기능 사용 상태”로 표현
 - 온보딩 종료 후에도 메뉴/설정에서 다시 열 수 있어야 함
+- 앱이 시스템 설정에서 foreground로 복귀하면 권한 상태를 즉시 재검사해야 한다.
 
-## 9. State expectations
+## 9. Trigger and resume rules
+
+온보딩은 아래 조건에서 표시한다.
+
+- 앱 첫 실행이며 onboarding completed가 false
+- 온보딩 버전이 현재 앱의 required onboarding version보다 낮음
+- 사용자가 메뉴/설정에서 “온보딩 다시 보기”를 명시적으로 선택함
+
+온보딩은 아래 조건에서는 표시하지 않는다.
+
+- 단순 앱 재실행이며 completed/version 조건이 충족됨
+- 제한 모드 사용자이지만 이미 온보딩을 완료했고 별도 재오픈 요청이 없음
+
+중도 이탈/재진입 규칙:
+
+- 사용자가 `나중에 설정`으로 종료하면 completed는 true로 처리하되 최종 상태는 `limitedNoAX`로 남긴다.
+- 시스템 설정 앱으로 이동했다가 돌아오면 permission step에서 즉시 상태를 갱신한다.
+- 앱이 강제 종료되더라도 이미 저장된 basic setup 값은 재입력하지 않도록 유지한다.
+
+## 10. State expectations
 
 온보딩 완료 시 상태 기대값:
 
@@ -186,33 +213,37 @@ MVP는 **최대 4화면**으로 제한한다.
   - 제한 모드 UI 노출
   - 설정 복귀 후 재검사 가능
 
-## 10. Acceptance Criteria
+## 11. Acceptance Criteria
 
 - 최초 실행이고 AX 권한이 없으면 메뉴 탐색 전에 온보딩이 먼저 보인다.
 - 권한 허용/거부 어느 경우든 온보딩을 완료할 수 있다.
 - 권한 허용 시 monitoring 준비 상태로 진입한다.
 - 권한 거부 시 limited mode 안내와 복구 경로가 보인다.
-- 기본 설정 3개가 저장되고 다음 실행에 유지된다.
+- `idle threshold`, `launch at login`, `TTS`, `visual mode`가 저장되고 다음 실행에 유지된다.
 - KR/EN 모두 문구가 disclosure 문서와 의미상 일치한다.
 - 다음 실행에서는 onboarding completed 플래그에 따라 반복 노출되지 않는다.
+- launch at login은 SwiftData가 아니라 device-local 설정 계층으로 저장된다.
 
-## 11. Recommended implementation order
+## 12. Recommended implementation order
 
 1. `UserDefaults` 기반 onboarding completion/version flag 추가
 2. 온보딩 전용 container 및 step state 추가
 3. Permission screen에 기존 `PermissionManager` 흐름 재사용
-4. Basic setup 화면에서 `UserSettings` 저장 연결
-5. granted / denied completion 분기 추가
-6. 메뉴/설정에서 onboarding 재오픈 경로 추가
-7. KR/EN 로컬라이제이션 반영
-8. UI / permission flow 테스트 추가
+4. Basic setup 화면에서 `UserSettings` 저장 연결 (`idle threshold`, `TTS`, `visual mode`)
+5. launch at login은 `SMAppService` + device-local flag로 별도 연결
+6. granted / denied completion 분기 추가
+7. 메뉴/설정에서 onboarding 재오픈 경로 추가
+8. KR/EN 로컬라이제이션 반영
+9. UI / permission flow 테스트 추가
 
-## 12. Verification plan
+## 13. Verification plan
 
 Unit:
 - onboarding completed flag 저장/복원
 - initial setting persistence
 - permission state refresh after returning from Settings
+- launch at login device-local persistence
+- onboarding version bump 시 재표시 조건
 
 UI:
 - fresh install granted path
@@ -229,10 +260,18 @@ Localization:
 Manual:
 - 새 설치 → 권한 거부 → 제한 모드 진입 확인
 - 설정 앱에서 권한 허용 후 앱 복귀 → 상태 재검사 확인
+- launch at login on/off 설정 후 재부팅 또는 로그인 재진입 시 반영 확인
 
-## 13. Open questions
+## 14. Known constraints / notes
+
+- Phase 1은 자체 커스텀 오버레이 넛지를 사용하므로 `UNUserNotificationCenter` 권한 요청은 온보딩에서 제외한다.
+- `launch at login`은 사용자 기기별 동작이므로 SwiftData source of truth에 넣지 않고 device-local 설정으로 관리해야 한다.
+- Input Monitoring 권한은 현재 표준 경로의 필수 권한으로 가정하지 않는다. 실제 macOS 정책/배포 방식에서 필요성이 확인될 때만 별도 검토한다.
+
+## 15. Open questions
 
 - 최초 온보딩을 full-screen window로 띄울지, 작은 setup window로 띄울지
 - 완료 화면에서 “메뉴바에서 시작” CTA가 실제로 어떤 행동을 해야 하는지
 - onboarding을 다시 여는 진입점을 메뉴바에 둘지 설정 화면에 둘지
-- 최초 기본값을 `5분 / TTS on / sprout`로 확정할지 여부
+- 최초 기본값을 `5분 / 자동실행 on / TTS on / sprout`로 확정할지 여부
+- `나중에 설정`을 눌렀을 때 completion으로 볼지, reminder 배지를 남길지 여부
