@@ -66,5 +66,72 @@ struct nudgeTests {
         #expect(petStates.first?.stage == .sprout)
         #expect(petStates.first?.emotion == .sleep)
     }
+    
+    @Test
+    func runtimeReducerHonorsPriorityRulesAndRecoveryFlow() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        var snapshot = RuntimeSnapshot()
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .accessibilityGranted, at: baseDate)
+        #expect(snapshot.runtimeState == .monitoring)
+        #expect(snapshot.contentState == .focus)
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .idleDeadlineReached, at: baseDate.addingTimeInterval(300))
+        #expect(snapshot.runtimeState == .alerting)
+        #expect(snapshot.contentState == .idleDetected)
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .manualPauseEnabled, at: baseDate.addingTimeInterval(301))
+        #expect(snapshot.runtimeState == .pausedManual)
+        #expect(snapshot.contentState == .break)
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .manualPauseDisabled, at: baseDate.addingTimeInterval(302))
+        #expect(snapshot.runtimeState == .monitoring)
+        #expect(snapshot.contentState == .focus)
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .idleDeadlineReached, at: baseDate.addingTimeInterval(600))
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .userActivityDetected, at: baseDate.addingTimeInterval(601))
+        #expect(snapshot.runtimeState == .monitoring)
+        #expect(snapshot.contentState == .recovery)
+        
+        snapshot = RuntimeStateReducer.reduce(snapshot, event: .cooldownExpired, at: baseDate.addingTimeInterval(661))
+        #expect(snapshot.contentState == .focus)
+    }
+    
+    @MainActor
+    @Test
+    func idleMonitorUsesOneShotDeadlinesForIdleAlertAndCooldown() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            idleThreshold: 300,
+            alertEscalationInterval: 30,
+            cooldownDuration: 60
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(300))
+        
+        idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
+        #expect(runtimeController.snapshot.runtimeState == .alerting)
+        #expect(runtimeController.snapshot.contentState == .idleDetected)
+        #expect(idleMonitor.alertEscalationDeadlineAt == baseDate.addingTimeInterval(330))
+        
+        idleMonitor.fireAlertEscalationDeadline(at: baseDate.addingTimeInterval(330))
+        #expect(runtimeController.snapshot.contentState == .gentleNudge)
+        #expect(idleMonitor.alertEscalationDeadlineAt == baseDate.addingTimeInterval(360))
+        
+        idleMonitor.recordInput(at: baseDate.addingTimeInterval(331))
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(runtimeController.snapshot.contentState == .recovery)
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(631))
+        #expect(idleMonitor.cooldownDeadlineAt == baseDate.addingTimeInterval(391))
+        
+        idleMonitor.fireCooldownExpired(at: baseDate.addingTimeInterval(391))
+        #expect(runtimeController.snapshot.contentState == .focus)
+    }
 
 }

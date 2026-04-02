@@ -39,19 +39,19 @@
 
 ### 2. Core Runtime and State Machine
 
-- [ ] `nudge/Services/PermissionManager.swift` 작성
-- [ ] `nudge/Services/IdleMonitor.swift` 작성
+- [x] `nudge/Services/PermissionManager.swift` 작성
+- [x] `nudge/Services/IdleMonitor.swift` 작성
 - [ ] `nudge/Services/FrontmostAppProvider.swift` 작성
-- [ ] `nudge/Services/RuntimeStateController.swift` 또는 동등 구조 작성
-- [ ] runtime state enum 구현: `limitedNoAX`, `monitoring`, `pausedManual`, `pausedWhitelist`, `alerting`, `suspendedSleepOrLock`
-- [ ] content state enum 구현: `Focus`, `IdleDetected`, `GentleNudge`, `StrongNudge`, `Recovery`, `Break`, `RemoteEscalation`
+- [x] `nudge/Services/RuntimeStateController.swift` 또는 동등 구조 작성
+- [x] runtime state enum 구현: `limitedNoAX`, `monitoring`, `pausedManual`, `pausedWhitelist`, `alerting`, `suspendedSleepOrLock`
+- [x] content state enum 구현: `Focus`, `IdleDetected`, `GentleNudge`, `StrongNudge`, `Recovery`, `Break`, `RemoteEscalation`
 - [ ] `mouseMoved`, `mouseDown`, `scrollWheel`, `keyDown`만 입력 소스로 사용
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지
-- [ ] idle detection을 polling이 아닌 one-shot deadline timer 기반으로 구현
+- [x] idle detection을 polling이 아닌 one-shot deadline timer 기반으로 구현
 - [ ] sleep/wake, lock/unlock, fast user switching 처리 추가
 - [ ] `accessibilityDenied`를 OS 이벤트가 아닌 재검사 기반 합성 이벤트로 처리
-- [ ] `limitedNoAX` 제한 모드에서 graceful degradation 구현
-- [ ] 상태 전환 로그/테스트 훅 추가
+- [x] `limitedNoAX` 제한 모드에서 graceful degradation 구현
+- [x] 상태 전환 로그/테스트 훅 추가
 
 ### 3. Alert System
 
@@ -247,7 +247,7 @@
 ## Immediate Next Slice
 
 - [x] `Item.swift` 제거 및 `Shared/Models` 기본 구조 생성
-- [ ] `PermissionManager`, `IdleMonitor`, `RuntimeStateController` 스켈레톤 작성
+- [x] `PermissionManager`, `IdleMonitor`, `RuntimeStateController` 스켈레톤 작성
 - [ ] `Localizable.xcstrings` 생성 및 메뉴바 핵심 문자열 외부화
 - [ ] `MenuBarExtra` 기본 드롭다운을 실제 상태 기반 UI로 교체
 - [ ] idle detection + limitedNoAX + perimeter pulse까지 동작하는 최소 Free 루프 완성
