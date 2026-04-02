@@ -28,10 +28,10 @@
 
 ## P2 (출시/운영 품질 강화)
 
-- [ ] `docs/legal/open-core-license-and-trademark-policy.md` 작성
-- [ ] `docs/qa/acceptance-matrix.md` 작성
-- [ ] `docs/qa/localization-test-matrix.md` 작성
-- [ ] `docs/release/release-readiness-checklist.md` 작성
+- [x] `docs/legal/open-core-license-and-trademark-policy.md` 작성
+- [x] `docs/qa/acceptance-matrix.md` 작성
+- [x] `docs/qa/localization-test-matrix.md` 작성
+- [x] `docs/release/release-readiness-checklist.md` 작성
 
 ## Completed This Turn
 
@@ -55,3 +55,7 @@
 - [x] `docs/marketing/funnel-strategy.md` 작성
 - [x] `docs/marketing/competitive-analysis.md` 작성
 - [x] `docs/web/i18n/README.md` 작성
+- [x] `docs/legal/open-core-license-and-trademark-policy.md` 작성
+- [x] `docs/qa/acceptance-matrix.md` 작성
+- [x] `docs/qa/localization-test-matrix.md` 작성
+- [x] `docs/release/release-readiness-checklist.md` 작성
