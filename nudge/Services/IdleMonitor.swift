@@ -19,6 +19,7 @@ final class IdleMonitor {
     let permissionManager: PermissionManager
     let runtimeStateController: RuntimeStateController
     let eventMonitor: any EventMonitoring
+    let lifecycleMonitor: any SystemLifecycleMonitoring
     let idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
@@ -32,6 +33,7 @@ final class IdleMonitor {
         permissionManager: PermissionManager? = nil,
         runtimeStateController: RuntimeStateController? = nil,
         eventMonitor: (any EventMonitoring)? = nil,
+        lifecycleMonitor: (any SystemLifecycleMonitoring)? = nil,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
         cooldownDuration: TimeInterval = 60
@@ -39,6 +41,7 @@ final class IdleMonitor {
         self.permissionManager = permissionManager ?? PermissionManager()
         self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
         self.eventMonitor = eventMonitor ?? SystemEventMonitor()
+        self.lifecycleMonitor = lifecycleMonitor ?? SystemLifecycleMonitor()
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
@@ -59,9 +62,11 @@ final class IdleMonitor {
         
         if permissionState == .granted {
             startEventMonitoringIfNeeded()
+            startLifecycleMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
         } else {
             stopEventMonitoring()
+            stopLifecycleMonitoring()
             cancelAllDeadlines()
         }
     }
@@ -73,9 +78,11 @@ final class IdleMonitor {
         
         if state == .granted {
             startEventMonitoringIfNeeded()
+            startLifecycleMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
         } else {
             stopEventMonitoring()
+            stopLifecycleMonitoring()
             cancelAllDeadlines()
         }
     }
@@ -124,7 +131,8 @@ final class IdleMonitor {
         case .sleepDetected, .screenLocked, .fastUserSwitchingStarted:
             cancelAllDeadlines()
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
-            scheduleIdleDeadline(from: lastInputAt ?? date)
+            lastInputAt = date
+            scheduleIdleDeadline(from: date)
         default:
             break
         }
@@ -240,5 +248,18 @@ final class IdleMonitor {
     /// 전역 입력 이벤트 모니터 정지
     private func stopEventMonitoring() {
         eventMonitor.stop()
+    }
+    
+    /// 시스템 lifecycle 모니터 시작
+    private func startLifecycleMonitoringIfNeeded() {
+        guard !lifecycleMonitor.isMonitoring else { return }
+        lifecycleMonitor.start { [weak self] event in
+            self?.handleSystemEvent(event)
+        }
+    }
+    
+    /// 시스템 lifecycle 모니터 정지
+    private func stopLifecycleMonitoring() {
+        lifecycleMonitor.stop()
     }
 }

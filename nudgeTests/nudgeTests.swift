@@ -47,6 +47,30 @@ private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     }
 }
 
+@MainActor
+private final class TestSystemLifecycleMonitor: SystemLifecycleMonitoring {
+    private(set) var isMonitoring = false
+    private(set) var startCount = 0
+    private(set) var stopCount = 0
+    private var onEvent: (@MainActor (NudgeRuntimeEvent) -> Void)?
+    
+    func start(onEvent: @escaping @MainActor (NudgeRuntimeEvent) -> Void) {
+        isMonitoring = true
+        startCount += 1
+        self.onEvent = onEvent
+    }
+    
+    func stop() {
+        isMonitoring = false
+        stopCount += 1
+        onEvent = nil
+    }
+    
+    func emit(_ event: NudgeRuntimeEvent) {
+        onEvent?(event)
+    }
+}
+
 @Suite(.serialized)
 struct nudgeTests {
 
@@ -142,10 +166,12 @@ struct nudgeTests {
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
         let runtimeController = RuntimeStateController()
         let eventMonitor = TestEventMonitor()
+        let lifecycleMonitor = TestSystemLifecycleMonitor()
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             runtimeStateController: runtimeController,
             eventMonitor: eventMonitor,
+            lifecycleMonitor: lifecycleMonitor,
             idleThreshold: 300,
             alertEscalationInterval: 30,
             cooldownDuration: 60
@@ -182,16 +208,20 @@ struct nudgeTests {
         let permissionManager = PermissionManager(accessibilityPermissionState: .unknown)
         let runtimeController = RuntimeStateController()
         let eventMonitor = TestEventMonitor()
+        let lifecycleMonitor = TestSystemLifecycleMonitor()
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             runtimeStateController: runtimeController,
             eventMonitor: eventMonitor,
+            lifecycleMonitor: lifecycleMonitor,
             idleThreshold: 300
         )
         
         idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
         #expect(eventMonitor.startCount == 1)
+        #expect(lifecycleMonitor.startCount == 1)
         #expect(eventMonitor.isMonitoring)
+        #expect(lifecycleMonitor.isMonitoring)
         
         eventMonitor.emitActivity()
         #expect(idleMonitor.lastInputAt != nil)
@@ -199,7 +229,9 @@ struct nudgeTests {
         
         idleMonitor.setAccessibilityPermission(.denied, at: baseDate.addingTimeInterval(1))
         #expect(eventMonitor.stopCount == 1)
+        #expect(lifecycleMonitor.stopCount == 1)
         #expect(!eventMonitor.isMonitoring)
+        #expect(!lifecycleMonitor.isMonitoring)
         #expect(runtimeController.snapshot.runtimeState == .limitedNoAX)
     }
     
@@ -253,6 +285,47 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func idleMonitorSuspendsAndResumesAcrossSystemLifecycleEvents() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let eventMonitor = TestEventMonitor()
+        let lifecycleMonitor = TestSystemLifecycleMonitor()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: eventMonitor,
+            lifecycleMonitor: lifecycleMonitor,
+            idleThreshold: 300
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(300))
+        
+        lifecycleMonitor.emit(.sleepDetected)
+        #expect(runtimeController.snapshot.runtimeState == .suspendedSleepOrLock)
+        #expect(idleMonitor.idleDeadlineAt == nil)
+        
+        lifecycleMonitor.emit(.wakeDetected)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(idleMonitor.idleDeadlineAt != nil)
+        
+        lifecycleMonitor.emit(.screenLocked)
+        #expect(runtimeController.snapshot.runtimeState == .suspendedSleepOrLock)
+        
+        lifecycleMonitor.emit(.screenUnlocked)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        
+        lifecycleMonitor.emit(.fastUserSwitchingStarted)
+        #expect(runtimeController.snapshot.runtimeState == .suspendedSleepOrLock)
+        
+        lifecycleMonitor.emit(.fastUserSwitchingEnded)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+    }
+    
+    @MainActor
+    @Test
     func onboardingStorageTracksCompletionResumeAndDraft() {
         let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.storage.\(UUID().uuidString)")!
         let storage = OnboardingStorage(defaults: defaults, requiredVersion: 2)
@@ -286,7 +359,11 @@ struct nudgeTests {
         let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.viewmodel.\(UUID().uuidString)")!
         let storage = OnboardingStorage(defaults: defaults)
         let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
-        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let permissionManager = PermissionManager(
+            accessibilityPermissionState: .granted,
+            trustCheck: { _ in true },
+            settingsOpener: { _ in true }
+        )
         let launchAtLoginManager = TestLaunchAtLoginManager()
         var didFinish = false
         let viewModel = OnboardingViewModel(
@@ -326,7 +403,11 @@ struct nudgeTests {
         let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.close.\(UUID().uuidString)")!
         let storage = OnboardingStorage(defaults: defaults)
         let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
-        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let permissionManager = PermissionManager(
+            accessibilityPermissionState: .granted,
+            trustCheck: { _ in true },
+            settingsOpener: { _ in true }
+        )
         let viewModel = OnboardingViewModel(
             storage: storage,
             modelContainer: container,

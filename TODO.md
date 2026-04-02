@@ -24,9 +24,9 @@
 
 - [ ] `nudge/Services/FrontmostAppProvider.swift` 작성
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지 구조를 더 강하게 분리
-- [ ] sleep/wake 처리 추가
-- [ ] lock/unlock 처리 추가
-- [ ] fast user switching 처리 추가
+- [x] sleep/wake 처리 추가
+- [x] lock/unlock 처리 추가
+- [x] fast user switching 처리 추가
 - [ ] 상태 아이콘 반영 1초 이내 목표 검증 및 필요 시 구조 보정
 
 ### B. Alert System MVP
@@ -157,5 +157,5 @@
 
 ## Current Next Slice
 
-- [ ] sleep/wake, lock/unlock, fast user switching 처리 추가
 - [ ] `perimeterPulse` 최소 구현으로 Free 루프 첫 시각 넛지 완성
+- [ ] `AlertManager.swift` 작성 및 1차 알림 루프 연결
