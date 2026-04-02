@@ -59,6 +59,7 @@ struct RuntimeSnapshot: Equatable, Sendable {
     var whitelistMatched = false
     var schedulePaused = false
     var suspended = false
+    var alertEscalationStep = 0
     var lastInputAt: Date?
 }
 
@@ -78,39 +79,49 @@ enum RuntimeStateReducer {
             next.accessibilityGranted = true
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .accessibilityDenied, .monitorStartFailed:
             next.accessibilityGranted = false
             next.runtimeState = .limitedNoAX
             next.contentState = .focus
+            next.alertEscalationStep = 0
             
         case .manualPauseEnabled:
             next.manualPauseEnabled = true
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = .break
+            next.alertEscalationStep = 0
             
         case .manualPauseDisabled:
             next.manualPauseEnabled = false
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .whitelistMatched:
             next.whitelistMatched = true
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = next.runtimeState == .pausedWhitelist ? .focus : next.contentState
+            if next.runtimeState != .alerting {
+                next.alertEscalationStep = 0
+            }
             
         case .whitelistUnmatched:
             next.whitelistMatched = false
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .idleDeadlineReached:
             guard resolveBaseRuntimeState(from: next) == .monitoring else { return next }
             next.runtimeState = .alerting
             next.contentState = .idleDetected
+            next.alertEscalationStep = 1
             
         case .alertEscalationDeadlineReached:
             guard next.runtimeState == .alerting else { return next }
+            next.alertEscalationStep += 1
             switch next.contentState {
             case .idleDetected:
                 next.contentState = .gentleNudge
@@ -125,21 +136,25 @@ enum RuntimeStateReducer {
             let wasAlerting = next.runtimeState == .alerting
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = wasAlerting ? .recovery : baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .ttsFinished:
             guard next.runtimeState == .alerting else { return next }
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .scheduleWindowEntered:
             next.schedulePaused = true
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .scheduleWindowExited:
             next.schedulePaused = false
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
             
         case .cooldownExpired:
             if next.runtimeState == .monitoring && next.contentState == .recovery {
@@ -150,11 +165,13 @@ enum RuntimeStateReducer {
             next.suspended = true
             next.runtimeState = .suspendedSleepOrLock
             next.contentState = .focus
+            next.alertEscalationStep = 0
             
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
             next.suspended = false
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
+            next.alertEscalationStep = 0
         }
         
         return next

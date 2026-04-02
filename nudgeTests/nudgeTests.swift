@@ -87,6 +87,20 @@ private final class TestAlertPresenter: AlertPresenting {
     }
 }
 
+@MainActor
+private final class TestNotificationNudgeManager: NotificationNudgeManaging {
+    private(set) var deliverCount = 0
+    private(set) var clearCount = 0
+    
+    func deliverThirdStageNudge() {
+        deliverCount += 1
+    }
+    
+    func clearPendingNudges() {
+        clearCount += 1
+    }
+}
+
 @Suite(.serialized)
 struct nudgeTests {
 
@@ -344,7 +358,11 @@ struct nudgeTests {
     @Test
     func alertManagerShowsAndHidesPerimeterPulseAcrossAlertLifecycle() {
         let presenter = TestAlertPresenter()
-        let alertManager = AlertManager(presenter: presenter)
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
         
         alertManager.handle(
             snapshot: RuntimeSnapshot(
@@ -373,6 +391,22 @@ struct nudgeTests {
         )
         #expect(presenter.showCount == 2)
         #expect(presenter.shownStyles == [.perimeterPulse, .strongVisualNudge])
+        #expect(notificationManager.deliverCount == 0)
+        
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .strongNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 4,
+                lastInputAt: nil
+            )
+        )
+        #expect(notificationManager.deliverCount == 1)
         
         alertManager.handle(
             snapshot: RuntimeSnapshot(
@@ -381,11 +415,13 @@ struct nudgeTests {
                 accessibilityGranted: true,
                 manualPauseEnabled: false,
                 whitelistMatched: false,
+                schedulePaused: false,
                 suspended: false,
                 lastInputAt: nil
             )
         )
         #expect(presenter.hideCount == 1)
+        #expect(notificationManager.clearCount == 1)
     }
     
     @MainActor
