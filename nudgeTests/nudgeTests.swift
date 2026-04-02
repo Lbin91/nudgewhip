@@ -34,6 +34,20 @@ private final class TestEventMonitor: EventMonitoring {
     }
 }
 
+@MainActor
+private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
+    private(set) var isEnabled: Bool
+    
+    init(isEnabled: Bool = false) {
+        self.isEnabled = isEnabled
+    }
+    
+    func setEnabled(_ enabled: Bool) throws {
+        isEnabled = enabled
+    }
+}
+
+@Suite(.serialized)
 struct nudgeTests {
 
     @Test
@@ -235,6 +249,101 @@ struct nudgeTests {
         idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
         #expect(viewModel.systemImageName == "exclamationmark.circle")
         #expect(viewModel.countdownText(now: baseDate.addingTimeInterval(300)) == nil)
+    }
+    
+    @MainActor
+    @Test
+    func onboardingStorageTracksCompletionResumeAndDraft() {
+        let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.storage.\(UUID().uuidString)")!
+        let storage = OnboardingStorage(defaults: defaults, requiredVersion: 2)
+        
+        #expect(storage.shouldPresentOnboarding)
+        #expect(storage.resumeStep == nil)
+        #expect(storage.savedDraft == nil)
+        
+        let draft = OnboardingDraft(
+            idleThresholdSeconds: 600,
+            launchAtLoginEnabled: true,
+            ttsEnabled: false,
+            petPresentationMode: .minimal
+        )
+        storage.saveDraft(draft)
+        storage.saveResumeStep(.basicSetup)
+        
+        #expect(storage.savedDraft == draft)
+        #expect(storage.resumeStep == .basicSetup)
+        
+        storage.markCompleted()
+        
+        #expect(!storage.shouldPresentOnboarding)
+        #expect(storage.resumeStep == nil)
+        #expect(storage.savedDraft == nil)
+    }
+    
+    @MainActor
+    @Test
+    func onboardingViewModelPersistsSelectionsAndTransitions() throws {
+        let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.viewmodel.\(UUID().uuidString)")!
+        let storage = OnboardingStorage(defaults: defaults)
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let launchAtLoginManager = TestLaunchAtLoginManager()
+        var didFinish = false
+        let viewModel = OnboardingViewModel(
+            storage: storage,
+            modelContainer: container,
+            permissionManager: permissionManager,
+            launchAtLoginManager: launchAtLoginManager
+        ) {
+            didFinish = true
+        }
+        
+        viewModel.continueFromWelcome()
+        viewModel.requestPermission()
+        #expect(viewModel.step == .basicSetup)
+        
+        viewModel.idleThresholdSeconds = 600
+        viewModel.ttsEnabled = false
+        viewModel.launchAtLoginEnabled = true
+        viewModel.petPresentationMode = .minimal
+        viewModel.continueFromBasicSetup()
+        #expect(viewModel.step == .completionReady)
+        
+        viewModel.finish()
+        #expect(didFinish)
+        #expect(launchAtLoginManager.isEnabled)
+        
+        let settings = try container.mainContext.fetch(FetchDescriptor<UserSettings>())
+        #expect(settings.first?.idleThresholdSeconds == 600)
+        #expect(settings.first?.ttsEnabled == false)
+        #expect(settings.first?.petPresentationMode == .minimal)
+        #expect(!storage.shouldPresentOnboarding)
+    }
+    
+    @MainActor
+    @Test
+    func onboardingViewModelPreservesDraftOnBasicSetupWindowClose() throws {
+        let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.close.\(UUID().uuidString)")!
+        let storage = OnboardingStorage(defaults: defaults)
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let viewModel = OnboardingViewModel(
+            storage: storage,
+            modelContainer: container,
+            permissionManager: permissionManager,
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+        
+        viewModel.continueFromWelcome()
+        viewModel.requestPermission()
+        viewModel.idleThresholdSeconds = 180
+        
+        let shouldStartApp = viewModel.handleWindowClose()
+        
+        #expect(shouldStartApp)
+        #expect(storage.resumeStep == .basicSetup)
+        #expect(storage.savedDraft?.idleThresholdSeconds == 180)
+        #expect(storage.shouldPresentOnboarding)
     }
 
 }

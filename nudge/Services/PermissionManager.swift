@@ -14,8 +14,8 @@ enum AccessibilityPermissionState: String, CaseIterable, Sendable {
     case denied
 }
 
-typealias AccessibilityTrustCheck = @Sendable (_ promptIfNeeded: Bool) -> Bool
-typealias AccessibilitySettingsOpener = @Sendable (_ url: URL) -> Bool
+typealias AccessibilityTrustCheck = @MainActor @Sendable (_ promptIfNeeded: Bool) -> Bool
+typealias AccessibilitySettingsOpener = @MainActor @Sendable (_ url: URL) -> Bool
 
 @MainActor
 @Observable

@@ -10,7 +10,11 @@ import SwiftData
 
 @main
 struct NudgeApp: App {
-    @State private var menuBarViewModel = MenuBarViewModel()
+    @State private var menuBarViewModel = NudgeAppController.shared.menuBarViewModel
+    
+    init() {
+        NudgeAppController.shared.startup()
+    }
     
     private var menuTitle: String {
         localizedAppString("app.menu.title", defaultValue: "Nudge")
@@ -22,11 +26,16 @@ struct NudgeApp: App {
     
     var body: some Scene {
         MenuBarExtra(menuTitle, systemImage: menuBarViewModel.systemImageName) {
-            // 이 안에 메뉴바 아이콘을 클릭했을 때 나올 UI를 넣어주면 돼.
             ContentView(menuBarViewModel: menuBarViewModel)
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                     menuBarViewModel.refreshPermission()
                 }
+            
+            Divider()
+            
+            Button(localizedAppString("menu.action.open_onboarding", defaultValue: "Open setup guide")) {
+                NudgeAppController.shared.presentOnboarding()
+            }
             
             Divider()
             
