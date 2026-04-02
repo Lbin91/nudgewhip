@@ -37,13 +37,16 @@
 
 ### 3.1 State Set
 
-| State | Meaning | Visual Cue |
-|---|---|---|
-| `active` | 정상 모니터링 | 채워진 중심점 + 얇은 궤도 |
-| `rest` | 휴식 모드 | 완화된 곡선 + 낮은 대비 |
-| `alert` | 알림 진행 중 | 더 강한 궤도 + 명확한 강조 |
-| `limitedNoAX` | 권한 부족 | 점선 또는 경고 마크 |
-| `pausedWhitelist` | 예외 앱 감지 | 얇은 정지선 또는 체크형 보조 |
+> 상태명은 `docs/app/spec.md` 5.1 Runtime States 기준. 6개 상태를 Phase 1 필수(4개)와 Phase 2 추가(2개)로 구분한다.
+
+| State | Phase | Meaning | Color Guide | Shape Example |
+|---|---|---|---|---|
+| `monitoring` | **1** | 정상 모니터링 — 입력 유휴 타이머 동작 중 | 기본 전경색 (템플릿 렌더링) | 채워진 중심점 + 얇은 궤도 |
+| `alerting` | **1** | 알림 단계 진행 중 — 에스컬레이션 활성 | 강조 전경색 (윤곽 대비 우선) | 더 강한 궤도 + 명확한 강조 요소 |
+| `pausedManual` | **1** | 사용자 수동 휴식 모드 | 낮은 대비, 보조색 | 완화된 곡선 + 일시정지 표시 |
+| `limitedNoAX` | **1** | Accessibility 미허용 제한 모드 | 경고 보조색 | 점선 궤도 또는 경고 마크 |
+| `pausedWhitelist` | **2** | 전면 활성 앱이 화이트리스트에 포함 | 기본 전경색, 체크 보조 | 얇은 정지선 또는 체크형 보조 |
+| `suspendedSleepOrLock` | **2** | sleep/lock/user switching으로 감지 중단 | 무채색, 가장 낮은 대비 | 궤도 생략 + 점만 표시 또는 빈 실루엣 |
 
 ### 3.2 Rendering Rules
 
@@ -55,46 +58,49 @@
 ### 3.3 Template Strategy
 
 - 상태 아이콘은 template rendering을 전제로 한다.
-- `active`, `rest`, `alert`, `limitedNoAX`는 동일한 실루엣 계열을 유지한다.
+- `monitoring`, `alerting`, `pausedManual`, `limitedNoAX`는 동일한 실루엣 계열을 유지한다.
 - 상태 변화 시 외형이 급격히 바뀌지 않도록 한다.
 
 ## 4. Badge and Glyph Rules
 
 - 숫자 배지는 최소 사용한다.
 - 가능한 경우 상태 전환과 아이콘 형태만으로 표현한다.
-- `alert`에서는 빨간색 자체보다 윤곽 대비를 먼저 강화한다.
-- `rest`는 눈에 띄지만 공격적이지 않게 유지한다.
+- `alerting`에서는 빨간색 자체보다 윤곽 대비를 먼저 강화한다.
+- `pausedManual`은 눈에 띄지만 공격적이지 않게 유지한다.
 
 ## 5. Geometry
 
-- 기본 stroke width는 1.5px 기준.
+- 아이콘 기본 stroke: 1px (design-system.md 토큰 참조), 강조 요소 stroke: 1.5px.
 - 캡과 조인 형태는 round를 기본으로 한다.
 - 아이콘은 24px 그리드 기준으로 설계한다.
 - 모든 상태 변형은 같은 중심과 safe area를 공유한다.
 
 ## 6. Export Matrix
 
-| Use | Size | Format | Notes |
-|---|---|---|---|
-| macOS app icon | 1024 | PDF + SVG source | App Store/asset catalog |
-| menu bar icon | 16, 18, 20, 22 | PDF | template-friendly |
-| settings preview | 128, 256 | PNG | docs and QA |
-| landing preview | 512, 1024 | PNG/WebP | marketing use only |
+| Use | Size | Format | Background | Notes |
+|---|---|---|---|---|
+| macOS app icon | 1024 | PDF + SVG source | 불투명 (불필요 시 투명) | App Store/asset catalog |
+| menu bar icon | 16, 18, 20, 22 | PDF | 투명 (template rendering) | template-friendly |
+| settings preview | 128, 256 | PNG | 투명 + 불투명 양쪽 변형 | docs and QA |
+| landing preview | 512, 1024 | PNG/WebP | 불투명 배경 | marketing use only |
 
 ## 7. Naming Convention
 
 - App icon: `app-icon/{variant}`
 - Menu bar icon: `menu-bar/{state}`
 - 상태별 파일명은 `kebab-case`를 사용한다.
-- 예: `menu-bar/alert.svg`, `menu-bar/limited-no-ax.svg`
+- 예: `menu-bar/alerting.svg`, `menu-bar/limited-no-ax.svg`, `menu-bar/suspended-sleep-or-lock.svg`
 
 ## 8. QA Checklist
 
-- 16px에서 실루엣이 무너지지 않는다.
-- light/dark 모두 대비가 충분하다.
+- 16px 렌더링 시 최소 1px 유효 stroke 유지, 실루엣이 무너지지 않는다.
+- light/dark 모두 대비 3:1 이상 유지한다.
 - `limitedNoAX`는 권한 부족 상태가 명확하다.
-- `alert`와 `rest`가 색만으로만 달라 보이지 않는다.
+- `alerting`과 `pausedManual`이 색만으로 달라 보이지 않는다 — 형태 차이로 구분 가능해야 한다.
 - App icon은 메뉴바 아이콘과 혼동되지 않는다.
+- `suspendedSleepOrLock`은 다른 상태와 명확히 구분되면서도 시각적 노이즈가 아니다.
+- 18px 이하 크기에서 내부 디테일(점선, 보조 마크)이 번지지 않는다.
+- 투명 배경 변형이 임의 배경색 위에서도 윤곽이 유지된다.
 
 ## 9. Handoff Notes
 

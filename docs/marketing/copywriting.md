@@ -37,6 +37,8 @@
 
 ## 5. App Store Copy
 
+> **주의**: Apple Review Guidelines 대응을 위해 "beta" 대신 "Early Access" 또는 "Preview"를 사용한다. App Store metadata, social 카피, email 카피에서 동일하게 적용한다.
+
 ### 5.1 Short Description
 
 - KR: 입력이 멈춘 순간을 감지해 부드럽게 작업으로 돌아오게 하는 macOS 메뉴바 앱
@@ -63,8 +65,8 @@
 
 ### 6.1 Launch Post
 
-- KR: Nudge는 딴짓을 막는 앱이 아닙니다. 입력이 멈춘 순간을 감지해, 바로 돌아오게 하는 macOS 메뉴바 앱입니다. 기다리던 beta가 열렸습니다.
-- EN: Nudge is not a blocker. It detects idle moments and nudges you back to work, right from the macOS menu bar. Beta is open.
+- KR: Nudge는 딴짓을 막는 앱이 아닙니다. 입력이 멈춘 순간을 감지해, 바로 돌아오게 하는 macOS 메뉴바 앱입니다. 기다리던 Early Access가 열렸습니다.
+- EN: Nudge is not a blocker. It detects idle moments and nudges you back to work, right from the macOS menu bar. Early Access is open.
 
 ### 6.2 Feature Post
 
@@ -80,18 +82,33 @@
 
 ### 7.1 Waitlist Confirmation
 
-- KR: Nudge 대기자 명단에 등록되었습니다. beta가 열리면 가장 먼저 알려드리겠습니다.
-- EN: You are on the Nudge waitlist. We will let you know first when beta opens.
+- KR: Nudge 대기자 명단에 등록되었습니다. Early Access가 열리면 가장 먼저 알려드리겠습니다.
+- EN: You are on the Nudge waitlist. We will let you know first when Early Access opens.
 
-### 7.2 Beta Invitation
+### 7.2 Early Access Invitation
 
-- KR: Nudge beta를 먼저 써보실 수 있습니다. Mac 메뉴바에서 바로 동작하고, 전역 입력 활동만 사용합니다.
-- EN: You can try the Nudge beta first. It lives in the Mac menu bar and uses only global input activity.
+- KR: Nudge Early Access를 먼저 써보실 수 있습니다. Mac 메뉴바에서 바로 동작하고, 전역 입력 활동만 사용합니다.
+- EN: You can try the Nudge Early Access first. It lives in the Mac menu bar and uses only global input activity.
 
 ### 7.3 Pro Launch
 
 - KR: Pro가 열렸습니다. iPhone 연동, 예외 제어, 상세 통계를 한 번에 사용할 수 있습니다.
 - EN: Pro is live. Get iPhone follow-up, exception controls, and detailed stats in one place.
+
+### 7.4 Welcome (첫 실행 후)
+
+- KR: Nudge를 설치해 주셔서 감사합니다. 첫 번째 idle 감지가 완료되면, 복귀 성공 알림을 보내드립니다. Accessibility 권한을 아직 승인하지 않으셨다면 설정에서 활성화해 주세요.
+- EN: Thanks for installing Nudge. Once your first idle detection completes, you will get a recovery confirmation. If you have not granted Accessibility permission yet, please enable it in Settings.
+
+### 7.5 Re-engagement (3일 미접속)
+
+- KR: 잠시 Nudge를 사용하지 않으셨네요. 메뉴바에서 바로 다시 시작할 수 있습니다. 이전 기록은 그대로 유지됩니다.
+- EN: It has been a few days since your last Nudge session. You can resume right from the menu bar. Your previous data is still intact.
+
+### 7.6 Pro Trial Expiring (만료 3일 전)
+
+- KR: Pro 체험이 3일 후에 종료됩니다. iPhone 연동과 상세 통계를 계속 사용하려면 Pro로 업그레이드해 주세요.
+- EN: Your Pro trial expires in 3 days. Upgrade to Pro to keep iPhone follow-up, detailed stats, and more.
 
 ## 8. Waitlist Copy
 
@@ -108,3 +125,33 @@
 - hero, web CTA, email, and app store copy는 같은 핵심 문장을 공유한다
 - KR/EN은 의미를 맞추되 직역에 묶이지 않는다
 - 길이가 길어질 경우 부가 설명을 빼고 핵심 가치만 남긴다
+
+## 10. ASO (App Store Optimization)
+
+### 10.1 Keyword Field 전략
+
+- Primary keywords: `focus timer`, `productivity`, `attention`, `distraction`, `idle detection`
+- Secondary keywords: `pomodoro`, `screen time`, `concentration`, `work timer`, `menu bar`
+- Long-tail: `mac menu bar focus`, `idle alert mac`, `attention recall`
+- 키워드는 title/subtitle에 이미 포함된 단어를 중복 배치하지 않는다.
+
+### 10.2 카테고리
+
+- Primary Category: `Productivity`
+- Secondary Category: `Lifestyle` (검토)
+
+### 10.3 Subtitle 최적화
+
+- KR: 입력이 멈춘 순간, 다시 작업으로
+- EN: Idle moment detected. Back to work.
+- Subtitle은 30자(EN) / 15자(KR) 이내로 유지한다.
+
+## 11. Privacy 카피 블록 (랜딩 페이지 전용)
+
+- KR: Nudge는 키 입력 내용을 저장하거나 전송하지 않습니다. 화면을 캡처하지 않습니다. Accessibility 권한은 전역 입력 활동 감지에만 사용되며, 입력 내용 자체는 수집되지 않습니다. 모든 감지는 Mac에서 로컬로 동작합니다.
+- EN: Nudge does not store or transmit keystroke content. It does not capture your screen. Accessibility permission is used solely for global input activity detection, not content collection. All detection runs locally on your Mac.
+- CloudKit 관련: KR "iOS 연동 기능 사용 시에만 상태 동기화에 CloudKit을 사용합니다." / EN "CloudKit is used only for state sync when iOS companion is enabled."
+
+## 12. CTA 관리
+
+- **"View on GitHub" CTA**: GitHub 저장소 공개 시점에 따라 CTA 활성화. Prelaunch에서는 비활성화 또는 "Coming Soon"으로 대체.

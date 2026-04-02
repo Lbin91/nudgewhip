@@ -19,6 +19,21 @@
 
 ## 3. Timeline
 
+### Phase Duration (예상)
+
+| Phase | 기간 | 비고 |
+|---|---|---|
+| Prelaunch | 4주 | 카피/디자인/웹/현지화 정렬 |
+| Beta | 8주 | 초기 사용자 확보, 피드백 수집, 리텐션 검증 |
+| Pro Launch | 4주 | Pro 전환, iOS 연동 메시징, 유료화 |
+
+### Phase Transition Gates
+
+| Gate | 진입 조건 | 검증 시점 |
+|---|---|---|
+| Beta 진입 | landing page 배포 완료 + waitlist 100명 이상 | Prelaunch 종료 시 |
+| Pro Launch 진입 | Beta D7 retention > 30% + critical bug 0개 + waitlist 500명 | Beta 종료 시 |
+
 ### 3.1 Prelaunch
 
 | Workstream | Goal | Deliverable | Owner | KPI |
@@ -72,18 +87,19 @@
 
 ### 5.1 Prelaunch KPIs
 
-- Waitlist conversion rate
+- Waitlist conversion rate: 목표 >15%, 최소 5%, 위험 <2%
 - GitHub click-through rate
-- permission onboarding completion rate
+- permission onboarding completion rate: 목표 >70%, 최소 50%, 위험 <30%
 - KR/EN page parity pass rate
 
 ### 5.2 Beta KPIs
 
 - Activation rate: idle detection 첫 성공 경험 비율
-- D7 retention
-- permission grant rate
+- D7 retention: 목표 >40%, 최소 25%, 위험 <15%
+- permission grant rate: 목표 >70%, 최소 50%, 위험 <30%
 - alert recovery rate
 - feedback completion rate
+- D30 retention: 목표 >20%, 최소 10%, 위험 <5%
 
 ### 5.3 Pro Launch KPIs
 

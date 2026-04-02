@@ -157,6 +157,60 @@
 - 포커스 링은 명확해야 하며 배경에 묻히면 안 된다.
 - 터치 타깃은 최소 44px을 기준으로 한다.
 
+### 7.1 WCAG 2.1 대비율 검증
+
+WCAG 2.1 상대 휘도 공식으로 계산. 기준일: 2026-04-02.
+
+#### Light Mode
+
+| 조합 | 전경 | 배경 | 대비율 | AA (4.5:1) | AAA (7:1) |
+|---|---|---|---|---|---|
+| text.primary / bg.canvas | `#141A21` | `#F7F3EC` | 15.83 | PASS | PASS |
+| text.secondary / bg.canvas | `#596273` | `#F7F3EC` | 5.55 | PASS | FAIL |
+| text.muted / bg.canvas | `#7B8596` | `#F7F3EC` | 3.37 | **FAIL** | FAIL |
+| text.primary / bg.surface | `#141A21` | `#FFFDF9` | 17.23 | PASS | PASS |
+| text.secondary / bg.surface | `#596273` | `#FFFDF9` | 6.04 | PASS | FAIL |
+| text.muted / bg.surface | `#7B8596` | `#FFFDF9` | 3.67 | **FAIL** | FAIL |
+| alert / bg.canvas | `#E35D3D` | `#F7F3EC` | 3.22 | **FAIL** | FAIL |
+| focus / bg.canvas | `#1E8E7E` | `#F7F3EC` | 3.63 | **FAIL** | FAIL |
+
+#### Dark Mode
+
+| 조합 | 전경 | 배경 | 대비율 | AA (4.5:1) | AAA (7:1) |
+|---|---|---|---|---|---|
+| text.primary / bg.canvas | `#F5F7FA` | `#0F1318` | 17.37 | PASS | PASS |
+| text.secondary / bg.canvas | `#A7B0BF` | `#0F1318` | 8.53 | PASS | PASS |
+| text.muted / bg.canvas | `#758095` | `#0F1318` | 4.68 | PASS | FAIL |
+| text.primary / bg.surface | `#F5F7FA` | `#161C23` | 15.98 | PASS | PASS |
+| text.secondary / bg.surface | `#A7B0BF` | `#161C23` | 7.84 | PASS | PASS |
+| alert / bg.canvas | `#FF8A68` | `#0F1318` | 8.07 | PASS | PASS |
+| focus / bg.canvas | `#47C4B0` | `#0F1318` | 8.69 | PASS | PASS |
+
+#### 불통과 조합 및 대체 색상 제안
+
+Light Mode에서 4개 조합이 AA 기준을 충족하지 않음.
+
+| 조합 | 현재 값 | 대비율 | 제안 값 | 제안 대비율 (canvas) | 비고 |
+|---|---|---|---|---|---|
+| text.muted / bg.canvas | `#7B8596` | 3.37 | `#5F6D82` | 4.75 | AA 통과 |
+| text.muted / bg.surface | `#7B8596` | 3.67 | `#5F6D82` | 5.17 | AA 통과 |
+| alert / bg.canvas | `#E35D3D` | 3.22 | `#B84525` | 4.85 | 일반 텍스트 AA 통과; 큰 텍스트(≥18pt)면 `#C44A2A` (4.35:1)도 가능 |
+| focus / bg.canvas | `#1E8E7E` | 3.63 | `#167A6C` | 4.71 | 동일 색조 어둡게 조정 |
+
+> Dark Mode는 모든 조합이 AA를 통과함. text.muted (`#758095`)는 AAA에는 미달하나 AA는 통과.
+
+### 7.2 Content State — 컬러 토큰 매핑
+
+| Content State | 컬러 토큰 | 비고 |
+|---|---|---|
+| Focus | `focus` | 진행/활성 |
+| IdleDetected | `focus` (muted) | 가벼운 알림 |
+| GentleNudge | `focus` (stronger) | 경고 |
+| StrongNudge | `alert` | 강한 경고 |
+| Recovery | `focus` (bright) | 복귀 축하 |
+| Break | `rest` | 휴식 |
+| RemoteEscalation | `alert` (urgent) | 긴급 |
+
 ## 8. Asset Pipeline
 
 ### 8.1 Source and Export

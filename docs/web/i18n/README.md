@@ -14,7 +14,7 @@
 
 - Supported locales: `ko`, `en`
 - Fallback locale: `en`
-- Locale selection priority: user browser locale -> explicit route or param -> fallback
+- Locale selection: route-based (`/en/`, `/ko/`) — confirmed. See `route-map.md` for detection priority and routing rules.
 - 미지원 언어는 영어로 보여준다
 
 ## 3. Content Ownership
@@ -22,16 +22,16 @@
 | Surface | Owner | Notes |
 |---|---|---|
 | Hero and CTA | `marketing-strategist` | same core claim in both locales |
-| Privacy and permission copy | `localization` + `macos-core` | must match app disclosure meaning |
+| Privacy and permission copy | `localization` + `content-strategist` | must match app disclosure meaning |
 | Product feature copy | `marketing-strategist` + `content-strategist` | align with app terminology |
 | Technical FAQ | `web-dev` + `localization` | no unsupported claims |
 
-## 4. File Layout Recommendation
+## 4. File Layout
 
-- `docs/web/i18n/ko.md`
-- `docs/web/i18n/en.md`
-- `docs/web/i18n/glossary.md`
-- `docs/web/i18n/route-map.md`
+- `docs/web/i18n/ko.md` — Korean landing page content skeleton
+- `docs/web/i18n/en.md` — English landing page content skeleton
+- `docs/web/i18n/route-map.md` — Multilingual routing map (route-based: `/en/`, `/ko/`)
+- Glossary is shared with the app: `docs/localization/glossary.md` (separate file not created)
 
 ## 5. Key Structure
 
@@ -47,7 +47,7 @@
 
 - title, description, og:title, og:description은 locale별로 관리한다
 - canonical은 locale별 페이지를 정확히 가리킨다
-- og:image는 locale에 따라 문구를 바꿀 수 있지만, 핵심 메시지는 동일해야 한다
+- og:image는 locale에 따라 문구를 바꿀 수 있지만, 핵심 메시지는 동일해야 한다 (권장 크기: 1200x630)
 - hreflang 또는 equivalent locale hints를 제공한다
 
 ## 7. Translation Workflow

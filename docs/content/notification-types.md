@@ -5,6 +5,8 @@
 - Owner: `content-strategist`
 - Scope: `P0` implementation contract for alert taxonomy and escalation
 
+> **Cross-document Reference** — 이 문서의 타입명은 `character-design-brief.md` 및 `dialogue-pool.md`의 슬롯명과 아래 **Notification Type — Dialogue Slot Mapping** 섹션의 매핑 테이블로 연결된다.
+
 ## 1. Purpose
 
 - 이 문서는 Nudge의 알림 종류, 발동 조건, 에스컬레이션, 피로도 제한, 접근성 원칙을 정의한다.
@@ -122,3 +124,21 @@
 - 구현은 알림 상태를 코드상 enum으로 고정하고, 단계별 카피 슬롯을 분리해야 한다.
 - 알림 종류는 UI와 로직이 섞이지 않도록 presentation layer와 trigger layer를 분리해야 한다.
 - TTS 호출은 큐 중첩을 금지하고, 입력 복귀 시 즉시 cancel 가능해야 한다.
+
+## 10. Notification Type — Dialogue Slot Mapping
+
+- 이 매핑은 `character-design-brief.md`의 **State-to-Emotion Mapping** (Section 3.3) 및 **Dialogue Slot Linkage** (Section 5.1)과 일치해야 한다.
+- 캐릭터 감정 열은 `character-design-brief.md` Section 3.1의 Canonical Emotion States를 따른다.
+
+| Notification Type | Dialogue Slot | 캐릭터 감정 | 비고 |
+|---|---|---|---|
+| `perimeterPulse` | `idle_notice` | cheer (mild) | 1차 시각 넛지 |
+| `strongVisualNudge` | `strong_warning` | sad (mild) + cheer | 2차 강화 넛지 |
+| `ttsNudge` | `tts_line` | cheer (active) | 음성 보조 채널 |
+| `remoteEscalation` | `remote_escalation` | sad (mild) | iOS 원격 에스컬레이션 |
+| `breakSuggestion` | `break_suggestion` | sleep | 휴식 제안 |
+| (복귀 감지 시) | `recovery_cheer` | happy (strong) | 복귀 축하 |
+| (GentleNudge) | `gentle_warning` | cheer (active) | 1.5차 경고 |
+
+- `recovery_cheer` 슬롯은 `dialogue-pool.md`의 `recovery` 슬롯에 대응하며, 복귀 감지 시 자동 발화한다.
+- `gentle_warning`은 `perimeterPulse`와 `strongVisualNudge` 사이의 선택적 중간 단계에서 사용한다.

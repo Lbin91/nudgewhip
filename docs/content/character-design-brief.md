@@ -55,13 +55,23 @@
 
 ### 3.3 State-to-Emotion Mapping
 
-- `Focus` -> `happy`
-- `IdleDetected` -> `cheer`
-- `GentleNudge` -> `cheer`
-- `StrongNudge` -> `sad`를 약하게 섞은 응원 표정
-- `Recovery` -> `happy`
-- `Break` -> `sleep`
-- `RemoteEscalation` -> `cheer` + 약한 urgency
+spec.md Content State와 캐릭터 감정의 공식 매핑. 동일 감정이 연속되는 경우 강도(intensity)로 구분한다.
+
+| Content State | Emotion | 강도 | 비고 |
+|---|---|---|---|
+| `Focus` | `happy` | 기본 | 집중 중 긍정 피드백 |
+| `IdleDetected` | `cheer` | mild | 가벼운 응원으로 복귀 유도 |
+| `GentleNudge` | `cheer` | active | 더 적극적 응원 |
+| `StrongNudge` | `sad` | mild | 약한 실망감 + 응원 혼합 |
+| `Recovery` | `happy` | strong | 복귀 축하 |
+| `Break` | `sleep` | 기본 | 휴식 모드 |
+| `RemoteEscalation` | `sad` | mild | 걱정 표현 |
+
+**강도 구분 원칙:**
+- `mild`: 작은 몸짓, 짧은 시선 이동, 미세한 표정 변화
+- `active`: 손짓, 앞을 바라보는 자세, 명확한 표정 변화
+- `strong`: 밝은 미소, 짧은 박수 반응, 안정적 정지
+- `기본`: 해당 감정의 표준 표현
 
 ## 4. Growth Stages
 
@@ -85,9 +95,26 @@
 - `buddy` -> `guide`: 장기 streak 또는 일일 요약 목표 달성
 - 단계 전환은 과한 축하보다 짧은 확인 문구와 함께 제공한다.
 
-## 5. Dialogue Slot Linkage
+## 5. Free/Pro Pet Visibility
 
-### 5.1 Slot Mapping
+gamification-system.md의 Free/Pro 경계와 일치하는 캐릭터 가시성 정의.
+
+| 항목 | Free | Pro |
+|---|---|---|
+| 성장 단계 | `sprout` 고정 | `sprout` → `buddy` → `guide` 성장 |
+| 감정 표현 | `happy`, `cheer`, `sleep` (3가지) | `happy`, `cheer`, `sad`, `sleep` (4가지 전체) |
+| `sad` 감정 | 사용하지 않음 | StrongNudge, RemoteEscalation에서 표현 |
+| 커스텀 액세서리 | 없음 | 레벨/성장에 따른 액세서리 해금 |
+| 펫 상세 화면 | 기본 상태만 표시 | 성장 이력, 액세서리, 상세 상태 |
+
+**설계 원칙:**
+- Free 사용자에게도 캐릭터는 보이지만, `sad` 감정이 없으므로 StrongNudge에서도 `cheer`(active)로만 대응한다.
+- Pro 사용자의 `sad` 감정은 비난이 아닌 걱정/응원 혼합 톤으로 유지한다 (3.2 Expression Rules 참조).
+- Free에서 Pro 전환 시 즉시 `sad` 감정과 성장 시스템이 활성화된다.
+
+## 6. Dialogue Slot Linkage
+
+### 6.1 Slot Mapping
 
 | Slot | Character Behavior |
 |---|---|
@@ -102,13 +129,13 @@
 | `level_up` | 작은 성장 연출, 과한 폭발 이펙트 금지 |
 | `remote_escalation` | 다른 기기 알림을 암시하는 연결 반응 |
 
-### 5.2 Timing Rules
+### 6.2 Timing Rules
 
 - 캐릭터 리액션은 알림 텍스트보다 먼저 길게 설명하지 않는다.
 - 대사와 애니메이션은 1:1이 아니라 `짧은 반응 + 한 줄 카피` 구조를 기본으로 한다.
 - 동일 슬롯 내 반복은 되도록 표정 변주로 풀고, 문구 재사용은 줄인다.
 
-## 6. Prohibitions
+## 7. Prohibitions
 
 - 감시자, 교관, 처벌자처럼 보이는 연출 금지
 - 울거나 죄책감을 유발하는 과도한 연출 금지
@@ -117,9 +144,9 @@
 - 너무 아기자기한 유아풍 스타일로만 고정되는 것 금지
 - 사용자 행동을 비난하거나 평가하는 표정 금지
 
-## 7. Asset Handoff
+## 8. Asset Handoff
 
-### 7.1 Deliverables for Visual Designer
+### 8.1 Deliverables for Visual Designer
 
 - 캐릭터 기본 실루엣
 - Stage 1~3별 포즈 가이드
@@ -127,7 +154,7 @@
 - 메뉴바 축약형 아이콘/실루엣
 - 기본 색상 팔레트와 경계선 처리 기준
 
-### 7.2 Deliverables for SwiftUI Designer
+### 8.2 Deliverables for SwiftUI Designer
 
 - 상태별 애니메이션 트리거 목록
 - 캐릭터 표시 크기별 대응 규칙
@@ -135,22 +162,22 @@
 - 메뉴바 드롭다운용 정적 버전과 overlay용 동적 버전
 - Reduce Motion 대응 대체 동작
 
-### 7.3 File Format Guidance
+### 8.3 File Format Guidance
 
 - 기본 비주얼 산출물은 SVG 또는 PDF 벡터 우선
 - 애니메이션은 SwiftUI native 또는 Lottie 중 하나를 명시해야 한다
 - 모든 파일은 상태명과 stage명을 포함한 규칙적 네이밍을 사용한다
 
-## 8. Animation Cues
+## 9. Animation Cues
 
-### 8.1 Motion Principles
+### 9.1 Motion Principles
 
 - 작은 움직임이 우선이다.
 - 상태 전환은 0.2~0.6초 범위의 짧은 리액션을 기본으로 한다.
 - 반복 루프는 단순하고 피로감이 없어야 한다.
 - 사용자를 압박하는 흔들림이나 급격한 확대는 피한다.
 
-### 8.2 Suggested Motions
+### 9.2 Suggested Motions
 
 - `focus_start`: 가볍게 고개를 들고 자리 잡기
 - `idle_notice`: 시선 이동 또는 작은 귀/몸짓 변화
@@ -161,12 +188,12 @@
 - `streak_reward`: 짧은 박수 또는 반짝임 1회
 - `level_up`: 짧은 성장 연출 후 정지
 
-### 8.3 Accessibility Motion Rule
+### 9.3 Accessibility Motion Rule
 
 - `Reduce Motion`이 켜져 있으면 캐릭터는 정적 상태 또는 미세한 opacity 변화만 사용한다.
 - 초당 반복되는 루프는 접근성 옵션과 충돌하지 않도록 제한한다.
 
-## 9. Localization Notes
+## 10. Localization Notes
 
 - 캐릭터 이름은 아직 고정하지 않는다. 이름을 먼저 고정하면 번역과 브랜드 조정이 경직될 수 있다.
 - 대사는 `dialogue-pool.md`의 canonical line을 우선 사용한다.
@@ -175,7 +202,7 @@
 - 지나치게 의인화된 말투보다 짧고 명확한 반응이 더 중요하다.
 - 신규 언어 추가 시 표정과 동작이 문구보다 먼저 의미를 전달해야 한다.
 
-## 10. Open Questions
+## 11. Open Questions
 
 - 캐릭터를 완전한 동물형으로 갈지, 약간의 기계적 요소를 섞을지
 - Stage 3를 초기 릴리즈에 포함할지 후속 업데이트로 둘지
