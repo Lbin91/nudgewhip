@@ -1,16 +1,14 @@
 {
   "images" : [
     {
-      "filename" : "MenuBarIcon_16.png",
+      "filename" : "bell_1x1_black-2.png",
       "idiom" : "mac",
-      "scale" : "1x",
-      "size" : "16x16"
+      "scale" : "1x"
     },
     {
-      "filename" : "MenuBarIcon_32.png",
+      "filename" : "bell_1x1_black.png",
       "idiom" : "mac",
-      "scale" : "2x",
-      "size" : "16x16"
+      "scale" : "2x"
     }
   ],
   "info" : {
