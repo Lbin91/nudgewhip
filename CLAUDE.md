@@ -66,7 +66,7 @@ docs/
 
 ## Agent Team (Harness) — Multi-Tool Compatible
 
-9-agent team for coordinated development. Agent definitions in `.claude/agents/`.
+10-agent team for coordinated development. Agent definitions in `.claude/agents/`.
 
 ### Claude Code에서 실행
 
@@ -88,6 +88,7 @@ docs/
 | `marketing-strategist` | 런칭 전략, 카피, 경쟁 분석 | `docs/marketing/*.md` |
 | `content-strategist` | 알림 종류, 캐릭터 설정, 게이미피케이션 | `docs/content/*.md` |
 | `visual-designer` | 캐릭터 디자인, 아이콘, 컬러 시스템 | `docs/design/*.md` |
+| `localization` | 다국어 현지화 (i18n/l10n), String Catalog | `nudge/Localizable.xcstrings`, `docs/localization/*.md` |
 | `web-dev` | 사전 홍보 랜딩 페이지 | `docs/web/*` |
 
 **실행 순서 (의존성 기반):**
@@ -106,7 +107,8 @@ Phase 2 (Phase 1 완료 후, 병렬):
 Phase 3 (Phase 2 완료 후, 병렬):
   [swiftui-designer]   → MenuBarExtra UI + 알림 시스템 (macos-core + visual-designer 완료 후)
   [cloudkit-sync]      → CloudKit 동기화 (data-architect + macos-core 완료 후)
-  [web-dev]            → 랜딩 페이지 (카피 + 디자인 완료 후)
+  [localization]       → String Catalog 다국어 현지화 (content + marketing 카피 완료 후)
+  [web-dev]            → 랜딩 페이지 (카피 + 디자인 + 현지화 완료 후)
 
 Phase 4 (Phase 3 완료 후):
   [qa-integrator]      → 단위 테스트 → 통합 테스트 → 최종 검증
