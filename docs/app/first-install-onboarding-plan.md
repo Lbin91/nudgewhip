@@ -1,0 +1,238 @@
+# First-install Onboarding Plan
+
+- Version: 0.1
+- Last Updated: 2026-04-03
+- Owner: `swiftui-designer` + `macos-core` + `localization`
+- Scope: macOS first-run onboarding and initial permission/setup flow for Nudge Phase 1
+
+## 1. Purpose
+
+- 메뉴바 앱 특성상 최초 실행 시 사용자가 “어디서 시작해야 하는지”를 놓치지 않게 한다.
+- Accessibility 권한의 필요성과 데이터 경계(무엇을 수집하지 않는지)를 먼저 설명한다.
+- Free Phase 1 기본 루프를 시작하는 데 필요한 최소 설정만 받고 빠르게 실제 사용 상태로 진입시킨다.
+- 권한을 거부해도 앱이 깨지지 않고 `limitedNoAX` 제한 모드로 계속 동작하게 한다.
+
+## 2. Why this is needed
+
+현재 구조에서는 사용자가 앱을 실행한 뒤 메뉴바 아이콘을 직접 열어 권한 요청 경로를 찾아야 한다.  
+이 방식은 아래 문제를 만든다.
+
+- 메뉴바 앱이라 메인 창이 없어 진입 경로가 불명확하다.
+- Accessibility 권한이 필요한 이유를 사용자가 충분히 이해하기 전에 이탈할 수 있다.
+- 권한을 거부했을 때 “앱이 고장 난 것처럼” 느껴질 수 있다.
+- 최초 기본 설정(`idle threshold`, `TTS`, `visual mode`)이 정리되지 않아 기본 경험이 불안정하다.
+
+따라서 최초 설치 시점에는 별도 온보딩 흐름이 필요하다.
+
+## 3. Product goals
+
+최초 설치 온보딩은 아래 5가지를 달성해야 한다.
+
+1. 제품 가치와 사용 맥락을 1~2 화면 안에 이해시킨다.
+2. Accessibility 권한 요청 전에 신뢰/프라이버시 메시지를 먼저 전달한다.
+3. Phase 1 실행에 필요한 최소 설정만 수집한다.
+4. 권한 허용/거부 어느 경로에서도 사용 가능한 종료 상태를 만든다.
+5. 다음 실행부터는 동일 플로우를 반복하지 않는다.
+
+## 4. Non-goals for MVP
+
+최초 설치 온보딩에서 아래 항목은 다루지 않는다.
+
+- whitelist 앱 설정
+- Pro 업그레이드/결제 유도
+- CloudKit / iCloud / iOS 연동 설정
+- 상세 통계 및 게이미피케이션 설정
+- 세부 알림 강도/에스컬레이션 튜닝
+- break mode 고급 정책
+
+## 5. First-run information architecture
+
+MVP는 **최대 4화면**으로 제한한다.
+
+### Screen 1 — Welcome
+
+목적:
+- Nudge가 어떤 앱인지 즉시 이해시킨다.
+
+표시 내용:
+- 제품명
+- 한 줄 설명
+  - 예: “무입력 상태를 감지하고 부드럽게 집중 복귀를 돕는 메뉴바 앱”
+- 신뢰 메시지 요약
+  - 키 입력 내용 수집 안 함
+  - 화면 내용/스크린 캡처 수집 안 함
+- Primary CTA: `시작하기`
+
+### Screen 2 — Accessibility Permission
+
+목적:
+- 권한이 필요한 이유와 거부 시 동작을 명확히 설명한다.
+
+표시 내용:
+- 권한 필요 이유
+  - 전역 입력 활동 감지를 위해 필요
+- 데이터 비수집 고지
+  - 키 입력 내용, 화면 내용, 파일, 메시지, 브라우징 기록 수집 안 함
+- 현재 권한 상태 badge
+- Primary CTA: `권한 요청`
+- Secondary CTA: `설정 열기`
+- Tertiary CTA: `나중에 설정`
+
+행동 결과:
+- 허용됨 → 다음 화면으로 진행
+- 거부됨 → 다음 화면으로 진행하되 `limitedNoAX` 경로로 분기
+
+### Screen 3 — Basic Setup
+
+목적:
+- Phase 1 기본 루프에 필요한 최소 설정만 고르게 한다.
+
+수집할 항목:
+- Idle threshold
+  - `3분`, `5분(추천)`, `10분`
+- TTS
+  - `켜기` / `끄기`
+- Visual mode
+  - `sprout`
+  - `minimal`
+
+설계 원칙:
+- 고급 옵션은 숨긴다.
+- 사용자 피로를 줄이기 위해 3개 이상 묻지 않는다.
+- 기본값은 즉시 usable 해야 한다.
+
+### Screen 4 — Completion
+
+권한 허용/거부에 따라 2가지 버전이 필요하다.
+
+#### 4.1 Granted variant
+
+표시 내용:
+- `모니터링 준비 완료`
+- 선택한 threshold / TTS / visual mode 요약
+- Primary CTA: `메뉴바에서 시작`
+
+종료 상태:
+- 앱은 `monitoring` 진입 준비 상태여야 한다.
+
+#### 4.2 Denied variant
+
+표시 내용:
+- `제한 모드로 시작`
+- 무엇이 제한되는지 설명
+  - 실제 전역 입력 감지가 완전하지 않음
+- Primary CTA: `메뉴바에서 계속`
+- Secondary CTA: `권한 다시 설정`
+
+종료 상태:
+- 앱은 `limitedNoAX` 상태를 명확히 노출해야 한다.
+
+## 6. What to collect on first install
+
+최초 설치에서 저장할 설정:
+
+- `UserSettings.idleThresholdSeconds`
+- `UserSettings.ttsEnabled`
+- `UserSettings.petPresentationMode`
+
+기기 로컬 플래그(`UserDefaults`)로 저장할 값:
+
+- onboarding completed 여부
+- 마지막으로 본 onboarding 버전
+
+최초 설치에서 저장하지 않을 값:
+
+- whitelist 목록
+- CloudKit preference
+- custom alert cadence
+- Pro entitlement 관련 사용자 선택
+
+## 7. Copy and disclosure rules
+
+온보딩 권한 화면의 문구는 아래 문서와 의미가 일치해야 한다.
+
+- `docs/privacy/accessibility-and-data-disclosure.md`
+- `docs/app/spec.md`
+- `docs/localization/glossary.md`
+
+필수 원칙:
+
+- KR/EN 의미 parity 유지
+- 사용자 비난 톤 금지
+- “실시간 보장”, “감시”, “추적” 같은 과장/위협 표현 금지
+- 권한 거부 시에도 앱이 계속 실행됨을 명시
+- 고지 문구는 `String Catalog (.xcstrings)` 단일 소스로 관리
+
+## 8. UX rules
+
+- 최대 4단계
+- 각 화면은 primary action 1개 중심으로 설계
+- 고정 폭 CTA 버튼 사용 금지
+- KR/EN 모두 2줄 래핑 허용
+- 제한 모드도 실패가 아니라 “부분 기능 사용 상태”로 표현
+- 온보딩 종료 후에도 메뉴/설정에서 다시 열 수 있어야 함
+
+## 9. State expectations
+
+온보딩 완료 시 상태 기대값:
+
+- Granted path
+  - `runtimeState = monitoring`
+  - `lastInputAt` baseline 준비
+  - idle countdown 시작 가능
+
+- Denied path
+  - `runtimeState = limitedNoAX`
+  - 제한 모드 UI 노출
+  - 설정 복귀 후 재검사 가능
+
+## 10. Acceptance Criteria
+
+- 최초 실행이고 AX 권한이 없으면 메뉴 탐색 전에 온보딩이 먼저 보인다.
+- 권한 허용/거부 어느 경우든 온보딩을 완료할 수 있다.
+- 권한 허용 시 monitoring 준비 상태로 진입한다.
+- 권한 거부 시 limited mode 안내와 복구 경로가 보인다.
+- 기본 설정 3개가 저장되고 다음 실행에 유지된다.
+- KR/EN 모두 문구가 disclosure 문서와 의미상 일치한다.
+- 다음 실행에서는 onboarding completed 플래그에 따라 반복 노출되지 않는다.
+
+## 11. Recommended implementation order
+
+1. `UserDefaults` 기반 onboarding completion/version flag 추가
+2. 온보딩 전용 container 및 step state 추가
+3. Permission screen에 기존 `PermissionManager` 흐름 재사용
+4. Basic setup 화면에서 `UserSettings` 저장 연결
+5. granted / denied completion 분기 추가
+6. 메뉴/설정에서 onboarding 재오픈 경로 추가
+7. KR/EN 로컬라이제이션 반영
+8. UI / permission flow 테스트 추가
+
+## 12. Verification plan
+
+Unit:
+- onboarding completed flag 저장/복원
+- initial setting persistence
+- permission state refresh after returning from Settings
+
+UI:
+- fresh install granted path
+- fresh install denied path
+- open-settings and return path
+- skip / set-up-later path
+- re-open onboarding path
+
+Localization:
+- KR/EN screenshot review
+- truncation critical issue 0
+- placeholder key exposure 0
+
+Manual:
+- 새 설치 → 권한 거부 → 제한 모드 진입 확인
+- 설정 앱에서 권한 허용 후 앱 복귀 → 상태 재검사 확인
+
+## 13. Open questions
+
+- 최초 온보딩을 full-screen window로 띄울지, 작은 setup window로 띄울지
+- 완료 화면에서 “메뉴바에서 시작” CTA가 실제로 어떤 행동을 해야 하는지
+- onboarding을 다시 여는 진입점을 메뉴바에 둘지 설정 화면에 둘지
+- 최초 기본값을 `5분 / TTS on / sprout`로 확정할지 여부
