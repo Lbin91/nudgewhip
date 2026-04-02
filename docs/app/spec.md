@@ -68,8 +68,8 @@
 
 ### 5.3 State Priority
 
-- `suspendedSleepOrLock` > `pausedManual` > `pausedWhitelist` > `alerting` > `monitoring`
-- `limitedNoAX`는 별도 capability gate로 동작하며, 감지 정확도 저하 상태를 항상 UI에 노출
+- `suspendedSleepOrLock` > `limitedNoAX` > `pausedManual` > `pausedWhitelist` > `alerting` > `monitoring`
+- `limitedNoAX`는 capability gate이자 우선순위 체인에 포함된다. 권한 없음이 monitoring보다 항상 우선한다.
 
 ## 6. Idle Detection and Alert Rules
 
@@ -157,7 +157,7 @@
 
 - CloudKit Private DB + custom zone `NudgeSync`
 - Core record: `MacState(macDeviceID)`
-- Core fields: `state`, `stateChangedAt`, `sequence`, `breakUntil`, `sourceDeviceID`
+- Core fields: `state`, `stateChangedAt`, `sequence`, `breakUntil`, `sourceDeviceID`, `lastAlertAt` (선택), `schemaVersion`
 
 ### 9.3 Write and Fetch Policy
 

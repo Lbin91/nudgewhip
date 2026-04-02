@@ -49,9 +49,28 @@
 - 일일 통계 카드
 - 연속 집중 알림
 
-## 4. Suggested Metrics
+## 4. Free/Pro 경계
 
-### 4.1 Session Metrics
+Phase 1 (macOS Free)과 Phase 2 (Pro)의 기능 경계를 정의한다. Free 사용자에게도 기본 집중 추적과 동기 부여를 제공하되, 심화 분석과 펫 성장은 Pro로 유도한다.
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| 기본 일일 요약 (총 집중 시간, 알림 횟수) | O | O |
+| 기본 XP 산정 (focus minute 기반) | O | O |
+| 연속 집중 streak 표시 | O | O |
+| 펫 성장 시스템 (PetState 연동) | X | O |
+| 상세 통계 대시보드 | X | O |
+| 누적 보상 및 레벨 상세 | X | O |
+| 수동 휴식 모드 | X | O |
+| 화이트리스트 | X | O |
+| iOS companion 연동 | X | O |
+
+- Free 사용자도 기본 XP와 streak를 확인할 수 있지만, 펫 성장 및 상세 분석은 Pro 전용이다.
+- 일일 요약은 Free에서도 성공한 점만 표시하며, 상세 개선점 분석은 Pro에서 제공한다.
+
+## 5. Suggested Metrics
+
+### 5.1 Session Metrics
 
 - 집중 세션 길이
 - 알림 발생 횟수
@@ -59,7 +78,7 @@
 - 무알림 세션 수
 - 최고 연속 집중 시간
 
-### 4.2 Daily Metrics
+### 5.2 Daily Metrics
 
 - 일일 총 집중 시간
 - 일일 경고 횟수
@@ -67,7 +86,7 @@
 - 일일 streak 유지 여부
 - 오늘의 성장 요약
 
-## 5. Anti-Gaming Rules
+## 6. Anti-Gaming Rules
 
 - 키 입력 내용을 점수로 사용하지 않는다.
 - 매우 짧은 세션 반복으로 XP를 무한 적립하지 못하게 최소 세션 길이를 둘 수 있다.
@@ -75,14 +94,14 @@
 - 휴식 모드와 whitelist pause는 보상 계산에서 분리한다.
 - idle detector를 우회해도 보상상 이득이 생기지 않도록 session boundary를 엄격히 관리한다.
 
-## 6. Daily Summary Contract
+## 7. Daily Summary Contract
 
 - 일일 요약은 하루 종료 시점 또는 다음 실행 시점에 표시할 수 있다.
 - 요약에는 성공한 점과 다음에 개선할 점을 같이 보여준다.
 - 요약 문구는 죄책감을 유발하지 않는다.
 - 요약 데이터는 raw input이 아니라 session aggregate를 사용한다.
 
-### 6.1 Summary Fields
+### 7.1 Summary Fields
 
 - 오늘의 총 집중 시간
 - 알림 발생 횟수
@@ -90,27 +109,27 @@
 - streak 상태
 - 펫 성장 상태
 
-## 7. Pet and Reward Link
+## 8. Pet and Reward Link
 
 - 펫은 보상 시각화 계층이다.
 - 펫 레벨과 XP는 연동될 수 있지만, 핵심 진실 원천은 XP 규칙이다.
 - 펫 상태는 `PetState`에서 관리하고, 보상 계산 로직과 분리한다.
 
-## 8. Data Dependencies
+## 9. Data Dependencies
 
 - `FocusSession`은 XP와 streak의 원천 데이터가 된다.
 - `DailyStats`는 일일 요약 집계에 사용된다.
 - `PetState`는 레벨과 성장 표현에 사용된다.
 - `UserSettings`는 XP 계산의 일부 옵션, 예를 들어 알림 허용/휴식 모드 정책과 연결된다.
 
-## 9. Implementation Constraints
+## 10. Implementation Constraints
 
 - 계산은 session 종료 시 재계산 가능해야 한다.
 - 보상 계산은 deterministic 해야 한다.
 - 로컬 저장소가 source of truth이며, 서버 동기화는 보상 계산의 전제 조건이 아니다.
 - 보상 변경 시 기존 세션 데이터에 대한 마이그레이션 가능성을 고려한다.
 
-## 10. UX Constraints
+## 11. UX Constraints
 
 - 보상 문구는 짧아야 한다.
 - 복귀 직후에는 강한 축하보다 안정적인 피드백이 우선이다.

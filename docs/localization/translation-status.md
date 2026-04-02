@@ -6,6 +6,7 @@
 - Scope: release-gate document for initial `ko/en` launch
 
 ## 1. Translation Policy
+번역 정책
 
 - Initial supported languages: `ko`, `en`
 - Technical fallback locale: `en`
@@ -16,6 +17,7 @@
 - String source of truth: `nudge/Localizable.xcstrings`
 
 ## 2. Launch Scope Definition
+런치 범위 정의
 
 - macOS app core UI
 - Accessibility onboarding and permission messaging
@@ -25,6 +27,7 @@
 - Launch web hero, FAQ, and privacy copy
 
 ## 3. Status Matrix
+상태 매트릭스
 
 | Language | Scope | Status | Gate | Owner | Blocker | Next Step |
 |---|---|---|---|---|---|---|
@@ -32,6 +35,7 @@
 | `en` | Launch scope, app + web core copy | Locked as technical fallback and launch copy | 100% key coverage in `.xcstrings`; EN screenshots reviewed; no placeholder text | `localization` + `marketing-strategist` | Terminology drift vs. KR source copy | Normalize glossary terms, then verify EN UI and web copy parity |
 
 ## 4. Surface Coverage
+표면 커버리지
 
 | Surface | KO | EN | Notes |
 |---|---|---|---|
@@ -44,6 +48,7 @@
 | Launch web hero / FAQ | Required | Required | Same product position, localized phrasing |
 
 ## 5. Gate Rules
+게이트 규칙
 
 - Gate 1: String coverage complete for launch scope
 - Gate 2: Glossary terms locked and consistent across app/web
@@ -53,6 +58,7 @@
 - Gate 6: Release candidate screenshots approved for both locales
 
 ## 6. Ownership and Handoff
+소유권 및 인계
 
 - `content-strategist`: app microcopy and notification wording source
 - `marketing-strategist`: launch/web copy source
@@ -61,6 +67,7 @@
 - `web-dev`: web locale wiring and copy integration
 
 ## 7. Blockers and Risks
+블로커 및 리스크
 
 - Content copy still being finalized in separate docs
 - Layout may change when longer EN strings land in UI
@@ -68,6 +75,7 @@
 - TTS lines may need last-mile brevity adjustments after implementation
 
 ## 8. Next Steps
+다음 단계
 
 - Freeze launch-scope keys in `.xcstrings`
 - Fill any missing KR/EN entries once content docs are finalized

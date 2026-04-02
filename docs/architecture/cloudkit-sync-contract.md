@@ -67,7 +67,7 @@
 ### 5.2 Content State Mapping
 
 - `Focus` -> baseline sync marker
-- `IdleDetected` -> `state = alerting` 전 단계 기록
+- `IdleDetected` -> `state = monitoring`에 `lastAlertAt` 갱신 없이 로컬에만 기록. iOS에는 전달하지 않는다.
 - `GentleNudge` -> `state = alerting`
 - `StrongNudge` -> `state = alerting`
 - `Recovery` -> `state = monitoring`
@@ -79,6 +79,7 @@
 - sync payload는 runtime state를 우선한다.
 - content state는 보조 signal로만 사용한다.
 - iOS는 runtime state 변화만으로도 충분히 사용자 상황을 이해할 수 있어야 한다.
+- `GentleNudge`와 `StrongNudge`은 모두 `state = alerting`으로 매핑된다. iOS가 강도를 구분해야 하면 `lastAlertAt`과 알림 발생 시간 차이로 유추한다. 필요시 `alertLevel` 필드를 optional로 추가할 수 있다.
 
 ## 6. Write Triggers
 
@@ -138,6 +139,13 @@
 
 - iOS는 서버 최신 상태를 표시하되, local preview가 있으면 임시 렌더링할 수 있다.
 - 레코드 순서는 `sequence`와 `stateChangedAt`를 함께 본다.
+
+### 8.4 macOS-Specific States on iOS
+
+- `limitedNoAX`는 macOS 권한 상태이므로 iOS에서 기능적 액션을 취하지 않는다.
+- iOS는 `limitedNoAX` 수신 시 "Mac에서 권한 설정이 필요합니다" 정도의 안내만 표시한다.
+- `limitedNoAX`는 iOS 알림을 발생시키지 않는다.
+- iOS가 이 상태를 수신해도 로컬 기능에는 영향이 없다.
 
 ## 9. Entitlement Separation
 

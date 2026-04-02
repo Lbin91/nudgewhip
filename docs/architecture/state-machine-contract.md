@@ -62,8 +62,9 @@
 - `fastUserSwitchingEnded`
 - `ttsFinished`
 - `cooldownExpired`
-- `permissionsRecovered`
 - `monitorStartFailed`
+
+- `accessibilityGranted`는 권한 부여와 모니터 재시작 성공을 모두 포괄한다. 별도의 `permissionsRecovered` 이벤트는 두지 않는다.
 
 ### 4.3 Event Handling Rule
 
