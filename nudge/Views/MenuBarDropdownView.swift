@@ -1,3 +1,9 @@
+// MenuBarDropdownView.swift
+// 메뉴바 드롭다운의 전체 레이아웃을 구성하는 뷰.
+//
+// StatusSummaryView, QuickControlsView, DailySummaryView를 수직으로 배치한다.
+// 설정과 펫 상태에서 로컬라이즈된 표시 문자열을 계산해 하위 뷰에 전달한다.
+
 import SwiftUI
 
 struct MenuBarDropdownView: View {
@@ -28,6 +34,7 @@ struct MenuBarDropdownView: View {
         }
     }
     
+    /// 설정값을 사람이 읽을 수 있는 시간 문자열로 변환
     private var idleThresholdText: String {
         guard let settings else { return localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable") }
         let formatter = DateComponentsFormatter()
@@ -38,12 +45,14 @@ struct MenuBarDropdownView: View {
             ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     }
     
+    /// TTS 활성화 여부에 따른 표시 문자열
     private var ttsStatusText: String {
         settings?.ttsEnabled == true
             ? localizedAppString("menu.dropdown.value.enabled", defaultValue: "Enabled")
             : localizedAppString("menu.dropdown.value.disabled", defaultValue: "Disabled")
     }
     
+    /// 펫 표시 모드(sprout/minimal) 로컬라이즈 문자열
     private var petPresentationText: String {
         guard let settings else {
             return localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
@@ -57,6 +66,7 @@ struct MenuBarDropdownView: View {
         }
     }
     
+    /// 펫 성장 단계 로컬라이즈 문자열
     private var localizedPetStage: String {
         guard let petState else {
             return localizedAppString("menu.dropdown.value.none", defaultValue: "None")
@@ -72,6 +82,7 @@ struct MenuBarDropdownView: View {
         }
     }
     
+    /// 펫 감정 상태 로컬라이즈 문자열
     private var localizedPetEmotion: String {
         guard let petState else {
             return localizedAppString("menu.dropdown.value.none", defaultValue: "None")

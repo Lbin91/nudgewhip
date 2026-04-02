@@ -1,3 +1,10 @@
+// RuntimeStateController.swift
+// Nudge의 런타임 상태 기계(Reducer)와 컨트롤러.
+//
+// 이벤트(NudgeRuntimeEvent)에 따라 상태 스냅샷을 갱신하는 불변 리듀서와
+// 상태 전이 로그를 기록하는 @Observable 컨트롤러로 구성된다.
+// 유휴 감시, 일시정지, 알림, 절전 등 모든 런타임 상태를 관리한다.
+
 import Foundation
 import Observation
 
@@ -58,6 +65,7 @@ struct RuntimeTransitionLogEntry: Equatable, Sendable {
 }
 
 enum RuntimeStateReducer {
+    /// 불변 리듀서. 이벤트에 따라 스냅샷에서 새 상태를 계산해 반환
     static func reduce(_ snapshot: RuntimeSnapshot, event: NudgeRuntimeEvent, at date: Date) -> RuntimeSnapshot {
         var next = snapshot
         
@@ -138,6 +146,7 @@ enum RuntimeStateReducer {
         return next
     }
     
+    /// 현재 플래그(절전/권한/일시정지/화이트리스트)로 기본 런타임 상태 결정
     private static func resolveBaseRuntimeState(from snapshot: RuntimeSnapshot) -> NudgeRuntimeState {
         if snapshot.suspended {
             return .suspendedSleepOrLock
@@ -158,6 +167,7 @@ enum RuntimeStateReducer {
         return .monitoring
     }
     
+    /// 런타임 상태에 대응하는 기본 콘텐츠 상태 반환
     private static func baseContentState(for runtimeState: NudgeRuntimeState) -> NudgeContentState {
         switch runtimeState {
         case .pausedManual:
@@ -179,6 +189,7 @@ final class RuntimeStateController {
         self.transitionLog = transitionLog
     }
     
+    /// 이벤트를 처리해 스냅샷 갱신하고 전이 로그에 기록
     func handle(_ event: NudgeRuntimeEvent, at date: Date = .now) {
         snapshot = RuntimeStateReducer.reduce(snapshot, event: event, at: date)
         transitionLog.append(RuntimeTransitionLogEntry(event: event, snapshot: snapshot, occurredAt: date))

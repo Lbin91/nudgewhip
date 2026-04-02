@@ -1,3 +1,9 @@
+// StatusSummaryView.swift
+// 현재 모니터링 상태와 카운트다운을 표시하는 뷰.
+//
+// 런타임/콘텐츠 상태에 따라 아이콘·타이틀·상세 설명을 갱신한다.
+// TimelineView로 카운트다운을 초 단위로 갱신한다.
+
 import SwiftUI
 
 struct StatusSummaryView: View {
@@ -36,6 +42,7 @@ struct StatusSummaryView: View {
         }
     }
     
+    /// 런타임 상태에 대응하는 로컬라이즈 타이틀
     private var runtimeStateTitle: String {
         switch menuBarViewModel.runtimeState {
         case .limitedNoAX:
@@ -53,6 +60,7 @@ struct StatusSummaryView: View {
         }
     }
     
+    /// 콘텐츠 상태에 대응하는 로컬라이즈 타이틀
     private var contentStateTitle: String {
         switch menuBarViewModel.contentState {
         case .focus:
@@ -72,6 +80,7 @@ struct StatusSummaryView: View {
         }
     }
     
+    /// 런타임 상태별 상세 설명 문구
     private var statusDetail: String {
         switch menuBarViewModel.runtimeState {
         case .limitedNoAX:

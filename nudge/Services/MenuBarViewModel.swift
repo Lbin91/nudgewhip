@@ -17,14 +17,17 @@ final class MenuBarViewModel {
         self.idleMonitor = idleMonitor ?? IdleMonitor()
     }
     
+    /// IdleMonitor의 현재 런타임 상태
     var runtimeState: NudgeRuntimeState {
         idleMonitor.runtimeStateController.snapshot.runtimeState
     }
     
+    /// IdleMonitor의 현재 콘텐츠 상태
     var contentState: NudgeContentState {
         idleMonitor.runtimeStateController.snapshot.contentState
     }
     
+    /// 런타임 상태에 대응하는 SF Symbol 이름
     var systemImageName: String {
         switch runtimeState {
         case .limitedNoAX:
@@ -42,10 +45,12 @@ final class MenuBarViewModel {
         }
     }
     
+    /// 접근성 권한이 없을 때 CTA 표시 여부
     var shouldShowPermissionCTA: Bool {
         runtimeState == .limitedNoAX
     }
     
+    /// 최초 1회만 실행. 권한 확인 후 모니터링 시작
     func startIfNeeded(at date: Date = .now) {
         guard !hasStarted else { return }
         hasStarted = true
@@ -61,6 +66,7 @@ final class MenuBarViewModel {
         }
     }
     
+    /// 권한 새로고침 후 필요 시 모니터링 시작
     func refreshPermission(at date: Date = .now) {
         idleMonitor.refreshPermission(at: date)
         
@@ -69,19 +75,23 @@ final class MenuBarViewModel {
         }
     }
     
+    /// 시스템 프롬프트와 함께 권한 요청
     func requestAccessibilityPermission(at date: Date = .now) {
         refreshPermission(promptIfNeeded: true, at: date)
     }
     
     @discardableResult
+    /// 시스템 환경설정 접근성 패널 열기
     func openAccessibilitySettings() -> Bool {
         idleMonitor.permissionManager.openAccessibilitySettings()
     }
     
+    /// 유휴 타이머 수동 리셋
     func resetIdleTimer(at date: Date = .now) {
         idleMonitor.recordInput(at: date)
     }
     
+    /// 내부: 프롬프트 옵션과 함께 권한 새로고침
     private func refreshPermission(promptIfNeeded: Bool, at date: Date) {
         idleMonitor.refreshPermission(promptIfNeeded: promptIfNeeded, at: date)
         
@@ -90,6 +100,7 @@ final class MenuBarViewModel {
         }
     }
     
+    /// 모니터링 중 다음 유휴 체크까지 카운트다운 문자열 반환
     func countdownText(now: Date = .now) -> String? {
         guard runtimeState == .monitoring, let deadline = idleMonitor.idleDeadlineAt else {
             return nil

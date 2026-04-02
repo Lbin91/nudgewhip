@@ -35,15 +35,18 @@ final class PermissionManager {
         self.settingsOpener = settingsOpener
     }
     
+    /// 접근성 권한 승인 여부 편의 프로퍼티
     var isAccessibilityGranted: Bool {
         accessibilityPermissionState == .granted
     }
     
+    /// 시스템 환경설정 접근성 패널 URL
     var accessibilitySettingsURL: URL {
         URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
     }
     
     @discardableResult
+    /// 접근성 권한 상태 갱신. promptIfNeeded=true면 시스템 권한 프롬프트 표시
     func refreshAccessibilityPermission(promptIfNeeded: Bool = false) -> AccessibilityPermissionState {
         let trusted = trustCheck(promptIfNeeded)
         accessibilityPermissionState = trusted ? .granted : .denied
@@ -51,10 +54,12 @@ final class PermissionManager {
     }
     
     @discardableResult
+    /// 시스템 환경설정 접근성 패널 열기
     func openAccessibilitySettings() -> Bool {
         settingsOpener(accessibilitySettingsURL)
     }
     
+    /// 기본 접근성 권한 확인 로직 (AXIsProcessTrusted 호출)
     private static func defaultTrustCheck(promptIfNeeded: Bool) -> Bool {
         if promptIfNeeded {
             let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
@@ -65,6 +70,7 @@ final class PermissionManager {
         return AXIsProcessTrusted()
     }
     
+    /// 기본 설정 앱 열기 로직 (NSWorkspace.shared.open)
     private static func defaultSettingsOpener(url: URL) -> Bool {
         NSWorkspace.shared.open(url)
     }

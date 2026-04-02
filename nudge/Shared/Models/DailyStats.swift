@@ -1,3 +1,9 @@
+// DailyStats.swift
+// 하루 단위 집계 통계를 나타내는 값 타입.
+//
+// 총 포커스 시간, 알림/TTS 횟수, 최장 연속 포커스, 완료 세션 수를 보관한다.
+// FocusSession 배열과 기준 날짜로부터 derive()로 자동 계산한다.
+
 import Foundation
 
 struct DailyStats: Equatable, Sendable {
@@ -8,6 +14,7 @@ struct DailyStats: Equatable, Sendable {
     let longestFocusDuration: TimeInterval
     let completedSessionCount: Int
     
+    /// 세션 배열에서 특정 날짜의 통계를 집계해 DailyStats 생성
     static func derive(
         for sessions: [FocusSession],
         on referenceDate: Date,

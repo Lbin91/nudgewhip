@@ -1,3 +1,9 @@
+// UserSettings.swift
+// 사용자 설정을 저장하는 SwiftData 모델.
+//
+// 유휴 임계값, 알림·TTS 설정, Pro 잠금 해제, 펫 표시 모드 등을 관리한다.
+// preferredLocaleIdentifier로 로컬라이즈 언어 설정도 보관한다.
+
 import Foundation
 import SwiftData
 
@@ -22,11 +28,13 @@ final class UserSettings {
     var createdAt: Date
     var updatedAt: Date
     
+    /// 로우 밸류와 편의 enum(PetPresentationMode) 간 변환
     var petPresentationMode: PetPresentationMode {
         get { PetPresentationMode(rawValue: petPresentationRawValue) ?? .sprout }
         set { petPresentationRawValue = newValue.rawValue }
     }
     
+    /// 모든 설정값의 기본값을 제공하는 이니셜라이저
     init(
         idleThresholdSeconds: Int = 300,
         gentleAlertLeadSeconds: Int = 30,

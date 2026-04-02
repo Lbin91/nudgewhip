@@ -1,3 +1,9 @@
+// FocusSession.swift
+// 개별 포커스 세션을 기록하는 SwiftData 모델.
+//
+// 세션 시작/종료 시각, 모니터링·휴식·화이트리스트 상태,
+// 알림·TTS·복구 횟수를 추적한다. 특정 시간 구간과의 겹침 계산도 지원한다.
+
 import Foundation
 import SwiftData
 
@@ -23,6 +29,7 @@ final class FocusSession {
     var endReasonRawValue: String?
     var createdAt: Date
     
+    /// 종료 사유 로우 밸류 ↔ enum 편의 변환
     var endReason: FocusSessionEndReason? {
         get {
             guard let endReasonRawValue else { return nil }
@@ -33,15 +40,18 @@ final class FocusSession {
         }
     }
     
+    /// 세션 지속 시간(초). 종료되지 않았으면 0 반환
     var duration: TimeInterval {
         guard let endedAt else { return 0 }
         return max(0, endedAt.timeIntervalSince(startedAt))
     }
     
+    /// 통계 집계에 포함되는 유효 세션 여부 (모니터링 활성 + 휴식/화이트리스트 아님 + 종료됨)
     var contributesToFocusTotals: Bool {
         monitoringActive && !breakMode && !whitelistedPause && endedAt != nil
     }
     
+    /// 세션 생성. 모니터링 활성 상태로 시작
     init(
         startedAt: Date,
         endedAt: Date? = nil,
@@ -68,6 +78,7 @@ final class FocusSession {
         self.createdAt = createdAt
     }
     
+    /// 특정 시간 구간과 겹치는 포커스 시간(초) 계산
     func focusDuration(overlapping interval: DateInterval) -> TimeInterval {
         guard contributesToFocusTotals, let endedAt else { return 0 }
         let safeEnd = max(startedAt, endedAt)

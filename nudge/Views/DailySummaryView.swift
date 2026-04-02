@@ -1,3 +1,9 @@
+// DailySummaryView.swift
+// 오늘의 포커스 통계와 워크스페이스 정보를 표시하는 뷰.
+//
+// Today 그룹: 총 포커스 시간, 완료 세션 수, 알림 횟수.
+// Workspace 그룹: 화이트리스트 앱 수, 펫 단계, 펫 감정.
+
 import SwiftUI
 
 struct DailySummaryView: View {
@@ -58,6 +64,7 @@ struct DailySummaryView: View {
         }
     }
     
+    /// TimeInterval을 "1h 23m" 형식의 읽기 쉬운 문자열로 포맷
     private func formattedDuration(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
