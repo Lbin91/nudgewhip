@@ -9,15 +9,17 @@ struct OnboardingFooterView: View {
     let tertiaryAction: (() -> Void)?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             Button(primaryTitle, action: primaryAction)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .frame(maxWidth: .infinity)
             
             if let secondaryTitle, let secondaryAction {
                 Button(secondaryTitle, action: secondaryAction)
                     .buttonStyle(.bordered)
                     .controlSize(.large)
+                    .frame(maxWidth: .infinity)
             }
             
             if let tertiaryTitle, let tertiaryAction {
@@ -25,5 +27,6 @@ struct OnboardingFooterView: View {
                     .buttonStyle(.link)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

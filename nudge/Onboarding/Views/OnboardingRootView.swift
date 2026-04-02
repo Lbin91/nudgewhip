@@ -13,24 +13,27 @@ struct OnboardingRootView: View {
             Color(nsColor: .windowBackgroundColor)
                 .ignoresSafeArea()
             
-            OnboardingCardView {
-                OnboardingHeaderView(
-                    title: headerTitle,
-                    subtitle: headerSubtitle,
-                    progressText: viewModel.progressText,
-                    showsBackButton: viewModel.showsBackButton,
-                    backAction: viewModel.goBack
-                )
-                
-                currentStepView
-                
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
+            ScrollView(showsIndicators: false) {
+                OnboardingCardView {
+                    OnboardingHeaderView(
+                        title: headerTitle,
+                        subtitle: headerSubtitle,
+                        progressText: viewModel.progressText,
+                        showsBackButton: viewModel.showsBackButton,
+                        backAction: viewModel.goBack
+                    )
+                    
+                    currentStepView
+                    
+                    if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
+                    }
+                    
+                    footerView
                 }
-                
-                footerView
+                .frame(maxWidth: .infinity, alignment: .top)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in

@@ -8,13 +8,17 @@ struct OnboardingHeaderView: View {
     let backAction: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 if showsBackButton {
                     Button(action: backAction) {
                         Label(localizedAppString("onboarding.common.back", defaultValue: "Back"), systemImage: "chevron.left")
                     }
                     .buttonStyle(.link)
+                } else {
+                    Text(localizedAppString("app.menu.title", defaultValue: "Nudge"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
@@ -28,11 +32,12 @@ struct OnboardingHeaderView: View {
             }
             
             Text(title)
-                .font(.largeTitle.bold())
+                .font(.system(size: 28, weight: .bold))
             
             Text(subtitle)
                 .font(.body)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

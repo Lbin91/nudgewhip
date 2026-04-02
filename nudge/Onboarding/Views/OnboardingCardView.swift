@@ -7,13 +7,16 @@ struct OnboardingCardView<Content: View>: View {
         VStack(alignment: .leading, spacing: 24) {
             content
         }
-        .padding(28)
-        .frame(width: 560)
+        .padding(24)
+        .frame(maxWidth: 500, alignment: .leading)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .strokeBorder(.quaternary, lineWidth: 1)
         )
-        .padding(20)
+        .shadow(color: .black.opacity(0.08), radius: 20, y: 8)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 12)
     }
 }
