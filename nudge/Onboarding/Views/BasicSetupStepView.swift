@@ -15,6 +15,7 @@ struct BasicSetupStepView: View {
                 Text(localizedAppString("onboarding.setup.idle_threshold.label", defaultValue: "Idle threshold"))
                     .font(.headline)
                 Picker("", selection: $idleThresholdSeconds) {
+                    Text(localizedAppString("onboarding.setup.idle_threshold.30s", defaultValue: "30 sec (Test)")).tag(30)
                     Text(localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min")).tag(180)
                     Text(localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min (Recommended)")).tag(300)
                     Text(localizedAppString("onboarding.setup.idle_threshold.10m", defaultValue: "10 min")).tag(600)
