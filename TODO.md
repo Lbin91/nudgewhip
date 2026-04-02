@@ -49,7 +49,7 @@
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지
 - [x] idle detection을 polling이 아닌 one-shot deadline timer 기반으로 구현
 - [ ] sleep/wake, lock/unlock, fast user switching 처리 추가
-- [ ] `accessibilityDenied`를 OS 이벤트가 아닌 재검사 기반 합성 이벤트로 처리
+- [x] `accessibilityDenied`를 OS 이벤트가 아닌 재검사 기반 합성 이벤트로 처리
 - [x] `limitedNoAX` 제한 모드에서 graceful degradation 구현
 - [x] 상태 전환 로그/테스트 훅 추가
 
@@ -82,7 +82,7 @@
 - [x] 중간 구역에 임계시간, TTS on/off, 기본 제어 배치
 - [x] 하단 구역에 오늘 요약 통계 표시
 - [x] 제한 모드 UI 표시
-- [ ] 권한 요청 CTA와 설정 이동 흐름 구현
+- [x] 권한 요청 CTA와 설정 이동 흐름 구현
 - [x] 상태 변화에 따른 메뉴바 아이콘 반영
 - [ ] 상태 아이콘 반영 1초 이내 목표 충족
 
@@ -193,7 +193,7 @@
 
 - [ ] `Clock` injectable 구현 및 테스트 추가
 - [x] `EventMonitor` injectable 구현 및 테스트 추가
-- [ ] `PermissionProvider` injectable 구현 및 테스트 추가
+- [x] `PermissionProvider` injectable 구현 및 테스트 추가
 - [ ] `FrontmostAppProvider` injectable 구현 및 테스트 추가
 - [ ] `SpeechSynthesizer` injectable 구현 및 테스트 추가
 - [ ] `CloudKitClient` injectable 구현 및 테스트 추가

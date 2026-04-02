@@ -850,6 +850,74 @@
           }
         }
       }
+    },
+    "permission.accessibility.cta.open_settings": {
+      "comment": "Button title that opens the macOS Accessibility settings page.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 열기"
+          }
+        }
+      }
+    },
+    "permission.accessibility.cta.request": {
+      "comment": "Button title that prompts for Accessibility permission again.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request access"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 요청"
+          }
+        }
+      }
+    },
+    "permission.accessibility.disclosure.primary": {
+      "comment": "Primary disclosure shown in limited mode about why Accessibility permission is needed.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibility permission is used only to detect global input activity so Nudge can identify idle periods and show local nudges."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "손쉬운 사용 권한은 전역 입력 활동을 감지해 무입력 상태를 파악하고, 로컬 넛지를 표시하기 위해서만 사용합니다."
+          }
+        }
+      }
+    },
+    "permission.accessibility.disclosure.secondary": {
+      "comment": "Secondary disclosure shown in limited mode describing what the app does not collect.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "키 입력 내용, 화면 내용, 파일, 메시지, 브라우징 기록은 수집하지 않습니다."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

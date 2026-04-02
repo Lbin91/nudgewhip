@@ -191,6 +191,31 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func permissionManagerSupportsPromptAndSettingsCTAInjection() {
+        var didPrompt = false
+        var openedURL: URL?
+        let permissionManager = PermissionManager(
+            trustCheck: { promptIfNeeded in
+                didPrompt = promptIfNeeded
+                return true
+            },
+            settingsOpener: { url in
+                openedURL = url
+                return true
+            }
+        )
+        
+        let permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: true)
+        let didOpenSettings = permissionManager.openAccessibilitySettings()
+        
+        #expect(didPrompt)
+        #expect(permissionState == .granted)
+        #expect(didOpenSettings)
+        #expect(openedURL == permissionManager.accessibilitySettingsURL)
+    }
+    
+    @MainActor
+    @Test
     func menuBarViewModelReflectsRuntimeIconAndCountdown() {
         let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)

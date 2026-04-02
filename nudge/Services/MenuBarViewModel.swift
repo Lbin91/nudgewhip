@@ -1,3 +1,9 @@
+// MenuBarViewModel.swift
+// 메뉴바 UI 상태를 관리하는 뷰모델.
+//
+// IdleMonitor를 래핑해 런타임/콘텐츠 상태를 뷰에 노출한다.
+// 메뉴바 아이콘 선택, 카운트다운 텍스트 생성, 권한 새로고침·타이머 리셋을 제공한다.
+
 import Foundation
 import Observation
 
@@ -36,6 +42,10 @@ final class MenuBarViewModel {
         }
     }
     
+    var shouldShowPermissionCTA: Bool {
+        runtimeState == .limitedNoAX
+    }
+    
     func startIfNeeded(at date: Date = .now) {
         guard !hasStarted else { return }
         hasStarted = true
@@ -59,8 +69,25 @@ final class MenuBarViewModel {
         }
     }
     
+    func requestAccessibilityPermission(at date: Date = .now) {
+        refreshPermission(promptIfNeeded: true, at: date)
+    }
+    
+    @discardableResult
+    func openAccessibilitySettings() -> Bool {
+        idleMonitor.permissionManager.openAccessibilitySettings()
+    }
+    
     func resetIdleTimer(at date: Date = .now) {
         idleMonitor.recordInput(at: date)
+    }
+    
+    private func refreshPermission(promptIfNeeded: Bool, at date: Date) {
+        idleMonitor.refreshPermission(promptIfNeeded: promptIfNeeded, at: date)
+        
+        if runtimeState == .monitoring, idleMonitor.lastInputAt == nil {
+            idleMonitor.recordInput(at: date)
+        }
     }
     
     func countdownText(now: Date = .now) -> String? {
