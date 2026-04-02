@@ -6,8 +6,10 @@
 //
 
 import XCTest
+import AppKit
 
 final class nudgeUITestsLaunchTests: XCTestCase {
+    private let bundleIdentifier = "com.bongjinlee.nudge"
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true
@@ -15,6 +17,7 @@ final class nudgeUITestsLaunchTests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        try terminateRunningAppIfNeeded()
     }
 
     @MainActor
@@ -29,5 +32,15 @@ final class nudgeUITestsLaunchTests: XCTestCase {
         attachment.name = "Launch Screen"
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+    
+    private func terminateRunningAppIfNeeded() throws {
+        let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
+        
+        for app in runningApps where !app.isTerminated {
+            if !app.terminate() {
+                _ = app.forceTerminate()
+            }
+        }
     }
 }

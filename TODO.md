@@ -45,7 +45,7 @@
 - [x] `nudge/Services/RuntimeStateController.swift` 또는 동등 구조 작성
 - [x] runtime state enum 구현: `limitedNoAX`, `monitoring`, `pausedManual`, `pausedWhitelist`, `alerting`, `suspendedSleepOrLock`
 - [x] content state enum 구현: `Focus`, `IdleDetected`, `GentleNudge`, `StrongNudge`, `Recovery`, `Break`, `RemoteEscalation`
-- [ ] `mouseMoved`, `mouseDown`, `scrollWheel`, `keyDown`만 입력 소스로 사용
+- [x] `mouseMoved`, `mouseDown`, `scrollWheel`, `keyDown`만 입력 소스로 사용
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지
 - [x] idle detection을 polling이 아닌 one-shot deadline timer 기반으로 구현
 - [ ] sleep/wake, lock/unlock, fast user switching 처리 추가
@@ -192,7 +192,7 @@
 ### 14. Unit and Integration Tests
 
 - [ ] `Clock` injectable 구현 및 테스트 추가
-- [ ] `EventMonitor` injectable 구현 및 테스트 추가
+- [x] `EventMonitor` injectable 구현 및 테스트 추가
 - [ ] `PermissionProvider` injectable 구현 및 테스트 추가
 - [ ] `FrontmostAppProvider` injectable 구현 및 테스트 추가
 - [ ] `SpeechSynthesizer` injectable 구현 및 테스트 추가

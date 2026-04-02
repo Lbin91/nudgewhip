@@ -10,6 +10,30 @@ import SwiftData
 import Testing
 @testable import nudge
 
+@MainActor
+private final class TestEventMonitor: EventMonitoring {
+    private(set) var isMonitoring = false
+    private(set) var startCount = 0
+    private(set) var stopCount = 0
+    private var onActivity: (@MainActor () -> Void)?
+    
+    func start(onActivity: @escaping @MainActor () -> Void) {
+        isMonitoring = true
+        startCount += 1
+        self.onActivity = onActivity
+    }
+    
+    func stop() {
+        isMonitoring = false
+        stopCount += 1
+        onActivity = nil
+    }
+    
+    func emitActivity() {
+        onActivity?()
+    }
+}
+
 struct nudgeTests {
 
     @Test
@@ -103,15 +127,18 @@ struct nudgeTests {
         let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
         let runtimeController = RuntimeStateController()
+        let eventMonitor = TestEventMonitor()
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             runtimeStateController: runtimeController,
+            eventMonitor: eventMonitor,
             idleThreshold: 300,
             alertEscalationInterval: 30,
             cooldownDuration: 60
         )
         
         idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        #expect(eventMonitor.isMonitoring)
         idleMonitor.recordInput(at: baseDate)
         #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(300))
         
@@ -132,6 +159,34 @@ struct nudgeTests {
         
         idleMonitor.fireCooldownExpired(at: baseDate.addingTimeInterval(391))
         #expect(runtimeController.snapshot.contentState == .focus)
+    }
+    
+    @MainActor
+    @Test
+    func idleMonitorStartsAndStopsRealInputMonitoringWithPermissionState() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .unknown)
+        let runtimeController = RuntimeStateController()
+        let eventMonitor = TestEventMonitor()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: eventMonitor,
+            idleThreshold: 300
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        #expect(eventMonitor.startCount == 1)
+        #expect(eventMonitor.isMonitoring)
+        
+        eventMonitor.emitActivity()
+        #expect(idleMonitor.lastInputAt != nil)
+        #expect(idleMonitor.idleDeadlineAt != nil)
+        
+        idleMonitor.setAccessibilityPermission(.denied, at: baseDate.addingTimeInterval(1))
+        #expect(eventMonitor.stopCount == 1)
+        #expect(!eventMonitor.isMonitoring)
+        #expect(runtimeController.snapshot.runtimeState == .limitedNoAX)
     }
     
     @MainActor
