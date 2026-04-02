@@ -1607,20 +1607,20 @@
         }
       }
     },
-    "onboarding.setup.idle_threshold.30s" : {
-      "comment" : "Idle threshold option for thirty seconds during onboarding for testing.",
+    "onboarding.setup.idle_threshold.10s" : {
+      "comment" : "Idle threshold option for ten seconds during onboarding for testing.",
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "30 sec (Test)"
+            "value" : "10 sec (Test)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "30초(테스트)"
+            "value" : "10초(테스트)"
           }
         }
       }

@@ -21,12 +21,12 @@ final class IdleMonitor {
     let eventMonitor: any EventMonitoring
     let lifecycleMonitor: any SystemLifecycleMonitoring
     let alertManager: (any AlertManaging)?
-    let idleThreshold: TimeInterval
+    private(set) var idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
-    let scheduleEnabled: Bool
-    let scheduleStart: TimeInterval
-    let scheduleEnd: TimeInterval
+    private(set) var scheduleEnabled: Bool
+    private(set) var scheduleStart: TimeInterval
+    private(set) var scheduleEnd: TimeInterval
     
     private var idleDeadlineWorkItem: DispatchWorkItem?
     private var alertEscalationWorkItem: DispatchWorkItem?
@@ -58,6 +58,20 @@ final class IdleMonitor {
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStart = scheduleStart
         self.scheduleEnd = scheduleEnd
+    }
+    
+    /// 저장된 사용자 설정을 runtime monitor에 반영
+    func applySettings(_ settings: UserSettings, at date: Date = .now) {
+        idleThreshold = TimeInterval(settings.idleThresholdSeconds)
+        scheduleEnabled = settings.scheduleEnabled
+        scheduleStart = TimeInterval(settings.scheduleStartSecondsFromMidnight)
+        scheduleEnd = TimeInterval(settings.scheduleEndSecondsFromMidnight)
+        
+        checkSchedule(at: date)
+        
+        if runtimeStateController.snapshot.runtimeState == .monitoring {
+            scheduleIdleDeadline(from: lastInputAt ?? date)
+        }
     }
     
     /// 권한 확인 후 유휴 감시 시작
@@ -257,13 +271,14 @@ final class IdleMonitor {
         }
         
         idleDeadlineAt = date.addingTimeInterval(idleThreshold)
+        let delay = max(0, idleDeadlineAt?.timeIntervalSinceNow ?? idleThreshold)
         let workItem = DispatchWorkItem { [weak self] in
             Task { @MainActor in
                 self?.fireIdleDeadline(at: .now)
             }
         }
         idleDeadlineWorkItem = workItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + idleThreshold, execute: workItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
     
     /// 알림 에스컬레이션 타이머 취소

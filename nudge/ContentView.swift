@@ -8,7 +8,6 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query private var settingsCollection: [UserSettings]
     @Query private var petStates: [PetState]
     @Query private var whitelistApps: [WhitelistApp]
@@ -30,6 +29,18 @@ struct ContentView: View {
     private var todayStats: DailyStats {
         DailyStats.derive(for: focusSessions, on: .now)
     }
+    
+    private var settingsSyncKey: String {
+        guard let settings else { return "no-settings" }
+        return [
+            "\(settings.idleThresholdSeconds)",
+            "\(settings.scheduleEnabled)",
+            "\(settings.scheduleStartSecondsFromMidnight)",
+            "\(settings.scheduleEndSecondsFromMidnight)",
+            "\(settings.ttsEnabled)",
+            settings.petPresentationMode.rawValue
+        ].joined(separator: "|")
+    }
 
     var body: some View {
         MenuBarDropdownView(
@@ -41,9 +52,10 @@ struct ContentView: View {
         )
         .padding(16)
         .frame(width: 320)
-        .task {
-            try? NudgeDataBootstrap.ensureDefaults(in: modelContext)
-            menuBarViewModel.startIfNeeded()
+        .task(id: settingsSyncKey) {
+            if let settings {
+                menuBarViewModel.apply(settings: settings)
+            }
         }
     }
 }

@@ -119,4 +119,9 @@ final class MenuBarViewModel {
         
         return String(format: "%02d:%02d", minutes, seconds)
     }
+    
+    /// SwiftData에 저장된 사용자 설정을 runtime monitor에 반영
+    func apply(settings: UserSettings, at date: Date = .now) {
+        idleMonitor.applySettings(settings, at: date)
+    }
 }

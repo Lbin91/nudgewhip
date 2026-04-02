@@ -27,9 +27,6 @@ struct NudgeApp: App {
     var body: some Scene {
         MenuBarExtra(menuTitle, image: "MenuBarIcon") {
             ContentView(menuBarViewModel: menuBarViewModel)
-                .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-                    menuBarViewModel.refreshPermission()
-                }
             
             Divider()
             

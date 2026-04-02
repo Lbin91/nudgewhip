@@ -18,7 +18,7 @@ struct BasicSetupStepView: View {
                         .font(.headline)
                     
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.30s", defaultValue: "30 sec (Test)"), value: 30)
+                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.10s", defaultValue: "10 sec (Test)"), value: 10)
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min"), value: 180)
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min (Recommended)"), value: 300)
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.10m", defaultValue: "10 min"), value: 600)

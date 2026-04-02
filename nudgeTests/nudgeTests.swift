@@ -356,6 +356,27 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func idleMonitorAppliesUserSettingsThresholdToRuntimeDeadline() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let settings = UserSettings(idleThresholdSeconds: 10)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor()
+        )
+        
+        idleMonitor.applySettings(settings, at: baseDate)
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(10))
+    }
+    
+    @MainActor
+    @Test
     func alertManagerShowsAndHidesPerimeterPulseAcrossAlertLifecycle() {
         let presenter = TestAlertPresenter()
         let notificationManager = TestNotificationNudgeManager()
