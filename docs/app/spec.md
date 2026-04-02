@@ -1,74 +1,265 @@
-# 📝 제품 기획 및 기술 명세서 (PRD): Nudge (넛지)
+# Nudge Product & Technical Spec vNext
 
-## 1. 프로젝트 개요
-* **앱 이름:** Nudge (넛지)
-* **플랫폼:** macOS (메뉴바 전용 유틸리티) 및 iOS (컴패니언 앱)
-* **한 줄 소개:** "모니터 밖의 딴짓을 부드럽게 찔러주는(Nudge) 역발상 집중력 케어 앱."
-* **타겟 유저:** 업무 중 스마트폰을 보거나 시선이 자주 이탈하는 직장인, 개발자, 수험생.
-* **핵심 가치 (UVP):** 기존의 '과로 방지'나 '앱 차단'이 아닌, 사용자의 '무입력(오프라인 딴짓)' 상태를 감지하여 즉각적으로 작업 복귀를 유도.
+- Version: vNext (draft-1)
+- Last Updated: 2026-04-02
+- Supersedes: 초기 PRD 초안
 
----
+## 1. Product Definition
 
-## 2. 핵심 기능 (Core Features) - MVP 및 기본(Free) 제공
-### 2.1. 메뉴바 상주 및 상태 제어
-* 하단 Dock에 노출되지 않고 상단 메뉴바(Status Bar)에만 상주.
-* 메뉴바 아이콘을 클릭하여 타이머 설정, 현재 상태 확인, 휴식 모드 토글 가능.
-* 상태(활성/휴식/알림 중)에 따라 메뉴바 아이콘 디자인 동적 변경.
+- Product Name: Nudge (넛지)
+- Category: `attention recall tool`
+- One-liner: 딴짓을 막는 앱이 아니라, 딴짓이 시작된 순간 다시 돌아오게 하는 앱
+- Core Value: 사용자 입력이 멈춘 오프라인 이탈 순간을 감지해 부드럽게 작업 복귀를 유도
+- Tone: 죄책감 유발 금지, 짧고 명확한 개입, 프라이버시 우선
 
-### 2.2. 사용자 입력 감지 로직
-* 마우스 이동, 클릭, 키보드 입력 등 시스템 전역의 사용자 액션 감지.
-* 유저가 설정한 '무입력 임계 시간(예: 1분, 3분, 5분 고정)' 도달 시 유휴 상태로 판단.
+## 2. Primary User
 
-### 2.3. 주의 환기 시스템 (Alert)
-* **시각적 넛지:** 화면 테두리 붉은색 깜빡임(Flash) 또는 화면 전체 흑백(Grayscale) 변환.
-* **청각적 넛지:** 로컬 TTS를 활용한 커스텀 음성 메시지 ("작업을 재개해 주세요").
-* 알림 발생 후 사용자가 마우스나 키보드를 다시 조작하면 즉시 알림 해제 및 타이머 초기화.
+- Primary Persona: Mac + iPhone을 함께 사용하는 지식노동자 (개발자, 디자이너, 창업자, 작가)
+- Secondary Persona: 시험 준비/학습 사용자
+- Core Problem: 책상 앞에서 입력이 멈춘 상태가 길어져 집중이 깨지는 문제
 
----
+## 3. Scope and Release Plan
 
-## 3. 프리미엄 기능 (Premium Features) - 유료 버전 (Pro Unlock)
-### 3.1. iOS 컴패니언 앱 연동 (핵심 과금 포인트)
-* 맥북이 일정 시간 유휴 상태에 빠지면, 동일한 Apple ID로 연동된 아이폰으로 즉각적인 백그라운드 푸시 알림 전송.
+### 3.1 Phase 1 (macOS Free Open Beta)
 
-### 3.2. 스마트 제어 (예외 처리)
-* **휴식 타이머:** 커피 브레이크, 흡연 등 자리 비움 시 임시로 알림을 끄는 수동 제어 기능.
-* **화이트리스트 (집중 모드 예외):** 유튜브, 넷플릭스 등 특정 앱이 '최상단 활성(Active)' 상태이거나 '전체 화면'일 경우 타이머 일시 정지.
+- Menu bar app (`LSUIElement = YES`)
+- Accessibility 권한 온보딩 + 제한 모드
+- 전역 입력 기반 idle detection
+- 기본 시각 넛지 (`perimeter pulse`)
+- 기본 일일 요약 통계
+- 한국어/영어 동시 지원 (핵심 UI + 핵심 알림)
 
-### 3.3. 게이미피케이션 및 대시보드
-* **가상 펫 육성:** 알림 없이 설정된 집중 시간을 채울 때마다 메뉴바의 가상 펫이 성장하거나 애니메이션 피드백 제공.
-* **상세 통계:** 일일 총 집중 시간, 딴짓으로 경고받은 횟수, 최대 연속 집중 시간 데이터 시각화.
+### 3.2 Phase 2 (Pro Launch)
 
----
+- iOS companion 연동 (CloudKit 기반 상태 전이 알림)
+- 수동 휴식 모드
+- 화이트리스트 (frontmost `bundleIdentifier` 기반)
+- 상세 통계 대시보드
+- 펫 성장 시스템
 
-## 4. 기술 스펙 (Technical Specifications)
+## 4. Free/Pro Packaging
 
-### 4.1. 아키텍처 및 프로젝트 구조
-* **구조:** Single Project, Multi-Target (macOS, iOS)
-* **모듈화:** 핵심 비즈니스 로직(타이머, 설정 데이터) 및 CloudKit 매니저는 `Shared` 디렉토리에서 양쪽 플랫폼이 공유.
+- Free: Mac 단일 기기 복귀 루프
+- Pro: Mac + iPhone 복귀 루프 + 예외 처리 + 누적 보상
+- Free included: 고정 임계시간 프리셋, 기본 시각 알림, 기본 일일 카운트
+- Pro included: iOS 연동, 커스텀 임계시간, 휴식 모드, 화이트리스트, 상세 통계, 펫 성장
+- Pricing: `$8.99~$9.99`는 가설 가격. 웹 waitlist fake-door 테스트 후 확정
 
-### 4.2. macOS 개발 스택 (하이브리드 접근)
-* **UI 프레임워크:** **SwiftUI** (macOS 13.0+)
-  * `MenuBarExtra`를 사용하여 메뉴바 인터페이스 및 드롭다운 뷰를 빠르고 모던하게 구현.
-* **코어 로직 (이벤트 감지):** **AppKit** (`NSEvent`)
-  * `NSEvent.addGlobalMonitorForEvents(matching:handler:)`를 사용하여 백그라운드에서 전역 마우스/키보드 이벤트 후킹.
-  * *권한 요구사항:* 앱 실행 시 `AXIsProcessTrusted()`를 체크하여 '시스템 환경설정 > 개인정보 보호 및 보안 > 손쉬운 사용(Accessibility)' 권한 획득 프롬프트 구현 필수.
-* **프로세스 설정:** `Info.plist` 내 `<key>LSUIElement</key>`를 `YES`로 설정하여 백그라운드 에이전트로 동작(Dock 아이콘 숨김).
-* **상태 감지 (화이트리스트용):** `NSWorkspace.shared.frontmostApplication`을 통해 현재 최상단 활성 앱 식별.
+## 5. Runtime State Model
 
-### 4.3. 데이터 동기화 및 iOS 연동 스택
-* **BaaS / 서버:** **CloudKit** (서버리스 아키텍처)
-  * 별도의 서드파티 백엔드(Firebase 등) 없이 애플 생태계 네이티브 활용 (비용 $0).
-* **푸시 알림 원리:**
-  1. 맥에서 유휴 상태 감지 시 CloudKit Private Database의 특정 레코드(Record) 상태 업데이트.
-  2. iOS 앱은 `CKQuerySubscription`을 통해 해당 레코드 변화를 구독(Subscribe).
-  3. APNs(Apple Push Notification service)를 통해 서버 개입 없이 아이폰으로 사일런트/일반 푸시 자동 발송.
+### 5.1 Runtime States
 
-### 4.4. 로컬 데이터 저장
-* 유저 설정값(타이머 임계치, 펫 상태 등)은 **UserDefaults** 또는 **SwiftData**를 활용하여 로컬 캐싱 및 CloudKit과 동기화.
+- `limitedNoAX`: Accessibility 미허용 제한 모드
+- `monitoring`: 정상 모니터링
+- `pausedManual`: 사용자가 수동 휴식 모드 활성화
+- `pausedWhitelist`: 전면 활성 앱이 화이트리스트에 포함
+- `alerting`: 알림 단계 진행 중
+- `suspendedSleepOrLock`: sleep/lock/user switching으로 일시 중단
 
----
+### 5.2 Content States
 
-## 5. 릴리즈 및 비즈니스 전략
-* **개발 페이즈 1 (MVP):** macOS 단일 타겟으로 메뉴바 UI와 AppKit 이벤트 감지 로직 완성.
-* **마케팅 전략 (Open Core):** 코어 로직(마우스/키보드 감지 및 타이머)을 GitHub에 오픈소스로 공개하여 개발자 커뮤니티 바이럴 및 실무 포트폴리오로 활용.
-* **수익 모델:** Freemium + Lifetime Purchase. 기본 기능은 무료, iOS 연동 및 화이트리스트 기능 포함 패키지는 1회성 결제($8.99 ~ $9.99)로 제공.
+- `Focus`
+- `IdleDetected`
+- `GentleNudge`
+- `StrongNudge`
+- `Recovery`
+- `Break`
+- `RemoteEscalation` (Pro)
+
+### 5.3 State Priority
+
+- `suspendedSleepOrLock` > `pausedManual` > `pausedWhitelist` > `alerting` > `monitoring`
+- `limitedNoAX`는 별도 capability gate로 동작하며, 감지 정확도 저하 상태를 항상 UI에 노출
+
+## 6. Idle Detection and Alert Rules
+
+### 6.1 Input Detection
+
+- Source events: `mouseMoved`, `mouseDown`, `scrollWheel`, `keyDown`
+- Event handler rule: `lastInputAt` 갱신 외 무거운 연산 금지
+- Idle timer rule: polling이 아닌 one-shot deadline timer 기반
+
+### 6.2 Escalation
+
+- Step 1: 임계시간 도달 시 `perimeter pulse` 1차 넛지
+- Step 2: 45~60초 추가 무입력 시 강한 시각 넛지
+- Step 3: 60~90초 추가 무입력 시 짧은 TTS 1회
+- Step 4: 장기 미복귀 시 iOS `RemoteEscalation` (Pro, best-effort)
+
+### 6.3 Fatigue Guardrails
+
+- 시간당 최대 알림 횟수 제한
+- 시간당 TTS 최대 횟수 제한
+- 복귀 직후 cooldown 적용
+- 동일 문구 연속 반복 금지 창 적용
+- 반복 오탐 시 휴식 모드 제안
+
+### 6.4 Out of Scope for MVP
+
+- 브라우저 도메인 단위 화이트리스트 (YouTube/Netflix 탭 인식)
+- 일반화된 fullscreen heuristic 자동 판정
+
+## 7. UI/UX and Visual System
+
+### 7.1 Menu Bar IA
+
+- Top: 현재 상태 + 남은 시간/카운트다운
+- Middle: 빠른 제어 (임계시간, 휴식, TTS on/off)
+- Bottom: 펫 요약 + 오늘 요약 통계
+- 상세 설정/상세 통계/펫 상세는 별도 창으로 분리
+
+### 7.2 Icon and Overlay Rules
+
+- 앱 아이콘과 메뉴바 아이콘 분리
+- 메뉴바 최소 상태 아이콘: 활성, 휴식, 알림, 권한 필요
+- 펫은 메뉴바 직접 노출보다 드롭다운/상세 화면 중심
+- 기본 시각 알림은 `perimeter pulse`, `grayscale`은 고강도 옵션
+
+### 7.3 Accessibility
+
+- Text contrast 4.5:1 이상
+- Core UI contrast 3:1 이상
+- 상태 전달 시 색상만으로 구분 금지
+- 초당 3회 초과 깜빡임 금지
+- `Reduce Motion`, `Increase Contrast`, `Differentiate Without Color` 대응
+
+## 8. Data and Persistence
+
+### 8.1 Source of Truth
+
+- Local `SwiftData`를 source of truth로 사용
+- `UserDefaults`는 device-local UI/운영 플래그만 저장
+
+### 8.2 MVP Models
+
+- `UserSettings`
+- `WhitelistApp`
+- `FocusSession`
+- `DailyStats`
+- `PetState`
+
+### 8.3 Data Rules
+
+- `DailyStats`는 `FocusSession` 기반 파생 집계
+- 화이트리스트 식별자는 앱 이름이 아닌 `bundleIdentifier`
+- 집중 시간 합산 조건: `monitoringActive && !breakMode && !whitelistedPause`
+- Raw input event는 저장하지 않고 시각/횟수/지속시간만 저장
+- Enum은 raw string 저장, 신규 필드는 optional/default 우선
+
+## 9. CloudKit and iOS Companion
+
+### 9.1 Positioning
+
+- iOS 연동은 실시간 보장 채널이 아닌 상태 전이 기반 보조 채널
+- “즉각적 푸시” 대신 `best-effort near real-time` 기준 사용
+
+### 9.2 Sync Shape
+
+- CloudKit Private DB + custom zone `NudgeSync`
+- Core record: `MacState(macDeviceID)`
+- Core fields: `state`, `stateChangedAt`, `sequence`, `breakUntil`, `sourceDeviceID`
+
+### 9.3 Write and Fetch Policy
+
+- Write trigger: `idle 진입`, `alert 발생`, `복귀`, `break 시작`, `break 종료`
+- macOS: local outbox 선기록 후 온라인 복구 시 최신 상태 coalesce 업로드
+- iOS: push 수신 여부와 무관하게 launch/foreground 시 delta fetch 수행
+
+### 9.4 Account and Entitlement
+
+- iCloud 계정 조건과 App Store 구매 계정 조건을 분리해 취급
+- 구매 entitlement source of truth는 StoreKit
+- CloudKit은 entitlement 저장소가 아니라 동기화 운반 계층
+
+## 10. Localization and Language Strategy
+
+### 10.1 Initial Language Support
+
+- 초기 지원 언어: 한국어(`ko`), 영어(`en`)
+- 범위: macOS 핵심 UI, iOS 핵심 UI, 권한 안내, 알림/TTS 핵심 문구, 업그레이드 문구, 웹 핵심 랜딩/프라이버시 카피
+- Locale behavior: 시스템 언어가 `ko/en`이면 해당 언어 표시, 미지원 언어는 영어 fallback
+
+### 10.2 Localization System Contract
+
+- 앱 문자열 단일 소스: `String Catalog (.xcstrings)`
+- 신규 `Localizable.strings` 추가 금지
+- 하드코딩 사용자 노출 문자열 금지
+- Key naming: `{domain}.{surface}.{intent}`
+- 모든 key에 번역 문맥 `comment` 필수
+- 수량형은 String Catalog variation으로 처리
+
+### 10.3 Copy Ownership
+
+- 앱 마이크로카피/알림 슬롯 원문: `content-strategist`
+- 마케팅/웹 원문: `marketing-strategist`
+- 번역 검수/용어집/키 거버넌스: `localization`
+- 앱/웹 공통 용어집 운영 (제품 카테고리, 프라이버시 문구, Free/Pro 명칭)
+
+### 10.4 UI and QA for KR/EN
+
+- KR/EN 모두 2줄 래핑 허용 가능한 레이아웃 기본
+- 고정 폭 CTA 버튼 금지
+- 누락 번역 fallback placeholder 노출 금지
+- QA gate: 누락 key 0, 하드코딩 문자열 0, truncation 0, KR/EN 스크린샷 검증, 앱/웹 용어 일치
+
+### 10.5 New Language Expansion Workflow
+
+- Step 1: 언어 추가 제안 + 비즈니스 우선순위 승인
+- Step 2: 범위 고정 (앱/웹/마케팅 포함 범위 정의)
+- Step 3: 용어집 업데이트 + 키 coverage 점검
+- Step 4: 번역/리뷰/문맥 검수
+- Step 5: 레이아웃/접근성/스크린샷 QA
+- Step 6: 릴리즈 게이트 통과 후 언어 활성화
+
+## 11. Privacy and Trust
+
+- 입력 내용(키 입력 텍스트) 저장/전송 금지
+- 화면 캡처/스크린 내용 수집 금지
+- 기본 감지 기능은 로컬 우선 동작
+- CloudKit은 iOS 연동 기능 사용 시에만 상태 동기화에 활용
+- 권한 거부 시 가능한 기능과 제한 기능을 UI에서 명확히 고지
+
+## 12. QA and Acceptance Criteria
+
+### 12.1 Timing SLAs
+
+- 임계시간 도달 오차: ±1초
+- 사용자 입력 복귀 후 알림 해제: 500ms 이내
+- 상태 아이콘 반영: 1초 이내
+
+### 12.2 Testability Requirements
+
+- DI points: `Clock`, `EventMonitor`, `PermissionProvider`, `FrontmostAppProvider`, `SpeechSynthesizer`, `CloudKitClient`
+- 필수 시나리오: AX 허용/거부/재시도, sleep/wake, lock/unlock, whitelist 전환, 입력 폭주, 오디오 부재, 다중 모니터, 오프라인 복구, iOS 미실행/알림 비허용
+
+## 13. Launch Web Presence
+
+- KPI: 방문 대비 waitlist 전환율, GitHub 클릭률, 출시 알림 구독 수
+- CTA 분리: `Waitlist`, `GitHub`, `iPhone 알림 소식 받기`
+- Waitlist 최소 필드: 이메일 + 관심사 1개
+- 관심사 세그먼트: macOS 출시, iOS 연동 관심, 오픈소스 업데이트
+- Web IA: Hero -> 문제/차별점 -> 동작 방식 -> 프라이버시/권한 -> Free/Pro 비교 -> Waitlist -> FAQ
+- SEO/OGP baseline: title/description template, canonical, FAQ schema, 1200x630 OGP 이미지
+- 웹도 초기 `ko/en` 동시 운영을 원칙으로 시작
+
+## 14. Open-Core Policy
+
+- 공개 후보: idle detection 엔진, 기본 macOS 셸, 기본 알림 로직
+- 비공개: iOS 연동, CloudKit 동기화 구현, 프리미엄 예외 규칙, 브랜드/캐릭터 자산
+- 라이선스/상표 정책은 별도 문서에서 확정
+
+## 15. Explicit Non-Goals (vNext)
+
+- 브라우저 탭/도메인 단위 자동 예외 인식
+- 감정 분석, 키스트로크 의미 분석, 화면 콘텐츠 분석
+- 다국어 3개 이상 동시 런칭
+
+## 16. Open Questions
+
+- TTS 기본값을 on으로 둘지 opt-in으로 둘지
+- `activate(ignoringOtherApps:)` 기반 강제 포커스 획득 허용 여부
+- 상세 통계와 펫 성장의 Free/Pro 경계 세분화
+- `Mac-only` 사용자용 Pro 가치 제안
+- 애니메이션 포맷을 SwiftUI native로 고정할지 Lottie 병행할지
+- 지역별 가격/얼리버드 정책 확정 시점
+
