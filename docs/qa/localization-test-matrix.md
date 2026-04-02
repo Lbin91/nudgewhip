@@ -9,7 +9,7 @@
 
 - 이 문서는 Nudge의 한국어/영어 현지화 품질을 릴리즈 게이트 수준에서 검증하기 위한 테스트 매트릭스다.
 - 목표는 앱과 웹의 핵심 문구가 같은 의미, 같은 용어, 같은 권한/프라이버시 메시지를 유지하는지 확인하는 것이다.
-- launch scope는 `docs/localization/translation-status.md`와 `docs/web/i18n/README.md` 기준을 따른다.
+- launch scope는 `docs/localization/translation-status.md` 기준을 따른다. 웹 i18n 범위는 `docs/web/i18n/README.md`가 작성된 후 해당 기준을 추가로 따른다.
 
 ## 2. Test Principles
 
@@ -29,6 +29,8 @@
 | Accessibility onboarding | EN | first-run permission screen | Accessibility rationale and limited mode remain clear and consistent with app disclosure | Required | meaning drift between app and website copy | `localization` + `macos-core` |
 | Idle alert copy | KR | `idle_notice`, `gentle_warning`, `strong_warning` 노출 | 모든 단계가 과하게 위협적으로 보이지 않고, 동일 세션 내 반복 문구가 과도하지 않음 | Required | tone drift, repeated copy fatigue | `content-strategist` |
 | Idle alert copy | EN | same alert ladder in English | sentence length remains short enough for alert overlays and TTS previews | Required | truncation, overly literal translation | `localization` + `content-strategist` |
+| Break suggestion | KR | 반복 오탐 감지 시 breakSuggestion 노출 | 휴식 제안 문구가 비난 톤 없이 표시되고, KR/EN 의미가 일치함 | Required | tone drift, missing copy | `content-strategist` + `localization` |
+| Break suggestion | EN | repeated false-positive triggers breakSuggestion | break suggestion copy is neutral, short, and meaning-matched with KR | Required | literal translation, truncation | `content-strategist` + `localization` |
 | TTS short lines | KR | alert 단계에서 TTS 문구 재생 | 한 문장만 발화되고, locale이 한국어일 때 한국어 음성이 사용됨 | Optional for screenshot; audio QA required | wrong voice locale, long utterance | `content-strategist` + `qa-integrator` |
 | TTS short lines | EN | alert 단계에서 TTS 문구 재생 | English TTS is selected and speech ends before user activity resumes | Optional for screenshot; audio QA required | locale mismatch, speech queue overlap | `content-strategist` + `qa-integrator` |
 | Upgrade / Pro copy | KR | Free/Pro 비교, 업그레이드 CTA 표시 | Free/Pro 명칭이 용어집과 일치하고, Pro 가치가 Mac+iPhone 루프로 이해됨 | Required | Pro value blur, pricing confusion | `marketing-strategist` |
@@ -59,6 +61,7 @@
 - Verify the same feature is described with the same intent on app, web, and store surfaces.
 - Verify `attention recall tool`, `Free`, `Pro`, and `best-effort near real-time` remain glossary-consistent.
 - Verify `no keystroke content`, `no screen capture`, and `Accessibility permission` remain aligned.
+- Verify `break_suggestion` copy remains neutral and consistent between notification surface and String Catalog.
 
 ### 5.2 Truncation
 

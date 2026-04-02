@@ -73,9 +73,9 @@
 
 | Item | Beta | Pro | Evidence | Blocker Rule |
 |---|---|---|---|---|
-| Analytics are privacy-friendly and limited to launch KPIs | [ ] | [ ] | analytics plan review | data collection creep is a blocker |
+| Analytics are privacy-friendly and limited to launch KPIs | [ ] | [ ] | spec.md Section 12 + data collection audit | data collection creep is a blocker |
 | No analytics event leaks sensitive content | [ ] | [ ] | event schema review | sensitive payload capture is a blocker |
-| Waitlist and launch metrics are defined | [ ] | [ ] | dashboard spec | no metric definition is a blocker |
+| Waitlist and launch metrics are defined | [ ] | [ ] | spec.md Section 13 (launch web KPI) + waitlist metric definition | no metric definition is a blocker |
 
 ### 3.7 Pricing Copy
 
@@ -84,6 +84,8 @@
 | Free/Pro messaging matches approved packaging | [ ] | [ ] | copy review | inconsistent package naming is a blocker |
 | Pricing copy does not claim unapproved pricing certainty | [ ] | [ ] | marketing review | false price certainty is a blocker |
 | Pricing copy does not imply real-time guarantees | [ ] | [ ] | marketing/privacy review | real-time promise is a blocker |
+
+- Free/Pro packaging의 source of truth는 `docs/app/spec.md` Section 4이다.
 
 ### 3.8 CloudKit and iOS Gating
 
@@ -160,8 +162,11 @@
 ## 6. Sign-Off
 
 - Product owner confirms launch scope
-- QA confirms all release blocker checks
-- Localization confirms launch-scope string parity
-- Privacy review confirms disclosure consistency
-- Engineering confirms rollback/fallback behavior
+- `qa-integrator`: 모든 release blocker 통과 확인 및 최종 서명
+- `localization`: launch-scope string parity 및 KR/EN 스크린샷 검증
+- `macos-core`: 권한 흐름, idle detection, 상태 전이 정상 확인
+- `cloudkit-sync`: macOS/iOS sync 및 복구 동작 확인
+- `data-architect`: 데이터 정합성 및 마이그레이션 안전성 확인
+- `content-strategist`: 알림 문구, 톤, break suggestion 카피 검증
+- `marketing-strategist`: 웹 카피, App Store 메타데이터, 가격 카피 검증
 
