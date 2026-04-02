@@ -15,8 +15,8 @@
 
 ## Current Reality
 
-- [ ] Xcode 템플릿 상태를 벗어나도록 placeholder 구조 제거
-- [ ] `nudge/Item.swift`를 실제 도메인 모델 구조로 교체
+- [x] Xcode 템플릿 상태를 벗어나도록 placeholder 구조 제거
+- [x] `nudge/Item.swift`를 실제 도메인 모델 구조로 교체
 - [ ] `nudge/Services`, `nudge/Views`, `nudge/Shared` 디렉터리 생성
 - [ ] 문서 기준 구현 우선순위를 코드 구조에 맞게 반영
 
@@ -24,18 +24,18 @@
 
 ### 1. Data Foundation
 
-- [ ] `nudge/Shared/Models/UserSettings.swift` 작성
-- [ ] `nudge/Shared/Models/WhitelistApp.swift` 작성
-- [ ] `nudge/Shared/Models/FocusSession.swift` 작성
-- [ ] `nudge/Shared/Models/DailyStats.swift` 작성
-- [ ] `nudge/Shared/Models/PetState.swift` 작성
-- [ ] SwiftData `ModelContainer` 초기화 구조 설계
-- [ ] local source of truth를 SwiftData로 고정
+- [x] `nudge/Shared/Models/UserSettings.swift` 작성
+- [x] `nudge/Shared/Models/WhitelistApp.swift` 작성
+- [x] `nudge/Shared/Models/FocusSession.swift` 작성
+- [x] `nudge/Shared/Models/DailyStats.swift` 작성
+- [x] `nudge/Shared/Models/PetState.swift` 작성
+- [x] SwiftData `ModelContainer` 초기화 구조 설계
+- [x] local source of truth를 SwiftData로 고정
 - [ ] `UserDefaults`는 device-local 플래그 전용으로 분리
-- [ ] enum raw string 저장 정책 반영
-- [ ] 신규 필드 optional/default 우선 정책 반영
-- [ ] `DailyStats`를 `FocusSession` 파생 집계로 구현
-- [ ] raw input event를 저장하지 않도록 저장 계층 가드 추가
+- [x] enum raw string 저장 정책 반영
+- [x] 신규 필드 optional/default 우선 정책 반영
+- [x] `DailyStats`를 `FocusSession` 파생 집계로 구현
+- [x] raw input event를 저장하지 않도록 저장 계층 가드 추가
 
 ### 2. Core Runtime and State Machine
 
@@ -73,7 +73,7 @@
 ### 4. Menu Bar UI
 
 - [ ] `nudge/nudgeApp.swift`를 실제 `MenuBarExtra` 구조로 정리
-- [ ] `nudge/ContentView.swift` placeholder 제거
+- [x] `nudge/ContentView.swift` placeholder 제거
 - [ ] `nudge/Views/MenuBarDropdownView.swift` 작성
 - [ ] `nudge/Views/StatusSummaryView.swift` 작성
 - [ ] `nudge/Views/QuickControlsView.swift` 작성
@@ -246,7 +246,7 @@
 
 ## Immediate Next Slice
 
-- [ ] `Item.swift` 제거 및 `Shared/Models` 기본 구조 생성
+- [x] `Item.swift` 제거 및 `Shared/Models` 기본 구조 생성
 - [ ] `PermissionManager`, `IdleMonitor`, `RuntimeStateController` 스켈레톤 작성
 - [ ] `Localizable.xcstrings` 생성 및 메뉴바 핵심 문자열 외부화
 - [ ] `MenuBarExtra` 기본 드롭다운을 실제 상태 기반 UI로 교체
