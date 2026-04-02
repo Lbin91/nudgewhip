@@ -178,6 +178,10 @@ MVP는 **최대 4화면**으로 제한한다.
 - KR/EN 모두 2줄 래핑 허용
 - 제한 모드도 실패가 아니라 “부분 기능 사용 상태”로 표현
 - 온보딩 종료 후에도 메뉴/설정에서 다시 열 수 있어야 함
+- 각 step에서 이전 화면으로 돌아갈 수 있는 back 액션을 제공한다.
+- 온보딩 창 닫기(Cmd+W/Esc) 시: Welcome 단계면 limitedNoAX로 진입, Basic Setup 이후면 저장된 draft 유지
+- 다크모드/Appearance에 관계없이 카드, 배경, 그림자가 가독성을 유지해야 한다.
+- 키보드 Tab/Enter 네비게이션과 VoiceOver를 지원한다.
 - 앱이 시스템 설정에서 foreground로 복귀하면 권한 상태를 즉시 재검사해야 한다.
 
 ## 9. Trigger and resume rules
@@ -198,6 +202,7 @@ MVP는 **최대 4화면**으로 제한한다.
 - 사용자가 `나중에 설정`으로 종료하면 completed는 true로 처리하되 최종 상태는 `limitedNoAX`로 남긴다.
 - 시스템 설정 앱으로 이동했다가 돌아오면 permission step에서 즉시 상태를 갱신한다.
 - 앱이 강제 종료되더라도 이미 저장된 basic setup 값은 재입력하지 않도록 유지한다.
+- 사용자가 온보딩 창을 닫으면(Cmd+W/Esc): 아무 설정도 저장하지 않은 Welcome 단계면 limitedNoAX로 진입하고, Basic Setup 이후면 이미 입력한 draft 값을 보존해 다음 실행에서 이어서 진행할 수 있게 한다.
 
 ## 10. State expectations
 
@@ -223,6 +228,10 @@ MVP는 **최대 4화면**으로 제한한다.
 - KR/EN 모두 문구가 disclosure 문서와 의미상 일치한다.
 - 다음 실행에서는 onboarding completed 플래그에 따라 반복 노출되지 않는다.
 - launch at login은 SwiftData가 아니라 device-local 설정 계층으로 저장된다.
+- 각 step에서 이전 화면으로 돌아가는 back 네비게이션이 동작한다.
+- 온보딩 창 닫기(Cmd+W/Esc) 시 정의된 동작(limitedNoAX 진입 또는 draft 보존)이 수행된다.
+- 다크모드/Appearance에서 모든 화면이 가독성을 유지한다.
+- 키보드 네비게이션(Tab/Enter)과 VoiceOver가 온보딩 전체 흐름에서 동작한다.
 
 ## 12. Recommended implementation order
 
@@ -232,7 +241,7 @@ MVP는 **최대 4화면**으로 제한한다.
 4. Basic setup 화면에서 `UserSettings` 저장 연결 (`idle threshold`, `TTS`, `visual mode`)
 5. launch at login은 `SMAppService` + device-local flag로 별도 연결
 6. granted / denied completion 분기 추가
-7. 메뉴/설정에서 onboarding 재오픈 경로 추가
+7. 메뉴/설정에서 onboarding 재오픈 경로 추가 (예: 메뉴바 드롭다운 하단 "도움말" 섹션에 "초기 설정 다시" 메뉴 아이템)
 8. KR/EN 로컬라이제이션 반영
 9. UI / permission flow 테스트 추가
 
@@ -267,6 +276,7 @@ Manual:
 - Phase 1은 자체 커스텀 오버레이 넛지를 사용하므로 `UNUserNotificationCenter` 권한 요청은 온보딩에서 제외한다.
 - `launch at login`은 사용자 기기별 동작이므로 SwiftData source of truth에 넣지 않고 device-local 설정으로 관리해야 한다.
 - Input Monitoring 권한은 현재 표준 경로의 필수 권한으로 가정하지 않는다. 실제 macOS 정책/배포 방식에서 필요성이 확인될 때만 별도 검토한다.
+- `LSUIElement = YES` 환경에서 전용 온보딩 윈도우를 띄울 때 Dock에 임시로 아이콘이 나타날 수 있다. `NSPanel` 또는 floating 레벨 윈도우를 검토해 이 사이드 이펙트를 최소화해야 한다.
 
 ## 15. Open questions
 

@@ -20,10 +20,12 @@ App Launch
       └─ Screen 1 Welcome
           └─ Continue
               └─ Screen 2 Accessibility Permission
+                  ← Back: return to Screen 1
                   ├─ Request Access -> permission granted? -> yes -> Screen 3 Basic Setup
                   │                                           └─ no/unchanged -> stay on Screen 2
                   ├─ Open Settings -> return to app -> recheck -> granted? -> Screen 3
                   └─ Set Up Later -> Screen 4B Limited Mode Completion
+              ← Back: return to Screen 2
               └─ Screen 3 Basic Setup
                   └─ Continue
                       ├─ if AX granted -> Screen 4A Ready to Monitor
@@ -46,6 +48,12 @@ App Launch
 ### Resume rules
 - 시스템 설정 앱에서 복귀하면 Screen 2에서 즉시 권한 상태를 재검사
 - 앱 재실행 시 이미 저장된 basic setup 값은 다시 묻지 않음
+
+### Window close rules
+- Cmd+W 또는 Esc로 창을 닫은 경우:
+  - Welcome 단계에서 닫으면: onboarding completed=true, `limitedNoAX`로 진입
+  - Permission 단계에서 닫으면: onboarding completed=true, `limitedNoAX`로 진입
+  - Basic Setup 단계에서 닫으면: 입력한 draft 값을 보존하고 다음 실행에서 이어서 진행 가능
 
 ## 4. Screen-by-screen spec
 
@@ -245,6 +253,9 @@ App Launch
 | Ready completion | Continue to Menu Bar | Dismiss onboarding |
 | Limited completion | Continue in Menu Bar | Dismiss onboarding in `limitedNoAX` |
 | Limited completion | Set Up Permission Again | Return to Permission step |
+| Permission | Back | Return to Welcome |
+| Basic Setup | Back | Return to Permission, preserve draft values |
+| Any screen | Cmd+W / Esc | Close window (see Window close rules) |
 
 ## 6. Suggested localization key groups
 
@@ -271,6 +282,10 @@ App Launch
 - 상태 전달은 아이콘 + 텍스트 동시 사용
 - permission / limited completion 화면은 색상만으로 성공/제한 상태를 구분하지 않음
 - macOS 작은 창 크기에서도 1-screen scrolling 없이 보여줄 수 있도록 정보량 제한
+- 최소 윈도우 너비 480pt, 높이 400pt 기준으로 레이아웃 검증
+- 다크모드에서 카드 배경, 그림자, 상태 badge 색상이 가독성을 유지해야 함
+- VoiceOver: 각 화면의 제목/본문/버튼이 의미 있는 accessibility label을 가져야 함
+- 키보드: Tab으로 CTA 간 이동, Enter/Space로 실행, Esc로 창 닫기 지원
 
 ## 8. Out-of-scope copy
 

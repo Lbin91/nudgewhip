@@ -157,6 +157,9 @@ enum OnboardingStep {
 | completionReady | finish | dismiss onboarding |
 | completionLimited | finish | dismiss onboarding |
 | completionLimited | retry permission | permission |
+| permission | back | welcome |
+| basicSetup | back | permission (preserve draft) |
+| any | window close (Cmd+W/Esc) | see window close rules |
 
 ## 6. Root UI composition
 
@@ -215,6 +218,7 @@ enum OnboardingStep {
 규칙:
 - 버튼 우선순위 시각 차등 명확히
 - KR/EN 모두 자연스럽게 줄바꿈 가능
+- Welcome 이외의 모든 화면에 back 버튼 포함 (secondary text button)
 
 ## 7.4 `PermissionStateBadge`
 
@@ -329,6 +333,22 @@ MVP 후보는 2개:
 
 즉, 최초 설치에서는 독립된 onboarding window를 띄우고, 완료 후 메뉴바 경험으로 넘긴다.
 
+### LSUIElement 고려사항
+
+현재 `LSUIElement = YES` 설정으로 앱이 Dock에 나타나지 않는다. 전용 온보딩 윈도우를 띄울 때:
+
+- `NSWindow` 직접 사용 시 Dock에 임시 아이콘이 나타날 수 있음
+- 대안: `NSPanel`(utility level) 또는 `NSWindow.Level.floating` 검토
+- 완료 후 윈도우를 `orderOut`하고 메뉴바 상태로 전환
+
+### Window close handling
+
+- `OnboardingCoordinator`는 window close(Cmd+W/Esc) 이벤트를 수신해야 한다.
+- close 시 동작:
+  - Welcome/Permission 단계: `limitedNoAX`로 진입, onboarding completed=true
+  - Basic Setup 단계: draft 값 보존, 다음 실행에서 resume 가능
+- `NSWindowDelegate.windowWillClose` 또는 SwiftUI `onDisappear`로 처리
+
 ## 10. Persistence design
 
 ## 10.1 `OnboardingStorage`
@@ -376,6 +396,7 @@ protocol LaunchAtLoginManaging {
 - `MenuBarViewModel.startIfNeeded()` 호출 가능 상태로 handoff
 
 설정 재오픈:
+- 메뉴바 드롭다운 하단 "도움말" 영역에 "초기 설정 다시" 메뉴 아이템 배치
 - menu/settings에서 onboarding coordinator 재호출
 
 ## 12. Localization design notes
@@ -412,7 +433,29 @@ Snapshot:
 - KR/EN 모든 step
 - granted / denied completion both
 
-## 14. Open implementation questions
+## 14. Accessibility and appearance requirements
+
+### Keyboard navigation
+- Tab: CTA 버튼 간 순차 이동
+- Enter/Space: 현재 포커스된 버튼 실행
+- Esc: 온보딩 창 닫기 (window close rules 적용)
+- Backspace: 이전 화면 복귀 (coordinator back action)
+
+### VoiceOver
+- 각 step 화면의 제목/본문/버튼에 의미 있는 accessibility label 적용
+- step 전환 시 announcement로 화면 변경 알림
+- permission 상태 badge는 값이 변경될 때 accessibility value 갱신
+
+### Dark mode / Appearance
+- `OnboardingCardView` 배경/그림자가 light/dark 모두에서 가독성 유지
+- 상태 badge 색상(확인 전/허용됨/필요함)이 색맹 사용자도 구분 가능하도록 아이콘+텍스트 동시 사용 (기존 규칙과 일치)
+- CTA 버튼 색상 대비 WCAG AA 기준 충족
+
+### Minimum window size
+- 너비: 480pt, 높이: 400pt 기준
+- Basic Setup 화면의 4개 컨트롤이 이 크기에서 scrolling 없이 표시되어야 함
+
+## 15. Open implementation questions
 
 - onboarding window를 SwiftUI `WindowGroup`로 둘지, 별도 window controller로 둘지
 - progress indicator를 step count로 보여줄지, 숨길지
