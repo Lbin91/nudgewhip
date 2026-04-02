@@ -1574,23 +1574,6 @@
         }
       }
     },
-    "onboarding.setup.idle_threshold.30s" : {
-      "comment" : "Idle threshold option for thirty seconds during onboarding for testing.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 sec (Test)"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30초(테스트)"
-          }
-        }
-      }
-    },
     "onboarding.setup.idle_threshold.5m" : {
       "comment" : "Idle threshold option for five minutes during onboarding.",
       "extractionState" : "stale",
@@ -1623,6 +1606,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10분"
+          }
+        }
+      }
+    },
+    "onboarding.setup.idle_threshold.30s" : {
+      "comment" : "Idle threshold option for thirty seconds during onboarding for testing.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 sec (Test)"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30초(테스트)"
           }
         }
       }
