@@ -133,5 +133,28 @@ struct nudgeTests {
         idleMonitor.fireCooldownExpired(at: baseDate.addingTimeInterval(391))
         #expect(runtimeController.snapshot.contentState == .focus)
     }
+    
+    @MainActor
+    @Test
+    func menuBarViewModelReflectsRuntimeIconAndCountdown() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            idleThreshold: 300
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+        
+        viewModel.startIfNeeded(at: baseDate)
+        
+        #expect(viewModel.systemImageName == "eye.circle")
+        #expect(viewModel.countdownText(now: baseDate) != nil)
+        
+        idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
+        #expect(viewModel.systemImageName == "exclamationmark.circle")
+        #expect(viewModel.countdownText(now: baseDate.addingTimeInterval(300)) == nil)
+    }
 
 }

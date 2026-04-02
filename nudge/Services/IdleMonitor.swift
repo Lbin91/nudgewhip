@@ -39,6 +39,12 @@ final class IdleMonitor {
     func refreshPermission(promptIfNeeded: Bool = false, at date: Date = .now) {
         let permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: promptIfNeeded)
         runtimeStateController.handle(permissionState == .granted ? .accessibilityGranted : .accessibilityDenied, at: date)
+        
+        if permissionState == .granted {
+            scheduleIdleDeadline(from: lastInputAt ?? date)
+        } else {
+            cancelAllDeadlines()
+        }
     }
     
     func setAccessibilityPermission(_ state: AccessibilityPermissionState, at date: Date = .now) {

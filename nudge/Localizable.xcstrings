@@ -1,482 +1,856 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "app.menu.action.quit" : {
-      "comment" : "Quit button title in the menu bar dropdown.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quit"
+  "sourceLanguage": "en",
+  "strings": {
+    "app.menu.action.quit": {
+      "comment": "Quit button title in the menu bar dropdown.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "종료"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
           }
         }
       }
     },
-    "app.menu.title" : {
-      "comment" : "Title shown for the menu bar extra.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nudge"
+    "app.menu.title": {
+      "comment": "Title shown for the menu bar extra.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nudge"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "넛지"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "넛지"
           }
         }
       }
     },
-    "menu.dropdown.group.settings" : {
-      "comment" : "Group title for current user settings in the dropdown.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
+    "menu.dropdown.group.settings": {
+      "comment": "Group title for current user settings in the dropdown.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "설정"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정"
           }
         }
       }
     },
-    "menu.dropdown.group.today" : {
-      "comment" : "Group title for today's summary in the dropdown.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Today"
+    "menu.dropdown.group.today": {
+      "comment": "Group title for today's summary in the dropdown.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "오늘"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오늘"
           }
         }
       }
     },
-    "menu.dropdown.group.workspace" : {
-      "comment" : "Group title for workspace metadata in the dropdown.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workspace"
+    "menu.dropdown.group.workspace": {
+      "comment": "Group title for workspace metadata in the dropdown.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "작업 환경"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "작업 환경"
           }
         }
       }
     },
-    "menu.dropdown.label.alerts" : {
-      "comment" : "Label for today's alert count.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alerts"
+    "menu.dropdown.label.alerts": {
+      "comment": "Label for today's alert count.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerts"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "알림 수"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알림 수"
           }
         }
       }
     },
-    "menu.dropdown.label.completed_sessions" : {
-      "comment" : "Label for today's completed focus session count.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completed sessions"
+    "menu.dropdown.label.completed_sessions": {
+      "comment": "Label for today's completed focus session count.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed sessions"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "완료된 세션"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료된 세션"
           }
         }
       }
     },
-    "menu.dropdown.label.focus_time" : {
-      "comment" : "Label for today's total focus time.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Focus time"
+    "menu.dropdown.label.focus_time": {
+      "comment": "Label for today's total focus time.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus time"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "집중 시간"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "집중 시간"
           }
         }
       }
     },
-    "menu.dropdown.label.idle_threshold" : {
-      "comment" : "Label for the idle threshold setting.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Idle threshold"
+    "menu.dropdown.label.idle_threshold": {
+      "comment": "Label for the idle threshold setting.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle threshold"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "무입력 기준 시간"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "무입력 기준 시간"
           }
         }
       }
     },
-    "menu.dropdown.label.pet_emotion" : {
-      "comment" : "Label for the current pet emotion.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet emotion"
+    "menu.dropdown.label.pet_emotion": {
+      "comment": "Label for the current pet emotion.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet emotion"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 감정"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펫 감정"
           }
         }
       }
     },
-    "menu.dropdown.label.pet_mode" : {
-      "comment" : "Label for the current pet presentation mode.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet mode"
+    "menu.dropdown.label.pet_mode": {
+      "comment": "Label for the current pet presentation mode.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet mode"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 모드"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펫 모드"
           }
         }
       }
     },
-    "menu.dropdown.label.pet_stage" : {
-      "comment" : "Label for the current pet growth stage.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet stage"
+    "menu.dropdown.label.pet_stage": {
+      "comment": "Label for the current pet growth stage.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pet stage"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 단계"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펫 단계"
           }
         }
       }
     },
-    "menu.dropdown.label.tts" : {
-      "comment" : "Label for text-to-speech enablement.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "TTS"
+    "menu.dropdown.label.tts": {
+      "comment": "Label for text-to-speech enablement.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TTS"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "음성 알림"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음성 알림"
           }
         }
       }
     },
-    "menu.dropdown.label.whitelist_apps" : {
-      "comment" : "Label for the count of whitelisted apps.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Whitelist apps"
+    "menu.dropdown.label.whitelist_apps": {
+      "comment": "Label for the count of whitelisted apps.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whitelist apps"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "화이트리스트 앱"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "화이트리스트 앱"
           }
         }
       }
     },
-    "menu.dropdown.subtitle.bootstrap" : {
-      "comment" : "Subtitle describing the current bootstrap status of the menu bar app.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Localized menu bar bootstrap"
+    "menu.dropdown.subtitle.bootstrap": {
+      "comment": "Subtitle describing the current bootstrap status of the menu bar app.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Localized menu bar bootstrap"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "로컬라이즈된 메뉴바 기초 구조"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬라이즈된 메뉴바 기초 구조"
           }
         }
       }
     },
-    "menu.dropdown.value.disabled" : {
-      "comment" : "Value shown when a toggle is disabled.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disabled"
+    "menu.dropdown.value.disabled": {
+      "comment": "Value shown when a toggle is disabled.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disabled"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "끔"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "끔"
           }
         }
       }
     },
-    "menu.dropdown.value.enabled" : {
-      "comment" : "Value shown when a toggle is enabled.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enabled"
+    "menu.dropdown.value.enabled": {
+      "comment": "Value shown when a toggle is enabled.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enabled"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "켬"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "켬"
           }
         }
       }
     },
-    "menu.dropdown.value.none" : {
-      "comment" : "Fallback value shown when an optional state is unavailable.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "None"
+    "menu.dropdown.value.none": {
+      "comment": "Fallback value shown when an optional state is unavailable.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "없음"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "없음"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_emotion.cheer" : {
-      "comment" : "Localized pet emotion value for cheer.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cheer"
+    "menu.dropdown.value.pet_emotion.cheer": {
+      "comment": "Localized pet emotion value for cheer.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cheer"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "응원"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "응원"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_emotion.concern" : {
-      "comment" : "Localized pet emotion value for concern.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Concern"
+    "menu.dropdown.value.pet_emotion.concern": {
+      "comment": "Localized pet emotion value for concern.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concern"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "걱정"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "걱정"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_emotion.happy" : {
-      "comment" : "Localized pet emotion value for happy.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Happy"
+    "menu.dropdown.value.pet_emotion.happy": {
+      "comment": "Localized pet emotion value for happy.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Happy"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기쁨"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기쁨"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_emotion.sleep" : {
-      "comment" : "Localized pet emotion value for sleep.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sleep"
+    "menu.dropdown.value.pet_emotion.sleep": {
+      "comment": "Localized pet emotion value for sleep.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "휴식"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴식"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_mode.minimal" : {
-      "comment" : "Localized value for the minimal pet presentation mode.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimal"
+    "menu.dropdown.value.pet_mode.minimal": {
+      "comment": "Localized value for the minimal pet presentation mode.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minimal"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미니멀"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미니멀"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_mode.sprout" : {
-      "comment" : "Localized value for the sprout pet presentation mode.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprout"
+    "menu.dropdown.value.pet_mode.sprout": {
+      "comment": "Localized value for the sprout pet presentation mode.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprout"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새싹"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새싹"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_stage.buddy" : {
-      "comment" : "Localized value for the buddy pet growth stage.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buddy"
+    "menu.dropdown.value.pet_stage.buddy": {
+      "comment": "Localized value for the buddy pet growth stage.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buddy"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "버디"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "버디"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_stage.guide" : {
-      "comment" : "Localized value for the guide pet growth stage.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guide"
+    "menu.dropdown.value.pet_stage.guide": {
+      "comment": "Localized value for the guide pet growth stage.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "가이드"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가이드"
           }
         }
       }
     },
-    "menu.dropdown.value.pet_stage.sprout" : {
-      "comment" : "Localized value for the sprout pet growth stage.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprout"
+    "menu.dropdown.value.pet_stage.sprout": {
+      "comment": "Localized value for the sprout pet growth stage.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprout"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새싹"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새싹"
           }
         }
       }
     },
-    "menu.dropdown.value.unavailable" : {
-      "comment" : "Fallback value shown when data is not yet available.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unavailable"
+    "menu.dropdown.value.unavailable": {
+      "comment": "Fallback value shown when data is not yet available.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable"
           }
         },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "준비 중"
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "준비 중"
+          }
+        }
+      }
+    },
+    "menu.quick.action.refresh_permission": {
+      "comment": "Button title for rechecking Accessibility permission.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refresh permission"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "권한 다시 확인"
+          }
+        }
+      }
+    },
+    "menu.quick.action.reset_timer": {
+      "comment": "Button title for resetting the idle timer from the dropdown.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset timer"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "타이머 재설정"
+          }
+        }
+      }
+    },
+    "menu.status.detail.alerting": {
+      "comment": "Helper text shown while alert escalation is active.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nudge escalation is active until activity returns."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용자 활동이 돌아올 때까지 넛지 에스컬레이션이 진행됩니다."
+          }
+        }
+      }
+    },
+    "menu.status.detail.limited_no_ax": {
+      "comment": "Helper text shown when Accessibility permission is missing.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibility permission is needed for active idle detection."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "실제 무입력 감지를 위해 손쉬운 사용 권한이 필요합니다."
+          }
+        }
+      }
+    },
+    "menu.status.detail.monitoring": {
+      "comment": "Helper text shown while monitoring is active.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle countdown is running with the current threshold."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 기준 시간으로 무입력 카운트다운이 진행 중입니다."
+          }
+        }
+      }
+    },
+    "menu.status.detail.paused_manual": {
+      "comment": "Helper text shown while manual pause is active.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual pause is active, so idle alerts are stopped."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수동 휴식 상태라서 무입력 알림이 멈춰 있습니다."
+          }
+        }
+      }
+    },
+    "menu.status.detail.paused_whitelist": {
+      "comment": "Helper text shown while a whitelisted app is frontmost.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A whitelisted app is frontmost, so monitoring is paused."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "화이트리스트 앱이 전면에 있어 모니터링이 일시중지되었습니다."
+          }
+        }
+      }
+    },
+    "menu.status.detail.suspended": {
+      "comment": "Helper text shown while monitoring is suspended due to sleep or lock.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monitoring is suspended while the Mac is asleep, locked, or switched away."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac이 잠자기, 잠금 또는 빠른 사용자 전환 상태라 모니터링이 중단되었습니다."
+          }
+        }
+      }
+    },
+    "menu.status.label.next_check": {
+      "comment": "Label for the remaining time until the next idle check.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next check"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음 확인"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.break": {
+      "comment": "Content state label for break.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Break"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴식"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.focus": {
+      "comment": "Content state label for focus.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "집중"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.gentle_nudge": {
+      "comment": "Content state label for gentle nudge.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gentle nudge"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가벼운 넛지"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.idle_detected": {
+      "comment": "Content state label for detected idle.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle detected"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "무입력 감지"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.recovery": {
+      "comment": "Content state label for recovery.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recovery"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복귀"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.remote_escalation": {
+      "comment": "Content state label for remote escalation.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote escalation"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "원격 에스컬레이션"
+          }
+        }
+      }
+    },
+    "menu.status.value.content.strong_nudge": {
+      "comment": "Content state label for strong nudge.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strong nudge"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "강한 넛지"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.alerting": {
+      "comment": "Runtime state label for alerting.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerting"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알림 진행 중"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.limited_no_ax": {
+      "comment": "Runtime state label for limited mode without Accessibility.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limited mode"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제한 모드"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.monitoring": {
+      "comment": "Runtime state label for active monitoring.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monitoring"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모니터링"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.paused_manual": {
+      "comment": "Runtime state label for manual pause.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Break mode"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴식 모드"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.paused_whitelist": {
+      "comment": "Runtime state label for whitelist pause.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Whitelist pause"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "화이트리스트 일시중지"
+          }
+        }
+      }
+    },
+    "menu.status.value.runtime.suspended": {
+      "comment": "Runtime state label for suspended monitoring.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suspended"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "중단됨"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

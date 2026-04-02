@@ -17,7 +17,7 @@
 
 - [x] Xcode 템플릿 상태를 벗어나도록 placeholder 구조 제거
 - [x] `nudge/Item.swift`를 실제 도메인 모델 구조로 교체
-- [ ] `nudge/Services`, `nudge/Views`, `nudge/Shared` 디렉터리 생성
+- [x] `nudge/Services`, `nudge/Views`, `nudge/Shared` 디렉터리 생성
 - [ ] 문서 기준 구현 우선순위를 코드 구조에 맞게 반영
 
 ## Phase 1: macOS Free Open Beta
@@ -72,18 +72,18 @@
 
 ### 4. Menu Bar UI
 
-- [ ] `nudge/nudgeApp.swift`를 실제 `MenuBarExtra` 구조로 정리
+- [x] `nudge/nudgeApp.swift`를 실제 `MenuBarExtra` 구조로 정리
 - [x] `nudge/ContentView.swift` placeholder 제거
-- [ ] `nudge/Views/MenuBarDropdownView.swift` 작성
-- [ ] `nudge/Views/StatusSummaryView.swift` 작성
-- [ ] `nudge/Views/QuickControlsView.swift` 작성
-- [ ] `nudge/Views/DailySummaryView.swift` 작성
-- [ ] 드롭다운 상단에 현재 상태 + 카운트다운 표시
-- [ ] 중간 구역에 임계시간, TTS on/off, 기본 제어 배치
-- [ ] 하단 구역에 오늘 요약 통계 표시
-- [ ] 제한 모드 UI 표시
+- [x] `nudge/Views/MenuBarDropdownView.swift` 작성
+- [x] `nudge/Views/StatusSummaryView.swift` 작성
+- [x] `nudge/Views/QuickControlsView.swift` 작성
+- [x] `nudge/Views/DailySummaryView.swift` 작성
+- [x] 드롭다운 상단에 현재 상태 + 카운트다운 표시
+- [x] 중간 구역에 임계시간, TTS on/off, 기본 제어 배치
+- [x] 하단 구역에 오늘 요약 통계 표시
+- [x] 제한 모드 UI 표시
 - [ ] 권한 요청 CTA와 설정 이동 흐름 구현
-- [ ] 상태 변화에 따른 메뉴바 아이콘 반영
+- [x] 상태 변화에 따른 메뉴바 아이콘 반영
 - [ ] 상태 아이콘 반영 1초 이내 목표 충족
 
 ### 5. Free Visual and Pet Layer
@@ -249,5 +249,5 @@
 - [x] `Item.swift` 제거 및 `Shared/Models` 기본 구조 생성
 - [x] `PermissionManager`, `IdleMonitor`, `RuntimeStateController` 스켈레톤 작성
 - [x] `Localizable.xcstrings` 생성 및 메뉴바 핵심 문자열 외부화
-- [ ] `MenuBarExtra` 기본 드롭다운을 실제 상태 기반 UI로 교체
+- [x] `MenuBarExtra` 기본 드롭다운을 실제 상태 기반 UI로 교체
 - [ ] idle detection + limitedNoAX + perimeter pulse까지 동작하는 최소 Free 루프 완성
