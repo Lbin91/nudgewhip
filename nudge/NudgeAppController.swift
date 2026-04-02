@@ -36,7 +36,10 @@ final class NudgeAppController {
     }
     
     func presentOnboarding() {
-        onboardingCoordinator.present()
+        let coordinator = onboardingCoordinator
+        DispatchQueue.main.async {
+            coordinator.present()
+        }
     }
     
     private func startFlow() {
