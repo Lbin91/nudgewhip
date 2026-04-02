@@ -14,6 +14,7 @@ enum NudgeRuntimeState: String, Codable, CaseIterable, Sendable {
     case pausedManual
     case pausedWhitelist
     case alerting
+    case pausedSchedule
     case suspendedSleepOrLock
 }
 
@@ -45,6 +46,8 @@ enum NudgeRuntimeEvent: Equatable, Sendable {
     case fastUserSwitchingEnded
     case ttsFinished
     case cooldownExpired
+    case scheduleWindowEntered
+    case scheduleWindowExited
     case monitorStartFailed
 }
 
@@ -54,6 +57,7 @@ struct RuntimeSnapshot: Equatable, Sendable {
     var accessibilityGranted = false
     var manualPauseEnabled = false
     var whitelistMatched = false
+    var schedulePaused = false
     var suspended = false
     var lastInputAt: Date?
 }
@@ -127,6 +131,16 @@ enum RuntimeStateReducer {
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = baseContentState(for: next.runtimeState)
             
+        case .scheduleWindowEntered:
+            next.schedulePaused = true
+            next.runtimeState = resolveBaseRuntimeState(from: next)
+            next.contentState = baseContentState(for: next.runtimeState)
+            
+        case .scheduleWindowExited:
+            next.schedulePaused = false
+            next.runtimeState = resolveBaseRuntimeState(from: next)
+            next.contentState = baseContentState(for: next.runtimeState)
+            
         case .cooldownExpired:
             if next.runtimeState == .monitoring && next.contentState == .recovery {
                 next.contentState = .focus
@@ -156,6 +170,10 @@ enum RuntimeStateReducer {
             return .limitedNoAX
         }
         
+        if snapshot.schedulePaused {
+            return .pausedSchedule
+        }
+        
         if snapshot.manualPauseEnabled {
             return .pausedManual
         }
@@ -170,7 +188,7 @@ enum RuntimeStateReducer {
     /// 런타임 상태에 대응하는 기본 콘텐츠 상태 반환
     private static func baseContentState(for runtimeState: NudgeRuntimeState) -> NudgeContentState {
         switch runtimeState {
-        case .pausedManual:
+        case .pausedManual, .pausedSchedule:
             return .break
         case .limitedNoAX, .monitoring, .pausedWhitelist, .alerting, .suspendedSleepOrLock:
             return .focus

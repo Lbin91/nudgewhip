@@ -12,6 +12,7 @@ struct QuickControlsView: View {
     let petPresentationText: String
     let ttsStatusText: String
     let idleThresholdText: String
+    let scheduleText: String
     
     var body: some View {
         GroupBox {
@@ -61,6 +62,12 @@ struct QuickControlsView: View {
                     Text(petPresentationText)
                 } label: {
                     Text(localizedAppString("menu.dropdown.label.pet_mode", defaultValue: "Pet mode"))
+                }
+                
+                LabeledContent {
+                    Text(scheduleText)
+                } label: {
+                    Text(localizedAppString("menu.dropdown.label.schedule", defaultValue: "Schedule"))
                 }
                 
                 HStack {

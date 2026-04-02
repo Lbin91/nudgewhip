@@ -40,6 +40,8 @@ final class MenuBarViewModel {
             return "checkmark.circle"
         case .alerting:
             return "exclamationmark.circle"
+        case .pausedSchedule:
+            return "clock.badge"
         case .suspendedSleepOrLock:
             return "moon.zzz"
         }

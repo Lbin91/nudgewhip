@@ -25,6 +25,9 @@ final class UserSettings {
     var proUnlocked: Bool
     var preferredLocaleIdentifier: String?
     var petPresentationRawValue: String
+    var scheduleEnabled: Bool
+    var scheduleStartSecondsFromMidnight: Int
+    var scheduleEndSecondsFromMidnight: Int
     var createdAt: Date
     var updatedAt: Date
     
@@ -47,6 +50,9 @@ final class UserSettings {
         proUnlocked: Bool = false,
         preferredLocaleIdentifier: String? = nil,
         petPresentationMode: PetPresentationMode = .sprout,
+        scheduleEnabled: Bool = false,
+        scheduleStartSecondsFromMidnight: Int = 32400,
+        scheduleEndSecondsFromMidnight: Int = 61200,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {
@@ -61,6 +67,9 @@ final class UserSettings {
         self.proUnlocked = proUnlocked
         self.preferredLocaleIdentifier = preferredLocaleIdentifier
         self.petPresentationRawValue = petPresentationMode.rawValue
+        self.scheduleEnabled = scheduleEnabled
+        self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
+        self.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }

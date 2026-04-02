@@ -55,6 +55,8 @@ struct StatusSummaryView: View {
             return localizedAppString("menu.status.value.runtime.paused_whitelist", defaultValue: "Whitelist pause")
         case .alerting:
             return localizedAppString("menu.status.value.runtime.alerting", defaultValue: "Alerting")
+        case .pausedSchedule:
+            return localizedAppString("menu.status.value.runtime.paused_schedule", defaultValue: "Waiting for schedule")
         case .suspendedSleepOrLock:
             return localizedAppString("menu.status.value.runtime.suspended", defaultValue: "Suspended")
         }
@@ -102,6 +104,11 @@ struct StatusSummaryView: View {
             return localizedAppString(
                 "menu.status.detail.alerting",
                 defaultValue: "Nudge escalation is active until activity returns."
+            )
+        case .pausedSchedule:
+            return localizedAppString(
+                "menu.status.detail.paused_schedule",
+                defaultValue: "Outside the active schedule. Monitoring will resume at the scheduled time."
             )
         case .suspendedSleepOrLock:
             return localizedAppString(

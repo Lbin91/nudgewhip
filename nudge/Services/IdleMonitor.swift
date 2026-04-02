@@ -24,10 +24,14 @@ final class IdleMonitor {
     let idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
+    let scheduleEnabled: Bool
+    let scheduleStart: TimeInterval
+    let scheduleEnd: TimeInterval
     
     private var idleDeadlineWorkItem: DispatchWorkItem?
     private var alertEscalationWorkItem: DispatchWorkItem?
     private var cooldownWorkItem: DispatchWorkItem?
+    private var scheduleBoundaryWorkItem: DispatchWorkItem?
     
     /// IdleMonitor 생성. 권한·상태·이벤트 모니터 주입 가능 (기본값 제공)
     init(
@@ -38,7 +42,10 @@ final class IdleMonitor {
         alertManager: (any AlertManaging)? = nil,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
-        cooldownDuration: TimeInterval = 60
+        cooldownDuration: TimeInterval = 60,
+        scheduleEnabled: Bool = false,
+        scheduleStart: TimeInterval = 32400,
+        scheduleEnd: TimeInterval = 61200
     ) {
         self.permissionManager = permissionManager ?? PermissionManager()
         self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
@@ -48,11 +55,16 @@ final class IdleMonitor {
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
+        self.scheduleEnabled = scheduleEnabled
+        self.scheduleStart = scheduleStart
+        self.scheduleEnd = scheduleEnd
     }
     
     /// 권한 확인 후 유휴 감시 시작
+    /// 권한 확인 후 유휴 감시 시작
     func start(at date: Date = .now, promptForPermission: Bool = false) {
         refreshPermission(promptIfNeeded: promptForPermission, at: date)
+        checkSchedule(at: date)
         if runtimeStateController.snapshot.runtimeState == .monitoring {
             scheduleIdleDeadline(from: date)
         }
@@ -141,6 +153,7 @@ final class IdleMonitor {
             cancelAllDeadlines()
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
             lastInputAt = date
+            checkSchedule(at: date)
             scheduleIdleDeadline(from: date)
         default:
             break
@@ -179,6 +192,60 @@ final class IdleMonitor {
         cooldownWorkItem = nil
     }
     
+    /// 현재 시간이 스케줄 윈도우 내인지 확인하고 상태 전이
+    func checkSchedule(at date: Date = .now) {
+        guard scheduleEnabled else { return }
+        let secondsFromMidnight: TimeInterval = TimeInterval(
+            Calendar.current.component(.hour, from: date) * 3600
+            + Calendar.current.component(.minute, from: date) * 60
+            + Calendar.current.component(.second, from: date)
+        )
+        
+        let inWindow: Bool
+        if scheduleStart <= scheduleEnd {
+            inWindow = secondsFromMidnight >= scheduleStart && secondsFromMidnight < scheduleEnd
+        } else {
+            // 자정을 넘나드는 스케줄 (예: 22:00 - 06:00)
+            inWindow = secondsFromMidnight >= scheduleStart || secondsFromMidnight < scheduleEnd
+        }
+        
+        let snapshot = runtimeStateController.snapshot
+        if inWindow && snapshot.schedulePaused {
+            runtimeStateController.handle(.scheduleWindowExited, at: date)
+            scheduleAlertSync()
+        } else if !inWindow && !snapshot.schedulePaused {
+            runtimeStateController.handle(.scheduleWindowEntered, at: date)
+            scheduleAlertSync()
+            cancelAllDeadlines()
+        }
+        
+        scheduleNextBoundary(from: date)
+    }
+    
+    /// 다음 스케줄 경계 시각에 타이머 예약
+    private func scheduleNextBoundary(from date: Date) {
+        scheduleBoundaryWorkItem?.cancel()
+        scheduleBoundaryWorkItem = nil
+        guard scheduleEnabled else { return }
+        
+        let cal = Calendar.current
+        let todayStart = cal.startOfDay(for: date)
+        let secondsFromMidnight = date.timeIntervalSince(todayStart)
+        
+        let nextStartOffset = scheduleStart > secondsFromMidnight ? scheduleStart : scheduleStart + 86400
+        let nextEndOffset = scheduleEnd > secondsFromMidnight ? scheduleEnd : scheduleEnd + 86400
+        let nextBoundaryOffset = min(nextStartOffset, nextEndOffset)
+        let delay = max(1, nextBoundaryOffset - secondsFromMidnight)
+        
+        let workItem = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                self?.checkSchedule(at: .now)
+            }
+        }
+        scheduleBoundaryWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
+    }
+    
     /// 유휴 데드라인 스케줄. 모니터링 상태에서만 동작
     private func scheduleIdleDeadline(from date: Date) {
         idleDeadlineWorkItem?.cancel()
@@ -214,6 +281,8 @@ final class IdleMonitor {
         alertEscalationWorkItem = nil
         cooldownWorkItem?.cancel()
         cooldownWorkItem = nil
+        scheduleBoundaryWorkItem?.cancel()
+        scheduleBoundaryWorkItem = nil
         idleDeadlineAt = nil
         alertEscalationDeadlineAt = nil
         cooldownDeadlineAt = nil

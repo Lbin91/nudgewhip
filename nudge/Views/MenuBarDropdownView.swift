@@ -22,7 +22,8 @@ struct MenuBarDropdownView: View {
                 settings: settings,
                 petPresentationText: petPresentationText,
                 ttsStatusText: ttsStatusText,
-                idleThresholdText: idleThresholdText
+                idleThresholdText: idleThresholdText,
+                scheduleText: scheduleText
             )
             
             DailySummaryView(
@@ -64,6 +65,24 @@ struct MenuBarDropdownView: View {
         case .minimal:
             return localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
         }
+    }
+    
+    /// 스케줄 활성 상태 문자열
+    private var scheduleText: String {
+        guard let settings, settings.scheduleEnabled else {
+            return localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+        }
+        let startMinutes = settings.scheduleStartSecondsFromMidnight / 60
+        let endMinutes = settings.scheduleEndSecondsFromMidnight / 60
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = [.pad]
+        let startStr = formatter.string(from: TimeInterval(startMinutes * 60))
+            ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+        let endStr = formatter.string(from: TimeInterval(endMinutes * 60))
+            ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+        return "\(startStr) - \(endStr)"
     }
     
     /// 펫 성장 단계 로컬라이즈 문자열
