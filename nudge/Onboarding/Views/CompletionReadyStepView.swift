@@ -18,10 +18,10 @@ struct CompletionReadyStepView: View {
             OnboardingSectionCard(title: localizedAppString("onboarding.completion.ready.header", defaultValue: "Ready to go")) {
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
-                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), value: idleThresholdText)
-                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.schedule", defaultValue: "Schedule"), value: scheduleText)
-                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), value: launchAtLoginText)
-                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.tts", defaultValue: "Voice nudges"), value: ttsText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), idleThresholdText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.schedule", defaultValue: "Schedule"), scheduleText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), launchAtLoginText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.tts", defaultValue: "Voice nudges"), ttsText)
                     }
                 }
             }
@@ -35,6 +35,19 @@ struct CompletionReadyStepView: View {
                 }
             }
         }
+    }
+    
+    private func summaryRow(_ label: String, _ value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text(label)
+                .foregroundStyle(.secondary)
+            Text("-")
+                .foregroundStyle(.tertiary)
+            Text(value)
+                .foregroundStyle(.primary)
+        }
+        .font(.body)
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     private func completionBullet(_ text: String) -> some View {

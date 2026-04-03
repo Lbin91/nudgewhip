@@ -5,6 +5,8 @@ struct BasicSetupStepView: View {
     @Binding var launchAtLoginEnabled: Bool
     @Binding var ttsEnabled: Bool
     
+    @State private var activePreviewStyle: AlertVisualStyle? = nil
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             OnboardingSectionCard(
@@ -38,6 +40,19 @@ struct BasicSetupStepView: View {
                         .toggleStyle(.checkbox)
                     Toggle(localizedAppString("onboarding.setup.tts.label", defaultValue: "Use voice nudges"), isOn: $ttsEnabled)
                         .toggleStyle(.checkbox)
+                }
+            }
+            
+            NudgePreviewCard(
+                idleThresholdSeconds: $idleThresholdSeconds,
+                ttsEnabled: $ttsEnabled,
+                activePreviewStyle: $activePreviewStyle
+            )
+        }
+        .overlay {
+            if let style = activePreviewStyle {
+                NudgePreviewOverlay(style: style) {
+                    activePreviewStyle = nil
                 }
             }
         }
