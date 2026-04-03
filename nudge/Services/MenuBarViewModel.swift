@@ -6,15 +6,34 @@
 
 import Foundation
 import Observation
+import SwiftData
 
 @MainActor
 @Observable
 final class MenuBarViewModel {
     let idleMonitor: IdleMonitor
+    private let modelContext: ModelContext
     private(set) var hasStarted = false
+    private(set) var idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+    private(set) var ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+    private(set) var petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+    private(set) var scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+    private(set) var scheduleEnabled = false
+    private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
+    private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
+    private(set) var whitelistCount = 0
+    private(set) var petStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+    private(set) var petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+    private(set) var todayStats = DailyStats.derive(for: [], on: .now)
     
     init(idleMonitor: IdleMonitor? = nil) {
         self.idleMonitor = idleMonitor ?? IdleMonitor()
+        self.modelContext = NudgeModelContainer.shared.mainContext
+    }
+    
+    init(idleMonitor: IdleMonitor? = nil, modelContext: ModelContext) {
+        self.idleMonitor = idleMonitor ?? IdleMonitor()
+        self.modelContext = modelContext
     }
     
     /// IdleMonitor의 현재 런타임 상태
@@ -123,10 +142,135 @@ final class MenuBarViewModel {
     /// SwiftData에 저장된 사용자 설정을 runtime monitor에 반영
     func apply(settings: UserSettings, at date: Date = .now) {
         idleMonitor.applySettings(settings, at: date)
+        refreshMenuSnapshot(now: date)
     }
     
     /// SwiftData에 저장된 whitelist 앱 목록을 runtime monitor에 반영
     func apply(whitelistApps: [WhitelistApp], at date: Date = .now) {
         idleMonitor.applyWhitelistApps(whitelistApps, at: date)
+        refreshMenuSnapshot(now: date)
+    }
+    
+    func refreshMenuSnapshot(now: Date = .now) {
+        let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
+        let petState = try? modelContext.fetch(FetchDescriptor<PetState>()).first
+        let whitelistApps = (try? modelContext.fetch(FetchDescriptor<WhitelistApp>())) ?? []
+        let focusSessions = (try? modelContext.fetch(FetchDescriptor<FocusSession>())) ?? []
+        
+        todayStats = DailyStats.derive(for: focusSessions, on: now)
+        whitelistCount = whitelistApps.count
+        
+        applyMenuSettingsSnapshot(settings)
+        applyPetSnapshot(petState)
+        idleMonitor.applyWhitelistApps(whitelistApps, at: now)
+    }
+    
+    func updateScheduleEnabled(_ enabled: Bool, at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.scheduleEnabled = enabled
+        settings.updatedAt = date
+        try? modelContext.save()
+        apply(settings: settings, at: date)
+    }
+    
+    func updateScheduleStartTime(_ dateValue: Date, at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.scheduleStartSecondsFromMidnight = secondsFromMidnight(for: dateValue)
+        settings.updatedAt = date
+        try? modelContext.save()
+        apply(settings: settings, at: date)
+    }
+    
+    func updateScheduleEndTime(_ dateValue: Date, at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.scheduleEndSecondsFromMidnight = secondsFromMidnight(for: dateValue)
+        settings.updatedAt = date
+        try? modelContext.save()
+        apply(settings: settings, at: date)
+    }
+    
+    private func applyMenuSettingsSnapshot(_ settings: UserSettings?) {
+        guard let settings else {
+            idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+            ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+            petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+            scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+            scheduleEnabled = false
+            return
+        }
+        
+        idleThresholdText = formattedDuration(TimeInterval(settings.idleThresholdSeconds))
+        ttsStatusText = settings.ttsEnabled
+            ? localizedAppString("menu.dropdown.value.enabled", defaultValue: "Enabled")
+            : localizedAppString("menu.dropdown.value.disabled", defaultValue: "Disabled")
+        petPresentationText = settings.petPresentationMode == .sprout
+            ? localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
+            : localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
+        
+        scheduleEnabled = settings.scheduleEnabled
+        scheduleStartTime = dateFromSeconds(settings.scheduleStartSecondsFromMidnight)
+        scheduleEndTime = dateFromSeconds(settings.scheduleEndSecondsFromMidnight)
+        
+        if settings.scheduleEnabled {
+            scheduleText = "\(formattedClock(scheduleStartTime)) - \(formattedClock(scheduleEndTime))"
+        } else {
+            scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+        }
+    }
+    
+    private func applyPetSnapshot(_ petState: PetState?) {
+        guard let petState else {
+            petStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+            petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+            return
+        }
+        
+        switch petState.stage {
+        case .sprout:
+            petStageText = localizedAppString("menu.dropdown.value.pet_stage.sprout", defaultValue: "Sprout")
+        case .buddy:
+            petStageText = localizedAppString("menu.dropdown.value.pet_stage.buddy", defaultValue: "Buddy")
+        case .guide:
+            petStageText = localizedAppString("menu.dropdown.value.pet_stage.guide", defaultValue: "Guide")
+        }
+        
+        switch petState.emotion {
+        case .happy:
+            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.happy", defaultValue: "Happy")
+        case .cheer:
+            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.cheer", defaultValue: "Cheer")
+        case .sleep:
+            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.sleep", defaultValue: "Sleep")
+        case .concern:
+            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.concern", defaultValue: "Concern")
+        }
+    }
+    
+    private func formattedDuration(_ duration: TimeInterval) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
+        formatter.unitsStyle = .abbreviated
+        formatter.zeroFormattingBehavior = [.pad]
+        return formatter.string(from: max(duration, 0))
+            ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+    }
+    
+    private func formattedClock(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.timeStyle = .short
+        formatter.dateStyle = .none
+        return formatter.string(from: date)
+    }
+    
+    private func dateFromSeconds(_ seconds: Int) -> Date {
+        let startOfDay = Calendar.current.startOfDay(for: .now)
+        return startOfDay.addingTimeInterval(TimeInterval(seconds))
+    }
+    
+    private func secondsFromMidnight(for date: Date) -> Int {
+        let calendar = Calendar.current
+        return calendar.component(.hour, from: date) * 3600
+            + calendar.component(.minute, from: date) * 60
     }
 }

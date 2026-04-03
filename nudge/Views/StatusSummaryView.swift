@@ -10,34 +10,32 @@ struct StatusSummaryView: View {
     let menuBarViewModel: MenuBarViewModel
     
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
-            VStack(alignment: .leading, spacing: 8) {
-                Label {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(runtimeStateTitle)
-                            .font(.headline)
-                        Text(contentStateTitle)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                } icon: {
-                    Image(systemName: menuBarViewModel.systemImageName)
-                        .font(.title2)
-                        .foregroundStyle(.tint)
-                }
-                
-                if let countdown = menuBarViewModel.countdownText(now: context.date) {
-                    LabeledContent {
-                        Text(countdown)
-                            .monospacedDigit()
-                    } label: {
-                        Text(localizedAppString("menu.status.label.next_check", defaultValue: "Next check"))
-                    }
-                } else {
-                    Text(statusDetail)
-                        .font(.footnote)
+        VStack(alignment: .leading, spacing: 8) {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(runtimeStateTitle)
+                        .font(.headline)
+                    Text(contentStateTitle)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+            } icon: {
+                Image(systemName: menuBarViewModel.systemImageName)
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+            }
+            
+            if let countdown = menuBarViewModel.countdownText() {
+                LabeledContent {
+                    Text(countdown)
+                        .monospacedDigit()
+                } label: {
+                    Text(localizedAppString("menu.status.label.next_check", defaultValue: "Next check"))
+                }
+            } else {
+                Text(statusDetail)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
         }
     }

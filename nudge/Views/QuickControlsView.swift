@@ -8,7 +8,6 @@ import SwiftUI
 
 struct QuickControlsView: View {
     let menuBarViewModel: MenuBarViewModel
-    let settings: UserSettings?
     let petPresentationText: String
     let ttsStatusText: String
     let idleThresholdText: String

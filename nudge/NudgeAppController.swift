@@ -67,14 +67,6 @@ final class NudgeAppController {
     }
     
     private func syncPersistedRuntimeState() {
-        let context = NudgeModelContainer.shared.mainContext
-        
-        if let settings = try? context.fetch(FetchDescriptor<UserSettings>()).first {
-            menuBarViewModel.apply(settings: settings)
-        }
-        
-        if let whitelistApps = try? context.fetch(FetchDescriptor<WhitelistApp>()) {
-            menuBarViewModel.apply(whitelistApps: whitelistApps)
-        }
+        menuBarViewModel.refreshMenuSnapshot()
     }
 }

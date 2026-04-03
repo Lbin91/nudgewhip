@@ -348,6 +348,58 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func menuBarViewModelBuildsStaticMenuSnapshotFromSwiftData() throws {
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeDataBootstrap.ensureDefaults(in: context)
+        
+        let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        settings.idleThresholdSeconds = 600
+        settings.scheduleEnabled = true
+        settings.scheduleStartSecondsFromMidnight = 32_400
+        settings.scheduleEndSecondsFromMidnight = 61_200
+        settings.ttsEnabled = false
+        settings.petPresentationMode = .minimal
+        
+        let petState = try #require(try context.fetch(FetchDescriptor<PetState>()).first)
+        petState.stage = .buddy
+        petState.emotion = .happy
+        
+        context.insert(WhitelistApp(bundleIdentifier: "com.apple.dt.Xcode"))
+        context.insert(
+            FocusSession(
+                startedAt: Date(timeIntervalSince1970: 1_775_088_000),
+                endedAt: Date(timeIntervalSince1970: 1_775_091_600),
+                alertCount: 2
+            )
+        )
+        try context.save()
+        
+        let viewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        
+        viewModel.refreshMenuSnapshot(now: Date(timeIntervalSince1970: 1_775_091_600))
+        
+        #expect(viewModel.idleThresholdText.contains("10"))
+        #expect(viewModel.ttsStatusText == "Disabled")
+        #expect(viewModel.petPresentationText == "Minimal")
+        #expect(viewModel.scheduleEnabled)
+        #expect(viewModel.whitelistCount == 1)
+        #expect(viewModel.petStageText == "Buddy")
+        #expect(viewModel.petEmotionText == "Happy")
+        #expect(viewModel.todayStats.alertCount == 2)
+    }
+    
+    @MainActor
+    @Test
     func idleMonitorSuspendsAndResumesAcrossSystemLifecycleEvents() {
         let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
