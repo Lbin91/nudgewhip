@@ -3,9 +3,11 @@ import SwiftUI
 
 struct OnboardingRootView: View {
     @Bindable var viewModel: OnboardingViewModel
+    let onPreferredContentHeightChange: (CGFloat) -> Void
     
-    init(viewModel: OnboardingViewModel) {
+    init(viewModel: OnboardingViewModel, onPreferredContentHeightChange: @escaping (CGFloat) -> Void) {
         self.viewModel = viewModel
+        self.onPreferredContentHeightChange = onPreferredContentHeightChange
     }
     
     var body: some View {
@@ -13,33 +15,44 @@ struct OnboardingRootView: View {
             Color(nsColor: .windowBackgroundColor)
                 .ignoresSafeArea()
             
-            ScrollView(showsIndicators: false) {
-                VStack {
-                    OnboardingCardView {
-                        OnboardingHeaderView(
-                            title: headerTitle,
-                            subtitle: headerSubtitle,
-                            progressText: viewModel.progressText,
-                            showsBackButton: viewModel.showsBackButton,
-                            backAction: viewModel.goBack
-                        )
-                        
-                        currentStepView
-                        
-                        if let errorMessage = viewModel.errorMessage {
-                            Text(errorMessage)
-                                .font(.footnote)
-                                .foregroundStyle(.red)
-                        }
-                        
-                        footerView
+            VStack {
+                Spacer(minLength: 0)
+                
+                OnboardingCardView {
+                    OnboardingHeaderView(
+                        title: headerTitle,
+                        subtitle: headerSubtitle,
+                        progressText: viewModel.progressText,
+                        showsBackButton: viewModel.showsBackButton,
+                        backAction: viewModel.goBack
+                    )
+                    
+                    currentStepView
+                    
+                    if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.red)
                     }
+                    
+                    footerView
                 }
-                .frame(maxWidth: .infinity, minHeight: 500, alignment: .center)
+                
+                Spacer(minLength: 0)
             }
+            .padding(.vertical, 18)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             viewModel.handleDidBecomeActive()
+        }
+        .onAppear {
+            onPreferredContentHeightChange(viewModel.preferredContentHeight)
+        }
+        .onChange(of: viewModel.step) { _, _ in
+            onPreferredContentHeightChange(viewModel.preferredContentHeight)
+        }
+        .onChange(of: viewModel.permissionState) { _, _ in
+            onPreferredContentHeightChange(viewModel.preferredContentHeight)
         }
     }
     

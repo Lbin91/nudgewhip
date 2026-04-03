@@ -768,5 +768,35 @@ struct nudgeTests {
         #expect(storage.savedDraft?.idleThresholdSeconds == 180)
         #expect(storage.shouldPresentOnboarding)
     }
+    
+    @MainActor
+    @Test
+    func onboardingViewModelExposesStepSpecificPreferredHeights() {
+        let deniedDefaults = UserDefaults(suiteName: "nudgeTests.onboarding.heights.denied.\(UUID().uuidString)")!
+        let deniedStorage = OnboardingStorage(defaults: deniedDefaults)
+        deniedStorage.saveResumeStep(.permission)
+        let deniedViewModel = OnboardingViewModel(
+            storage: deniedStorage,
+            modelContainer: NudgeModelContainer.preview,
+            permissionManager: PermissionManager(accessibilityPermissionState: .denied),
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+        
+        #expect(deniedViewModel.preferredContentHeight == 590)
+        
+        let grantedDefaults = UserDefaults(suiteName: "nudgeTests.onboarding.heights.granted.\(UUID().uuidString)")!
+        let grantedStorage = OnboardingStorage(defaults: grantedDefaults)
+        grantedStorage.saveResumeStep(.permission)
+        let grantedViewModel = OnboardingViewModel(
+            storage: grantedStorage,
+            modelContainer: NudgeModelContainer.preview,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+        
+        #expect(grantedViewModel.preferredContentHeight == 540)
+        grantedViewModel.continueFromPermission()
+        #expect(grantedViewModel.preferredContentHeight == 660)
+    }
 
 }

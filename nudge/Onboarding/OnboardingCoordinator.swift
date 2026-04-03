@@ -49,9 +49,16 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         }
         self.viewModel = viewModel
         
-        let rootView = OnboardingRootView(viewModel: viewModel)
+        let rootView = OnboardingRootView(viewModel: viewModel) { [weak self] preferredHeight in
+            self?.resizeWindow(toContentHeight: preferredHeight)
+        }
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 560),
+            contentRect: NSRect(
+                x: 0,
+                y: 0,
+                width: OnboardingWindowMetrics.contentWidth,
+                height: viewModel.preferredContentHeight
+            ),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
@@ -65,6 +72,7 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         shouldHandleWindowClose = true
         onboardingWindow = window
         window.makeKeyAndOrderFront(nil)
+        resizeWindow(toContentHeight: viewModel.preferredContentHeight, animated: false)
         NSApp.activate(ignoringOtherApps: true)
     }
     
@@ -90,5 +98,21 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         onboardingWindow = nil
         viewModel = nil
         onFinish()
+    }
+    
+    private func resizeWindow(toContentHeight height: CGFloat, animated: Bool = true) {
+        guard let onboardingWindow else { return }
+        
+        let targetContentRect = NSRect(
+            x: 0,
+            y: 0,
+            width: OnboardingWindowMetrics.contentWidth,
+            height: height
+        )
+        let targetFrame = onboardingWindow.frameRect(forContentRect: targetContentRect)
+        var newFrame = onboardingWindow.frame
+        newFrame.origin.y += newFrame.height - targetFrame.height
+        newFrame.size = targetFrame.size
+        onboardingWindow.setFrame(newFrame, display: true, animate: animated)
     }
 }

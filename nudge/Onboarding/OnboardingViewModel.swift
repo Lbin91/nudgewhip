@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import SwiftData
+import CoreGraphics
 
 @MainActor
 @Observable
@@ -62,6 +63,10 @@ final class OnboardingViewModel {
     
     var progressText: String {
         "\(step.progressIndex)/4"
+    }
+    
+    var preferredContentHeight: CGFloat {
+        OnboardingWindowMetrics.contentHeight(for: step, permissionState: permissionState)
     }
     
     func goBack() {

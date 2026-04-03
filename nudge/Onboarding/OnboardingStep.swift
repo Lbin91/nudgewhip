@@ -1,4 +1,5 @@
 import Foundation
+import CoreGraphics
 
 enum OnboardingStep: String, CaseIterable, Sendable {
     case welcome
@@ -22,4 +23,26 @@ struct OnboardingDraft: Equatable, Sendable {
     var launchAtLoginEnabled: Bool
     var ttsEnabled: Bool
     var petPresentationMode: PetPresentationMode
+}
+
+enum OnboardingWindowMetrics {
+    static let contentWidth: CGFloat = 560
+    
+    static func contentHeight(
+        for step: OnboardingStep,
+        permissionState: AccessibilityPermissionState
+    ) -> CGFloat {
+        switch step {
+        case .welcome:
+            return 460
+        case .permission:
+            return permissionState == .granted ? 540 : 590
+        case .basicSetup:
+            return 660
+        case .completionReady:
+            return 560
+        case .completionLimited:
+            return 520
+        }
+    }
 }
