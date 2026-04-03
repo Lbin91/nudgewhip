@@ -15,33 +15,13 @@ struct OnboardingRootView: View {
             Color(nsColor: .windowBackgroundColor)
                 .ignoresSafeArea()
             
-            OnboardingCardView {
-                OnboardingHeaderView(
-                    title: headerTitle,
-                    subtitle: headerSubtitle,
-                    progressText: viewModel.progressText,
-                    showsBackButton: viewModel.showsBackButton,
-                    backAction: viewModel.goBack
-                )
-                
-                currentStepView
-                
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.red)
-                }
-                
-                footerView
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            .padding(.vertical, 18)
+            content
+                .padding(.horizontal, 28)
+                .padding(.vertical, 32)
+                .frame(width: OnboardingWindowMetrics.contentWidth, alignment: .leading)
+                .background(contentHeightReader)
         }
-        .frame(
-            width: OnboardingWindowMetrics.contentWidth,
-            height: viewModel.preferredContentHeight,
-            alignment: .center
-        )
+        .fixedSize(horizontal: false, vertical: true)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             viewModel.handleDidBecomeActive()
         }
@@ -53,6 +33,39 @@ struct OnboardingRootView: View {
         }
         .onChange(of: viewModel.permissionState) { _, _ in
             onPreferredContentHeightChange(viewModel.preferredContentHeight)
+        }
+        .onPreferenceChange(OnboardingContentHeightPreferenceKey.self) { measuredHeight in
+            guard measuredHeight > 0 else { return }
+            onPreferredContentHeightChange(measuredHeight)
+        }
+    }
+    
+    private var content: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            OnboardingHeaderView(
+                title: headerTitle,
+                subtitle: headerSubtitle,
+                progressText: viewModel.progressText,
+                showsBackButton: viewModel.showsBackButton,
+                backAction: viewModel.goBack
+            )
+            
+            currentStepView
+            
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+            }
+            
+            footerView
+        }
+    }
+    
+    private var contentHeightReader: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .preference(key: OnboardingContentHeightPreferenceKey.self, value: proxy.size.height)
         }
     }
     
@@ -269,5 +282,13 @@ struct OnboardingRootView: View {
         formatter.timeStyle = .short
         formatter.dateStyle = .none
         return formatter.string(from: date)
+    }
+}
+
+private struct OnboardingContentHeightPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
