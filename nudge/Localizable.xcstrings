@@ -257,6 +257,91 @@
         }
       }
     },
+    "menu.dropdown.label.schedule" : {
+      "comment" : "Label for the current monitoring schedule.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schedule"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간대"
+          }
+        }
+      }
+    },
+    "menu.dropdown.schedule.enabled" : {
+      "comment" : "Toggle label for enabling schedule-based monitoring.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use schedule"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시간대 사용"
+          }
+        }
+      }
+    },
+    "menu.dropdown.schedule.start" : {
+      "comment" : "Label for schedule start time.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "시작"
+          }
+        }
+      }
+    },
+    "menu.dropdown.schedule.end" : {
+      "comment" : "Label for schedule end time.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "종료"
+          }
+        }
+      }
+    },
+    "menu.dropdown.value.schedule.off" : {
+      "comment" : "Value shown when schedule-based monitoring is turned off.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Off"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "끔"
+          }
+        }
+      }
+    },
     "menu.dropdown.label.whitelist_apps" : {
       "comment" : "Label for the count of whitelisted apps.",
       "extractionState" : "stale",

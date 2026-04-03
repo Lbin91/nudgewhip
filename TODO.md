@@ -22,6 +22,7 @@
 
 ### A. Core Runtime Completion
 
+- [x] 시작시간/종료시간(schedule) runtime 구조 및 저장 반영
 - [ ] `nudge/Services/FrontmostAppProvider.swift` 작성
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지 구조를 더 강하게 분리
 - [x] sleep/wake 처리 추가
@@ -50,6 +51,7 @@
 
 ### C. Menu Bar / First-run UX Completion
 
+- [x] 시작시간/종료시간 설정 UI 추가
 - [ ] 온보딩 완료 후 메뉴바 시작 CTA 동작 polish
 - [ ] 메뉴/설정에서 온보딩 재오픈 UX polish
 - [ ] 제한 모드/권한 복구 UX polish

@@ -13,6 +13,9 @@ struct QuickControlsView: View {
     let ttsStatusText: String
     let idleThresholdText: String
     let scheduleText: String
+    var scheduleEnabled: Binding<Bool>
+    var scheduleStartTime: Binding<Date>
+    var scheduleEndTime: Binding<Date>
     
     var body: some View {
         GroupBox {
@@ -68,6 +71,41 @@ struct QuickControlsView: View {
                     Text(scheduleText)
                 } label: {
                     Text(localizedAppString("menu.dropdown.label.schedule", defaultValue: "Schedule"))
+                }
+                
+                Toggle(
+                    localizedAppString("menu.dropdown.schedule.enabled", defaultValue: "Use schedule"),
+                    isOn: scheduleEnabled
+                )
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(localizedAppString("menu.dropdown.schedule.start", defaultValue: "Start"))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        DatePicker(
+                            "",
+                            selection: scheduleStartTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .datePickerStyle(.compact)
+                        .disabled(!scheduleEnabled.wrappedValue)
+                    }
+                    
+                    HStack {
+                        Text(localizedAppString("menu.dropdown.schedule.end", defaultValue: "End"))
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        DatePicker(
+                            "",
+                            selection: scheduleEndTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                        .datePickerStyle(.compact)
+                        .disabled(!scheduleEnabled.wrappedValue)
+                    }
                 }
                 
                 HStack {

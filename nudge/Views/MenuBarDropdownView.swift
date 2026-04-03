@@ -12,6 +12,9 @@ struct MenuBarDropdownView: View {
     let petState: PetState?
     let whitelistCount: Int
     let todayStats: DailyStats
+    var scheduleEnabled: Binding<Bool>
+    var scheduleStartTime: Binding<Date>
+    var scheduleEndTime: Binding<Date>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -23,7 +26,10 @@ struct MenuBarDropdownView: View {
                 petPresentationText: petPresentationText,
                 ttsStatusText: ttsStatusText,
                 idleThresholdText: idleThresholdText,
-                scheduleText: scheduleText
+                scheduleText: scheduleText,
+                scheduleEnabled: scheduleEnabled,
+                scheduleStartTime: scheduleStartTime,
+                scheduleEndTime: scheduleEndTime
             )
             
             DailySummaryView(
