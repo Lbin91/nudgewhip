@@ -2,7 +2,7 @@
 // 메뉴바 드롭다운의 최상위 뷰.
 //
 // SwiftData 쿼리로 설정·펫·세션 데이터를 읽어 MenuBarDropdownView에 전달한다.
-// .task에서 초기 데이터 시딩과 모니터링 시작을 트리거한다.
+// 메뉴가 열릴 때는 순수 렌더링만 수행하고, runtime 동기화는 AppController/사용자 액션 경로에서 처리한다.
 
 import SwiftUI
 import SwiftData
@@ -31,26 +31,6 @@ struct ContentView: View {
         DailyStats.derive(for: focusSessions, on: .now)
     }
     
-    private var settingsSyncKey: String {
-        guard let settings else { return "no-settings" }
-        return [
-            "\(settings.idleThresholdSeconds)",
-            "\(settings.scheduleEnabled)",
-            "\(settings.scheduleStartSecondsFromMidnight)",
-            "\(settings.scheduleEndSecondsFromMidnight)",
-            "\(settings.ttsEnabled)",
-            settings.petPresentationMode.rawValue
-        ].joined(separator: "|")
-    }
-    
-    private var whitelistSyncKey: String {
-        let enabledBundleIdentifiers = whitelistApps
-            .filter(\.isEnabled)
-            .map(\.bundleIdentifier)
-            .sorted()
-        return enabledBundleIdentifiers.joined(separator: "|")
-    }
-
     var body: some View {
         MenuBarDropdownView(
             menuBarViewModel: menuBarViewModel,
@@ -64,14 +44,6 @@ struct ContentView: View {
         )
         .padding(16)
         .frame(width: 320)
-        .task(id: settingsSyncKey) {
-            if let settings {
-                menuBarViewModel.apply(settings: settings)
-            }
-        }
-        .task(id: whitelistSyncKey) {
-            menuBarViewModel.apply(whitelistApps: whitelistApps)
-        }
     }
     
     private var scheduleEnabledBinding: Binding<Bool> {

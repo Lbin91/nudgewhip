@@ -17,18 +17,22 @@ final class NudgeAppController {
         let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager)
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
         self.menuBarViewModel = menuBarViewModel
+        let modelContext = NudgeModelContainer.shared.mainContext
         
         onboardingCoordinator = OnboardingCoordinator(
             storage: OnboardingStorage.shared,
             modelContainer: NudgeModelContainer.shared,
             permissionManager: permissionManager,
             launchAtLoginManager: LaunchAtLoginManager()
-        ) { [weak menuBarViewModel] in
-            if let settings = try? NudgeModelContainer.shared.mainContext.fetch(FetchDescriptor<UserSettings>()).first {
-                menuBarViewModel?.apply(settings: settings)
+        ) {
+            if let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first {
+                menuBarViewModel.apply(settings: settings)
             }
-            menuBarViewModel?.startIfNeeded()
-            menuBarViewModel?.refreshPermission()
+            if let whitelistApps = try? modelContext.fetch(FetchDescriptor<WhitelistApp>()) {
+                menuBarViewModel.apply(whitelistApps: whitelistApps)
+            }
+            menuBarViewModel.startIfNeeded()
+            menuBarViewModel.refreshPermission()
         }
     }
     
@@ -36,9 +40,7 @@ final class NudgeAppController {
         guard !hasStarted else { return }
         hasStarted = true
         try? NudgeDataBootstrap.ensureDefaults(in: NudgeModelContainer.shared.mainContext)
-        if let settings = try? NudgeModelContainer.shared.mainContext.fetch(FetchDescriptor<UserSettings>()).first {
-            menuBarViewModel.apply(settings: settings)
-        }
+        syncPersistedRuntimeState()
         registerActivationObserverIfNeeded()
         
         DispatchQueue.main.async { [weak self] in
@@ -75,7 +77,21 @@ final class NudgeAppController {
             object: nil,
             queue: .main
         ) { [weak menuBarViewModel] _ in
-            menuBarViewModel?.refreshPermission()
+            DispatchQueue.main.async {
+                menuBarViewModel?.refreshPermission()
+            }
+        }
+    }
+    
+    private func syncPersistedRuntimeState() {
+        let context = NudgeModelContainer.shared.mainContext
+        
+        if let settings = try? context.fetch(FetchDescriptor<UserSettings>()).first {
+            menuBarViewModel.apply(settings: settings)
+        }
+        
+        if let whitelistApps = try? context.fetch(FetchDescriptor<WhitelistApp>()) {
+            menuBarViewModel.apply(whitelistApps: whitelistApps)
         }
     }
 }
