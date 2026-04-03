@@ -398,7 +398,7 @@ struct nudgeTests {
         viewModel.refreshMenuSnapshot(now: Date(timeIntervalSince1970: 1_775_091_600))
         
         #expect(viewModel.idleThresholdText.contains("10"))
-        #expect(viewModel.ttsStatusText == "Disabled")
+        #expect(viewModel.ttsStatusText == localizedAppString("menu.dropdown.value.disabled", defaultValue: "Disabled"))
         #expect(viewModel.scheduleEnabled)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
@@ -935,7 +935,7 @@ struct nudgeTests {
             launchAtLoginManager: TestLaunchAtLoginManager()
         ) {}
         
-        #expect(deniedViewModel.preferredContentHeight == 590)
+        #expect(deniedViewModel.preferredContentHeight == 640)
         
         let grantedDefaults = UserDefaults(suiteName: "nudgeTests.onboarding.heights.granted.\(UUID().uuidString)")!
         let grantedStorage = OnboardingStorage(defaults: grantedDefaults)
@@ -947,7 +947,7 @@ struct nudgeTests {
             launchAtLoginManager: TestLaunchAtLoginManager()
         ) {}
         
-        #expect(grantedViewModel.preferredContentHeight == 540)
+        #expect(grantedViewModel.preferredContentHeight == 560)
         grantedViewModel.continueFromPermission()
         #expect(grantedViewModel.preferredContentHeight == 520)
         grantedViewModel.continueFromBasicSetup()
