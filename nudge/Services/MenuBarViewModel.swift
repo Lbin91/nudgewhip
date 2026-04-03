@@ -175,7 +175,9 @@ final class MenuBarViewModel {
     
     func updateScheduleStartTime(_ dateValue: Date, at date: Date = .now) {
         guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
-        settings.scheduleStartSecondsFromMidnight = secondsFromMidnight(for: dateValue)
+        let candidate = secondsFromMidnight(for: dateValue)
+        guard candidate != settings.scheduleEndSecondsFromMidnight else { return }
+        settings.scheduleStartSecondsFromMidnight = candidate
         settings.updatedAt = date
         try? modelContext.save()
         apply(settings: settings, at: date)
@@ -183,7 +185,9 @@ final class MenuBarViewModel {
     
     func updateScheduleEndTime(_ dateValue: Date, at date: Date = .now) {
         guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
-        settings.scheduleEndSecondsFromMidnight = secondsFromMidnight(for: dateValue)
+        let candidate = secondsFromMidnight(for: dateValue)
+        guard candidate != settings.scheduleStartSecondsFromMidnight else { return }
+        settings.scheduleEndSecondsFromMidnight = candidate
         settings.updatedAt = date
         try? modelContext.save()
         apply(settings: settings, at: date)

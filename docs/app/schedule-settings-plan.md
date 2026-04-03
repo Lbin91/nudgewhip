@@ -77,7 +77,7 @@ MVP 구성:
 
 ### 6.1 Validation
 
-- 시작/종료 시간이 같으면 허용하지 않음
+- 시작/종료 시간이 같으면 저장하지 않고 직전 유효값 유지
 - 자정 넘김 허용
   - 예: 22:00 ~ 06:00
 - 저장 즉시 runtime 반영
@@ -111,13 +111,19 @@ MVP 구성:
 
 - schedule 경계 시각에 타이머 재평가
 - wake/unlock 후에도 schedule 재평가
-- 앱 foreground 복귀 시에도 schedule 재평가
+- schedule 토글/시간 수정 시에도 즉시 재평가
+- 메뉴바를 열거나 단순 app activation이 발생했다고 해서 자동 재평가하지 않음
 
 ### 8.3 Baseline reset
 
 schedule 밖 → 안으로 복귀 시:
 - 기존 `lastInputAt`를 그대로 쓰지 않음
 - 현재 시각 기준으로 baseline 재설정
+- idle deadline을 현재 시각 기준으로 다시 예약
+
+schedule을 끄는 순간:
+- `pausedSchedule`가 즉시 해제되어야 함
+- 다른 pause 조건이 없으면 `monitoring`으로 복귀해야 함
 
 ## 9. Edge cases
 
@@ -126,6 +132,8 @@ schedule 밖 → 안으로 복귀 시:
 - sleep/wake 중 경계 시각 통과
 - 시스템 timezone/clock 변경
 - 앱 재실행 시 schedule 즉시 반영
+- `pausedSchedule` 상태에서 schedule 토글 off
+- 시작/종료를 같은 시각으로 맞추려는 편집
 
 ## 10. Acceptance Criteria
 
@@ -134,6 +142,9 @@ schedule 밖 → 안으로 복귀 시:
 - schedule 안으로 들어오면 monitoring이 자동 재개된다.
 - alerting 중 schedule 밖으로 나가면 즉시 알림이 종료된다.
 - 자정 넘김 schedule이 올바르게 동작한다.
+- `pausedSchedule` 상태에서 schedule을 끄면 즉시 monitoring으로 복귀한다.
+- schedule 밖 → 안 복귀 시 과거 `lastInputAt` 때문에 즉시 idle/alert로 오탐하지 않는다.
+- 시작/종료 시간이 같으면 기존 유효값이 유지된다.
 
 ## 11. Recommended implementation order
 
@@ -151,6 +162,9 @@ Unit:
 - start/end 변환 테스트
 - 자정 넘김 판단 테스트
 - boundary transition 테스트
+- schedule off -> pausedSchedule 해제 테스트
+- outside -> inside 복귀 시 baseline reset 테스트
+- same-time validation 테스트
 
 Integration:
 - alerting 중 schedule entry/exit

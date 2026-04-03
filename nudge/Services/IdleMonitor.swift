@@ -67,6 +67,7 @@ final class IdleMonitor {
     /// 저장된 사용자 설정을 runtime monitor에 반영
     func applySettings(_ settings: UserSettings, at date: Date = .now) {
         let oldThreshold = idleThreshold
+        let oldScheduleEnabled = scheduleEnabled
         idleThreshold = TimeInterval(settings.idleThresholdSeconds)
         scheduleEnabled = settings.scheduleEnabled
         scheduleStart = TimeInterval(settings.scheduleStartSecondsFromMidnight)
@@ -79,7 +80,7 @@ final class IdleMonitor {
         // 변경 없이 재호출되면 delay=0으로 즉시 fireIdleDeadline이 트리거되어
         // 드롭다운 렌더링과 충돌하며 메인 스레드가 블로킹된다.
         if runtimeStateController.snapshot.runtimeState == .monitoring,
-           abs(oldThreshold - idleThreshold) > 0.001 || idleDeadlineAt == nil {
+           abs(oldThreshold - idleThreshold) > 0.001 || idleDeadlineAt == nil || oldScheduleEnabled != scheduleEnabled {
             scheduleIdleDeadline(from: lastInputAt ?? date)
         }
     }
@@ -232,7 +233,17 @@ final class IdleMonitor {
     
     /// 현재 시간이 스케줄 윈도우 내인지 확인하고 상태 전이
     func checkSchedule(at date: Date = .now) {
-        guard scheduleEnabled else { return }
+        guard scheduleEnabled else {
+            if runtimeStateController.snapshot.schedulePaused {
+                runtimeStateController.handle(.scheduleWindowExited, at: date)
+                lastInputAt = date
+                scheduleAlertSync()
+                scheduleIdleDeadline(from: date)
+            }
+            scheduleBoundaryWorkItem?.cancel()
+            scheduleBoundaryWorkItem = nil
+            return
+        }
         let secondsFromMidnight: TimeInterval = TimeInterval(
             Calendar.current.component(.hour, from: date) * 3600
             + Calendar.current.component(.minute, from: date) * 60
@@ -250,7 +261,9 @@ final class IdleMonitor {
         let snapshot = runtimeStateController.snapshot
         if inWindow && snapshot.schedulePaused {
             runtimeStateController.handle(.scheduleWindowExited, at: date)
+            lastInputAt = date
             scheduleAlertSync()
+            scheduleIdleDeadline(from: date)
         } else if !inWindow && !snapshot.schedulePaused {
             runtimeStateController.handle(.scheduleWindowEntered, at: date)
             scheduleAlertSync()

@@ -400,6 +400,37 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func menuBarViewModelRejectsSameStartAndEndScheduleTimes() throws {
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeDataBootstrap.ensureDefaults(in: context)
+        let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        
+        let viewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        
+        let originalStart = settings.scheduleStartSecondsFromMidnight
+        let originalEnd = settings.scheduleEndSecondsFromMidnight
+        let startDate = Calendar.current.startOfDay(for: .now).addingTimeInterval(TimeInterval(originalStart))
+        let endDate = Calendar.current.startOfDay(for: .now).addingTimeInterval(TimeInterval(originalEnd))
+        
+        viewModel.updateScheduleStartTime(endDate)
+        viewModel.updateScheduleEndTime(startDate)
+        
+        #expect(settings.scheduleStartSecondsFromMidnight == originalStart)
+        #expect(settings.scheduleEndSecondsFromMidnight == originalEnd)
+    }
+    
+    @MainActor
+    @Test
     func idleMonitorSuspendsAndResumesAcrossSystemLifecycleEvents() {
         let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
@@ -458,6 +489,70 @@ struct nudgeTests {
         idleMonitor.recordInput(at: baseDate)
         
         #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(10))
+    }
+    
+    @MainActor
+    @Test
+    func idleMonitorResumesImmediatelyWhenScheduleIsTurnedOff() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            scheduleEnabled: true,
+            scheduleStart: 32_400,
+            scheduleEnd: 61_200
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.checkSchedule(at: baseDate.addingTimeInterval(70_000))
+        #expect(runtimeController.snapshot.runtimeState == .pausedSchedule)
+        
+        let updatedSettings = UserSettings(
+            scheduleEnabled: false,
+            scheduleStartSecondsFromMidnight: 32_400,
+            scheduleEndSecondsFromMidnight: 61_200
+        )
+        idleMonitor.applySettings(updatedSettings, at: baseDate.addingTimeInterval(70_001))
+        
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(idleMonitor.lastInputAt == baseDate.addingTimeInterval(70_001))
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(70_301))
+    }
+    
+    @MainActor
+    @Test
+    func idleMonitorResetsBaselineWhenScheduleWindowReopens() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300,
+            scheduleEnabled: true,
+            scheduleStart: 32_400,
+            scheduleEnd: 61_200
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        idleMonitor.checkSchedule(at: baseDate.addingTimeInterval(70_000))
+        #expect(runtimeController.snapshot.runtimeState == .pausedSchedule)
+        
+        let resumeDate = baseDate.addingTimeInterval(86_400 + 33_000)
+        idleMonitor.checkSchedule(at: resumeDate)
+        
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(idleMonitor.lastInputAt == resumeDate)
+        #expect(idleMonitor.idleDeadlineAt == resumeDate.addingTimeInterval(300))
     }
     
     @MainActor
