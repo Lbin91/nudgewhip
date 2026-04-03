@@ -10,7 +10,7 @@ struct SettingsRootView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 20) {
                 Text(localizedAppString("settings.header.title", defaultValue: "Settings"))
                     .font(.system(size: 28, weight: .bold))
                 
@@ -28,11 +28,10 @@ struct SettingsRootView: View {
                         .foregroundStyle(.red)
                 }
             }
-            .padding(24)
+            .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(minWidth: 560, minHeight: 620)
-        .background(Color(nsColor: .windowBackgroundColor))
+        .frame(minWidth: 560, minHeight: 540)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             viewModel.refreshPermission()
         }
@@ -171,14 +170,22 @@ struct SettingsRootView: View {
     }
     
     private func thresholdButton(title: String, value: Int) -> some View {
-        Button {
+        let isSelected = viewModel.settings?.idleThresholdSeconds == value
+        return Button {
             viewModel.updateIdleThreshold(value)
         } label: {
             Text(title)
-                .frame(maxWidth: .infinity, minHeight: 36)
+                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                .foregroundStyle(isSelected ? .white : .primary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isSelected ? Color.accentColor : Color(nsColor: .controlBackgroundColor))
+                )
         }
-        .buttonStyle(.bordered)
-        .tint(viewModel.settings?.idleThresholdSeconds == value ? .accentColor : .secondary)
+        .buttonStyle(.plain)
     }
     
     private var permissionStatusText: String {
