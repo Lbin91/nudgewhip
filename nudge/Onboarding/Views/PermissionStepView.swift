@@ -39,13 +39,25 @@ struct PermissionStepView: View {
                 }
             }
             
-            Label(localizedAppString(
-                "onboarding.permission.body.limited",
-                defaultValue: "If you do not allow it now, the app can still continue in limited mode."
-            ), systemImage: "info.circle")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .padding(.top, 2)
+            if permissionState == .granted {
+                OnboardingSectionCard(
+                    title: localizedAppString("onboarding.permission.section.granted", defaultValue: "You're ready for the next step")
+                ) {
+                    Text(localizedAppString(
+                        "onboarding.permission.body.granted",
+                        defaultValue: "Accessibility permission is already enabled. Continue to choose the defaults for your first sessions."
+                    ))
+                    .foregroundStyle(.primary)
+                }
+            } else {
+                Label(localizedAppString(
+                    "onboarding.permission.body.limited",
+                    defaultValue: "If you do not allow it now, the app can still continue in limited mode."
+                ), systemImage: "info.circle")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
+            }
         }
     }
 }

@@ -25,6 +25,27 @@ struct CompletionReadyStepView: View {
                     }
                 }
             }
+            
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.completion.ready.section.next", defaultValue: "What happens next")
+            ) {
+                VStack(alignment: .leading, spacing: 8) {
+                    completionBullet(localizedAppString("onboarding.completion.ready.next.menu", defaultValue: "Check your status and countdown from the menu bar icon."))
+                    completionBullet(localizedAppString("onboarding.completion.ready.next.settings", defaultValue: "You can reopen setup and change these defaults later from the menu."))
+                }
+            }
+        }
+    }
+    
+    private func completionBullet(_ text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "checkmark")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.green)
+                .padding(.top, 4)
+            Text(text)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

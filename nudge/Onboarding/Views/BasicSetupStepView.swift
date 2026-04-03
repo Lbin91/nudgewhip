@@ -31,7 +31,8 @@ struct BasicSetupStepView: View {
             }
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.setup.launch_at_login.label", defaultValue: "Launch at login")
+                title: localizedAppString("onboarding.setup.section.behavior", defaultValue: "How Nudge starts"),
+                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether Nudge opens automatically and whether voice nudges stay on.")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(localizedAppString("onboarding.setup.launch_at_login.label", defaultValue: "Launch at login"), isOn: $launchAtLoginEnabled)
@@ -42,7 +43,8 @@ struct BasicSetupStepView: View {
             }
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.setup.visual_mode.label", defaultValue: "Visual mode")
+                title: localizedAppString("onboarding.setup.visual_mode.label", defaultValue: "Visual mode"),
+                subtitle: localizedAppString("onboarding.setup.visual_mode.subtitle", defaultValue: "Pick the presentation style that feels the least distracting.")
             ) {
                 HStack(spacing: 10) {
                     modeButton(title: localizedAppString("onboarding.setup.visual_mode.sprout", defaultValue: "Sprout"), subtitle: "캐릭터와 함께", mode: .sprout)

@@ -51,7 +51,7 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         
         let rootView = OnboardingRootView(viewModel: viewModel)
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 580),
+            contentRect: NSRect(x: 0, y: 0, width: 560, height: 560),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false

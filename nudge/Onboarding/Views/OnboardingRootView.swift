@@ -35,7 +35,7 @@ struct OnboardingRootView: View {
                         footerView
                     }
                 }
-                .frame(maxWidth: .infinity, minHeight: 540, alignment: .center)
+                .frame(maxWidth: .infinity, minHeight: 500, alignment: .center)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -63,7 +63,9 @@ struct OnboardingRootView: View {
         case .welcome:
             localizedAppString("onboarding.welcome.subtitle", defaultValue: "Set up Nudge once, then stay in the menu bar.")
         case .permission:
-            localizedAppString("onboarding.permission.subtitle", defaultValue: "Allow background input detection so Nudge can detect idle moments.")
+            viewModel.permissionState == .granted
+                ? localizedAppString("onboarding.permission.subtitle.granted", defaultValue: "Permission is already granted. Continue to finish your first-run setup.")
+                : localizedAppString("onboarding.permission.subtitle", defaultValue: "Allow background input detection so Nudge can detect idle moments.")
         case .basicSetup:
             localizedAppString("onboarding.setup.subtitle", defaultValue: "Choose the defaults for your first sessions.")
         case .completionReady:
