@@ -9,7 +9,6 @@ final class NudgeAppController {
     let menuBarViewModel: MenuBarViewModel
     private let onboardingCoordinator: OnboardingCoordinator
     private var hasStarted = false
-    private var didRegisterActivationObserver = false
     
     private init() {
         let permissionManager = PermissionManager()
@@ -41,7 +40,6 @@ final class NudgeAppController {
         hasStarted = true
         try? NudgeDataBootstrap.ensureDefaults(in: NudgeModelContainer.shared.mainContext)
         syncPersistedRuntimeState()
-        registerActivationObserverIfNeeded()
         
         DispatchQueue.main.async { [weak self] in
             self?.startFlow()
@@ -65,21 +63,6 @@ final class NudgeAppController {
             onboardingCoordinator.present()
         } else {
             menuBarViewModel.startIfNeeded()
-        }
-    }
-    
-    private func registerActivationObserverIfNeeded() {
-        guard !didRegisterActivationObserver else { return }
-        didRegisterActivationObserver = true
-        
-        NotificationCenter.default.addObserver(
-            forName: NSApplication.didBecomeActiveNotification,
-            object: nil,
-            queue: .main
-        ) { [weak menuBarViewModel] _ in
-            DispatchQueue.main.async {
-                menuBarViewModel?.refreshPermission()
-            }
         }
     }
     
