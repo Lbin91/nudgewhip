@@ -13,6 +13,7 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
     private var onboardingWindow: NSWindow?
     private var viewModel: OnboardingViewModel?
     private var shouldHandleWindowClose = true
+    private var lastAppliedContentHeight: CGFloat?
     
     init(
         storage: OnboardingStoring,
@@ -52,12 +53,13 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         let rootView = OnboardingRootView(viewModel: viewModel) { [weak self] preferredHeight in
             self?.resizeWindow(toContentHeight: preferredHeight)
         }
+        let initialHeight = clampedContentHeight(for: viewModel.preferredContentHeight)
         let window = NSWindow(
             contentRect: NSRect(
                 x: 0,
                 y: 0,
                 width: OnboardingWindowMetrics.contentWidth,
-                height: viewModel.preferredContentHeight
+                height: initialHeight
             ),
             styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
@@ -65,14 +67,17 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         )
         window.title = localizedAppString("onboarding.common.window_title", defaultValue: "Nudge Setup")
         window.isReleasedWhenClosed = false
+        window.contentMinSize = NSSize(width: OnboardingWindowMetrics.contentWidth, height: OnboardingWindowMetrics.minimumContentHeight)
+        window.contentMaxSize = NSSize(width: OnboardingWindowMetrics.contentWidth, height: clampedContentHeight(for: OnboardingWindowMetrics.maximumContentHeight))
         window.center()
         window.delegate = self
         window.contentView = NSHostingView(rootView: rootView)
         
         shouldHandleWindowClose = true
         onboardingWindow = window
+        lastAppliedContentHeight = initialHeight
+        resizeWindow(toContentHeight: initialHeight, animated: false)
         window.makeKeyAndOrderFront(nil)
-        resizeWindow(toContentHeight: viewModel.preferredContentHeight, animated: false)
         NSApp.activate(ignoringOtherApps: true)
     }
     
@@ -80,12 +85,14 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         guard shouldHandleWindowClose else {
             onboardingWindow = nil
             viewModel = nil
+            lastAppliedContentHeight = nil
             return
         }
         
         let shouldStartApp = viewModel?.handleWindowClose() ?? false
         onboardingWindow = nil
         viewModel = nil
+        lastAppliedContentHeight = nil
         
         if shouldStartApp {
             onFinish()
@@ -97,22 +104,33 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         onboardingWindow?.close()
         onboardingWindow = nil
         viewModel = nil
+        lastAppliedContentHeight = nil
         onFinish()
     }
     
     private func resizeWindow(toContentHeight height: CGFloat, animated: Bool = true) {
         guard let onboardingWindow else { return }
         
+        let clampedHeight = clampedContentHeight(for: height)
+        if let lastAppliedContentHeight, abs(lastAppliedContentHeight - clampedHeight) < 0.5 {
+            return
+        }
+        lastAppliedContentHeight = clampedHeight
+        
         let targetContentRect = NSRect(
             x: 0,
             y: 0,
             width: OnboardingWindowMetrics.contentWidth,
-            height: height
+            height: clampedHeight
         )
         let targetFrame = onboardingWindow.frameRect(forContentRect: targetContentRect)
         var newFrame = onboardingWindow.frame
         newFrame.origin.y += newFrame.height - targetFrame.height
         newFrame.size = targetFrame.size
         onboardingWindow.setFrame(newFrame, display: true, animate: animated)
+    }
+    
+    private func clampedContentHeight(for height: CGFloat) -> CGFloat {
+        OnboardingWindowMetrics.clampedContentHeight(height, visibleFrameHeight: onboardingWindow?.screen?.visibleFrame.height ?? NSScreen.main?.visibleFrame.height)
     }
 }

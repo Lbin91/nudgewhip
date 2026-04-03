@@ -32,6 +32,9 @@ struct OnboardingDraft: Equatable, Sendable {
 
 enum OnboardingWindowMetrics {
     static let contentWidth: CGFloat = 560
+    static let minimumContentHeight: CGFloat = 460
+    static let maximumContentHeight: CGFloat = 640
+    private static let visibleFrameInset: CGFloat = 96
     
     static func contentHeight(
         for step: OnboardingStep,
@@ -51,5 +54,11 @@ enum OnboardingWindowMetrics {
         case .completionLimited:
             return 520
         }
+    }
+    
+    static func clampedContentHeight(_ requestedHeight: CGFloat, visibleFrameHeight: CGFloat?) -> CGFloat {
+        let availableHeight = max(minimumContentHeight, (visibleFrameHeight ?? maximumContentHeight) - visibleFrameInset)
+        let upperBound = min(maximumContentHeight, availableHeight)
+        return min(max(requestedHeight, minimumContentHeight), upperBound)
     }
 }

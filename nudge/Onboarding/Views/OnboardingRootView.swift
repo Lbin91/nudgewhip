@@ -15,33 +15,33 @@ struct OnboardingRootView: View {
             Color(nsColor: .windowBackgroundColor)
                 .ignoresSafeArea()
             
-            VStack {
-                Spacer(minLength: 0)
+            OnboardingCardView {
+                OnboardingHeaderView(
+                    title: headerTitle,
+                    subtitle: headerSubtitle,
+                    progressText: viewModel.progressText,
+                    showsBackButton: viewModel.showsBackButton,
+                    backAction: viewModel.goBack
+                )
                 
-                OnboardingCardView {
-                    OnboardingHeaderView(
-                        title: headerTitle,
-                        subtitle: headerSubtitle,
-                        progressText: viewModel.progressText,
-                        showsBackButton: viewModel.showsBackButton,
-                        backAction: viewModel.goBack
-                    )
-                    
-                    currentStepView
-                    
-                    if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
-                    
-                    footerView
+                currentStepView
+                
+                if let errorMessage = viewModel.errorMessage {
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
                 }
                 
-                Spacer(minLength: 0)
+                footerView
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             .padding(.vertical, 18)
         }
+        .frame(
+            width: OnboardingWindowMetrics.contentWidth,
+            height: viewModel.preferredContentHeight,
+            alignment: .center
+        )
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             viewModel.handleDidBecomeActive()
         }

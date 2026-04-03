@@ -110,6 +110,7 @@ final class OnboardingViewModel {
     }
     
     func handleDidBecomeActive() {
+        guard step == .permission || step == .completionLimited else { return }
         refreshPermission(promptIfNeeded: false)
     }
     

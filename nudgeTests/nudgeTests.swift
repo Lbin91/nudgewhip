@@ -1017,6 +1017,13 @@ struct nudgeTests {
         #expect(storage.shouldPresentOnboarding)
     }
     
+    @Test
+    func onboardingWindowMetricsClampOversizedHeightsToVisibleFrame() {
+        #expect(OnboardingWindowMetrics.clampedContentHeight(560, visibleFrameHeight: 900) == 560)
+        #expect(OnboardingWindowMetrics.clampedContentHeight(1200, visibleFrameHeight: 900) == 640)
+        #expect(OnboardingWindowMetrics.clampedContentHeight(1200, visibleFrameHeight: 520) == 460)
+    }
+    
     @MainActor
     @Test
     func onboardingViewModelExposesStepSpecificPreferredHeights() {
@@ -1045,6 +1052,8 @@ struct nudgeTests {
         #expect(grantedViewModel.preferredContentHeight == 560)
         grantedViewModel.continueFromPermission()
         #expect(grantedViewModel.preferredContentHeight == 520)
+        grantedViewModel.handleDidBecomeActive()
+        #expect(grantedViewModel.step == .basicSetup)
         grantedViewModel.continueFromBasicSetup()
         #expect(grantedViewModel.preferredContentHeight == 560)
     }
