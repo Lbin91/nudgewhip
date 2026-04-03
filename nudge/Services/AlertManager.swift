@@ -160,7 +160,10 @@ final class NotificationNudgeManager: NotificationNudgeManaging {
         
         let content = UNMutableNotificationContent()
         content.title = localizedAppString("app.menu.title", defaultValue: "Nudge")
-        content.body = "You've been away for a while. Come back to your focus flow."
+        content.body = localizedAppString(
+            "alert.notification.third_stage.body",
+            defaultValue: "You've been away for a while. Come back to your focus flow."
+        )
         content.sound = .default
         
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
