@@ -117,6 +117,11 @@ final class MenuBarViewModel {
         idleMonitor.recordInput(at: date)
     }
     
+    /// 메뉴바 드롭다운 표시 상태를 idle monitor에 전달
+    func setMenuPresentationActive(_ active: Bool) {
+        idleMonitor.setMenuPresentationActive(active)
+    }
+    
     /// 사용자가 다시 켤 때까지 수동 일시정지
     func pauseUntilResumed(at date: Date = .now) {
         idleMonitor.setManualPause(true, at: date)

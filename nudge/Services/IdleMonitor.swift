@@ -16,6 +16,7 @@ final class IdleMonitor {
     private(set) var alertEscalationDeadlineAt: Date?
     private(set) var cooldownDeadlineAt: Date?
     private(set) var manualPauseUntil: Date?
+    private(set) var isMenuPresentationActive = false
     
     let permissionManager: PermissionManager
     let runtimeStateController: RuntimeStateController
@@ -158,6 +159,18 @@ final class IdleMonitor {
         if wasAlerting {
             scheduleCooldown(from: date)
         }
+    }
+    
+    /// Event monitor에서 들어온 활동을 처리한다. 메뉴바 메뉴가 열려 있을 때는 무시한다.
+    func handleObservedActivity(at date: Date = .now) {
+        guard !isMenuPresentationActive else { return }
+        recordInput(at: date)
+    }
+    
+    /// 메뉴바 드롭다운이 열려 있는 동안 event monitor 기반 activity 처리를 잠시 멈춘다.
+    /// MenuBarExtra depth-menu hover가 observed activity로 해석되면 submenu가 흔들릴 수 있다.
+    func setMenuPresentationActive(_ active: Bool) {
+        isMenuPresentationActive = active
     }
     
     /// 수동 일시정지 토글. 활성 시 모든 모니터링 데드라인을 취소하고, 필요 시 자동 해제 시각을 예약
@@ -410,7 +423,7 @@ final class IdleMonitor {
     private func startEventMonitoringIfNeeded() {
         guard !eventMonitor.isMonitoring else { return }
         eventMonitor.start { [weak self] in
-            self?.recordInput()
+            self?.handleObservedActivity()
         }
     }
     

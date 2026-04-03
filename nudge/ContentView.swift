@@ -18,6 +18,7 @@ struct ContentView: View {
         )
         .padding(16)
         .frame(width: 320)
+        .trackMenuPresentation(using: menuBarViewModel)
     }
     
     private var scheduleEnabledBinding: Binding<Bool> {
