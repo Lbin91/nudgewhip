@@ -9,6 +9,10 @@ struct CompletionLimitedStepView: View {
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 10) {
+                    Text(localizedAppString("onboarding.completion.limited.section.limitations", defaultValue: "What this limits"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    
                     Text(localizedAppString("onboarding.completion.limited.body.primary", defaultValue: "Without Accessibility permission, Nudge cannot detect global background input activity."))
                     Text(localizedAppString("onboarding.completion.limited.body.secondary", defaultValue: "That means idle detection and the automatic return loop will not work fully."))
                         .foregroundStyle(.secondary)

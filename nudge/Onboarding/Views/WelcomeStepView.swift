@@ -24,6 +24,10 @@ struct WelcomeStepView: View {
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 10) {
+                    Text(localizedAppString("onboarding.welcome.section.trust", defaultValue: "Privacy at a glance"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    
                     Label(localizedAppString("onboarding.welcome.bullet.keystrokes", defaultValue: "Nudge does not collect keystroke content."), systemImage: "checkmark.seal")
                     Label(localizedAppString("onboarding.welcome.bullet.screen", defaultValue: "Nudge does not collect screen contents or screenshots."), systemImage: "checkmark.seal")
                 }

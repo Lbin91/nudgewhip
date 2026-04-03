@@ -9,12 +9,20 @@ struct PermissionStepView: View {
             
             GroupBox {
                 VStack(alignment: .leading, spacing: 12) {
+                    Text(localizedAppString("onboarding.permission.section.reason", defaultValue: "Why Nudge needs this"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    
                     Text(localizedAppString(
                         "onboarding.permission.body.reason",
                         defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
                     ))
                     
                     Divider()
+                    
+                    Text(localizedAppString("onboarding.permission.section.privacy", defaultValue: "What Nudge does not collect"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
                     
                     Text(localizedAppString(
                         "onboarding.permission.body.privacy",
@@ -31,6 +39,7 @@ struct PermissionStepView: View {
             ), systemImage: "info.circle")
             .font(.footnote)
             .foregroundStyle(.secondary)
+            .padding(.top, 2)
         }
     }
 }

@@ -10,6 +10,9 @@ struct OnboardingFooterView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            Divider()
+                .padding(.bottom, 4)
+            
             Button(primaryTitle, action: primaryAction)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
@@ -28,5 +31,6 @@ struct OnboardingFooterView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 4)
     }
 }

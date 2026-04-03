@@ -1224,6 +1224,23 @@
         }
       }
     },
+    "onboarding.completion.limited.section.limitations" : {
+      "comment" : "Section heading for the limitations block on the limited completion step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What this limits"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제한되는 내용"
+          }
+        }
+      }
+    },
     "onboarding.completion.ready.body" : {
       "comment" : "Body text for the ready completion step.",
       "extractionState" : "stale",
@@ -1508,6 +1525,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "손쉬운 사용 권한"
+          }
+        }
+      }
+    },
+    "onboarding.permission.section.privacy" : {
+      "comment" : "Section heading for the privacy explanation on the permission step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What Nudge does not collect"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "수집하지 않는 정보"
+          }
+        }
+      }
+    },
+    "onboarding.permission.section.reason" : {
+      "comment" : "Section heading for the permission rationale on the permission step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Why Nudge needs this"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "왜 필요한가요"
           }
         }
       }
@@ -1922,6 +1973,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "넛지 시작하기"
+          }
+        }
+      }
+    },
+    "onboarding.welcome.section.trust" : {
+      "comment" : "Section heading for the trust and privacy block on the welcome step.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy at a glance"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "한눈에 보는 프라이버시"
           }
         }
       }
