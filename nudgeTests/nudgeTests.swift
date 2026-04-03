@@ -447,6 +447,100 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func alertManagerRespectsHourlyAlertAndNotificationLimits() {
+        var currentTime = Date(timeIntervalSince1970: 1_775_088_000)
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager,
+            nowProvider: { currentTime }
+        )
+        alertManager.apply(
+            settings: UserSettings(
+                alertsPerHourLimit: 2,
+                ttsPerHourLimit: 1
+            )
+        )
+        
+        let idleSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .idleDetected,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 1,
+            lastInputAt: nil
+        )
+        
+        alertManager.handle(snapshot: idleSnapshot)
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .monitoring,
+                contentState: .recovery,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 0,
+                lastInputAt: nil
+            )
+        )
+        currentTime.addTimeInterval(10)
+        alertManager.handle(snapshot: idleSnapshot)
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .monitoring,
+                contentState: .recovery,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 0,
+                lastInputAt: nil
+            )
+        )
+        currentTime.addTimeInterval(10)
+        alertManager.handle(snapshot: idleSnapshot)
+        
+        #expect(presenter.showCount == 2)
+        
+        let notificationSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .strongNudge,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 4,
+            lastInputAt: nil
+        )
+        alertManager.handle(snapshot: notificationSnapshot)
+        currentTime.addTimeInterval(30)
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .strongNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 5,
+                lastInputAt: nil
+            )
+        )
+        
+        #expect(notificationManager.deliverCount == 1)
+    }
+    
+    @MainActor
+    @Test
     func onboardingStorageTracksCompletionResumeAndDraft() {
         let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.storage.\(UUID().uuidString)")!
         let storage = OnboardingStorage(defaults: defaults, requiredVersion: 2)

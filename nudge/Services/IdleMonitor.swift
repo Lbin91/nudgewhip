@@ -66,6 +66,7 @@ final class IdleMonitor {
         scheduleEnabled = settings.scheduleEnabled
         scheduleStart = TimeInterval(settings.scheduleStartSecondsFromMidnight)
         scheduleEnd = TimeInterval(settings.scheduleEndSecondsFromMidnight)
+        alertManager?.apply(settings: settings)
         
         checkSchedule(at: date)
         

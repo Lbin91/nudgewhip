@@ -11,6 +11,7 @@ enum AlertVisualStyle: Equatable, Sendable {
 @MainActor
 protocol AlertManaging: AnyObject {
     func handle(snapshot: RuntimeSnapshot)
+    func apply(settings: UserSettings)
 }
 
 @MainActor
@@ -29,18 +30,28 @@ protocol NotificationNudgeManaging: AnyObject {
 final class AlertManager: AlertManaging {
     private let presenter: AlertPresenting
     private let notificationNudgeManager: NotificationNudgeManaging
+    private let nowProvider: @MainActor () -> Date
     private(set) var activeStyle: AlertVisualStyle?
     private var lastDeliveredNotificationStep = 0
+    private var visualAlertTimestamps: [Date] = []
+    private var thirdStageNotificationTimestamps: [Date] = []
+    private var alertsPerHourLimit = 6
+    private var thirdStagePerHourLimit = 2
     
     init(
         presenter: AlertPresenting? = nil,
-        notificationNudgeManager: NotificationNudgeManaging? = nil
+        notificationNudgeManager: NotificationNudgeManaging? = nil,
+        nowProvider: @escaping @MainActor () -> Date = { .now }
     ) {
         self.presenter = presenter ?? PerimeterPulsePresenter()
         self.notificationNudgeManager = notificationNudgeManager ?? NotificationNudgeManager()
+        self.nowProvider = nowProvider
     }
     
     func handle(snapshot: RuntimeSnapshot) {
+        let now = nowProvider()
+        pruneTimestamps(now: now)
+        
         guard let nextStyle = visualStyle(for: snapshot) else {
             guard activeStyle != nil else { return }
             presenter.hide()
@@ -51,15 +62,25 @@ final class AlertManager: AlertManaging {
         }
         
         if activeStyle != nextStyle {
+            guard canPresentVisualAlert else { return }
             playSound(for: nextStyle)
             presenter.show(style: nextStyle)
             activeStyle = nextStyle
+            visualAlertTimestamps.append(now)
         }
         
-        if snapshot.alertEscalationStep >= 4, snapshot.alertEscalationStep > lastDeliveredNotificationStep {
+        if snapshot.alertEscalationStep >= 4,
+           snapshot.alertEscalationStep > lastDeliveredNotificationStep,
+           canPresentThirdStageNotification {
             notificationNudgeManager.deliverThirdStageNudge()
+            thirdStageNotificationTimestamps.append(now)
             lastDeliveredNotificationStep = snapshot.alertEscalationStep
         }
+    }
+    
+    func apply(settings: UserSettings) {
+        alertsPerHourLimit = max(0, settings.alertsPerHourLimit)
+        thirdStagePerHourLimit = max(0, settings.ttsPerHourLimit)
     }
 
     private func playSound(for style: AlertVisualStyle) {
@@ -85,6 +106,20 @@ final class AlertManager: AlertManaging {
         case .focus, .recovery, .break, .remoteEscalation:
             return nil
         }
+    }
+    
+    private var canPresentVisualAlert: Bool {
+        visualAlertTimestamps.count < alertsPerHourLimit
+    }
+    
+    private var canPresentThirdStageNotification: Bool {
+        thirdStageNotificationTimestamps.count < thirdStagePerHourLimit
+    }
+    
+    private func pruneTimestamps(now: Date) {
+        let cutoff = now.addingTimeInterval(-3600)
+        visualAlertTimestamps.removeAll { $0 < cutoff }
+        thirdStageNotificationTimestamps.removeAll { $0 < cutoff }
     }
 }
 

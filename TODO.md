@@ -39,8 +39,8 @@
 - [ ] `ttsNudge` 3차 알림 구현
 - [ ] TTS 큐 중첩 금지 구현
 - [ ] 복귀 시 TTS 즉시 cancel 구현
-- [ ] 시간당 최대 알림 횟수 제한 구현
-- [ ] 시간당 TTS 최대 횟수 제한 구현
+- [x] 시간당 최대 알림 횟수 제한 구현
+- [x] 시간당 TTS 최대 횟수 제한 구현
 - [ ] 복귀 직후 cooldown 구현
 - [ ] 동일 문구 연속 반복 금지 창 구현
 - [ ] `RemoteEscalation` 비활성 유지 가드 구현
@@ -160,5 +160,5 @@
 
 ## Current Next Slice
 
-- [ ] 시간당 최대 알림 횟수 제한 구현
-- [ ] system notification 중복/피로도 제한 구현
+- [ ] `FrontmostAppProvider.swift` 작성
+- [ ] whitelist 기반 `pausedWhitelist` 진입/해제 연결
