@@ -24,6 +24,8 @@ struct PermissionStepView: View {
                         defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
                     ))
                     .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             }
             
@@ -36,6 +38,8 @@ struct PermissionStepView: View {
                         defaultValue: "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
                     ))
                     .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             }
             
@@ -48,6 +52,8 @@ struct PermissionStepView: View {
                         defaultValue: "Accessibility permission is already enabled. Continue to choose the defaults for your first sessions."
                     ))
                     .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             } else {
                 Label(localizedAppString(
@@ -56,6 +62,7 @@ struct PermissionStepView: View {
                 ), systemImage: "info.circle")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 2)
             }
         }

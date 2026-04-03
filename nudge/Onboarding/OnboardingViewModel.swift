@@ -27,6 +27,15 @@ final class OnboardingViewModel {
     var petPresentationMode: PetPresentationMode {
         didSet { persistDraft() }
     }
+    var scheduleEnabled: Bool {
+        didSet { persistDraft() }
+    }
+    var scheduleStartSecondsFromMidnight: Int {
+        didSet { persistDraft() }
+    }
+    var scheduleEndSecondsFromMidnight: Int {
+        didSet { persistDraft() }
+    }
     var errorMessage: String?
     
     init(
@@ -53,16 +62,19 @@ final class OnboardingViewModel {
         self.launchAtLoginEnabled = initialDraft.launchAtLoginEnabled
         self.ttsEnabled = initialDraft.ttsEnabled
         self.petPresentationMode = initialDraft.petPresentationMode
+        self.scheduleEnabled = initialDraft.scheduleEnabled
+        self.scheduleStartSecondsFromMidnight = initialDraft.scheduleStartSecondsFromMidnight
+        self.scheduleEndSecondsFromMidnight = initialDraft.scheduleEndSecondsFromMidnight
         
         persistDraft()
     }
     
     var showsBackButton: Bool {
-        step == .permission || step == .basicSetup
+        step == .permission || step == .basicSetup || step == .scheduleSetup
     }
     
     var progressText: String {
-        "\(step.progressIndex)/4"
+        "\(step.progressIndex)/5"
     }
     
     var preferredContentHeight: CGFloat {
@@ -75,6 +87,8 @@ final class OnboardingViewModel {
             step = .welcome
         case .basicSetup:
             step = .permission
+        case .scheduleSetup:
+            step = .basicSetup
         default:
             return
         }
@@ -110,6 +124,11 @@ final class OnboardingViewModel {
     }
     
     func continueFromBasicSetup() {
+        step = .scheduleSetup
+        storage.saveResumeStep(step)
+    }
+    
+    func continueFromScheduleSetup() {
         step = permissionManager.isAccessibilityGranted ? .completionReady : .completionLimited
         storage.saveResumeStep(step)
     }
@@ -137,8 +156,8 @@ final class OnboardingViewModel {
         case .welcome, .permission:
             storage.markCompleted()
             return true
-        case .basicSetup:
-            storage.saveResumeStep(.basicSetup)
+        case .basicSetup, .scheduleSetup:
+            storage.saveResumeStep(step)
             return true
         case .completionReady, .completionLimited:
             do {
@@ -167,6 +186,9 @@ final class OnboardingViewModel {
             settings.idleThresholdSeconds = idleThresholdSeconds
             settings.ttsEnabled = ttsEnabled
             settings.petPresentationMode = petPresentationMode
+            settings.scheduleEnabled = scheduleEnabled
+            settings.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
+            settings.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight
             settings.updatedAt = .now
         }
         
@@ -180,7 +202,10 @@ final class OnboardingViewModel {
                 idleThresholdSeconds: idleThresholdSeconds,
                 launchAtLoginEnabled: launchAtLoginEnabled,
                 ttsEnabled: ttsEnabled,
-                petPresentationMode: petPresentationMode
+                petPresentationMode: petPresentationMode,
+                scheduleEnabled: scheduleEnabled,
+                scheduleStartSecondsFromMidnight: scheduleStartSecondsFromMidnight,
+                scheduleEndSecondsFromMidnight: scheduleEndSecondsFromMidnight
             )
         )
     }
@@ -202,7 +227,10 @@ final class OnboardingViewModel {
             idleThresholdSeconds: settings?.idleThresholdSeconds ?? 300,
             launchAtLoginEnabled: storage.shouldPresentOnboarding ? true : launchAtLoginManager.isEnabled,
             ttsEnabled: settings?.ttsEnabled ?? true,
-            petPresentationMode: settings?.petPresentationMode ?? .sprout
+            petPresentationMode: settings?.petPresentationMode ?? .sprout,
+            scheduleEnabled: settings?.scheduleEnabled ?? false,
+            scheduleStartSecondsFromMidnight: settings?.scheduleStartSecondsFromMidnight ?? 32_400,
+            scheduleEndSecondsFromMidnight: settings?.scheduleEndSecondsFromMidnight ?? 61_200
         )
     }
 }

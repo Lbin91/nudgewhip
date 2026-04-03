@@ -2,15 +2,13 @@
 // 오늘의 포커스 통계와 워크스페이스 정보를 표시하는 뷰.
 //
 // Today 그룹: 총 포커스 시간, 완료 세션 수, 알림 횟수.
-// Workspace 그룹: 화이트리스트 앱 수, 펫 단계, 펫 감정.
+// Workspace 그룹: 화이트리스트 앱 수.
 
 import SwiftUI
 
 struct DailySummaryView: View {
     let todayStats: DailyStats
     let whitelistCount: Int
-    let petStageText: String
-    let petEmotionText: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -44,18 +42,6 @@ struct DailySummaryView: View {
                         Text("\(whitelistCount)")
                     } label: {
                         Text(localizedAppString("menu.dropdown.label.whitelist_apps", defaultValue: "Whitelist apps"))
-                    }
-                    
-                    LabeledContent {
-                        Text(petStageText)
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.pet_stage", defaultValue: "Pet stage"))
-                    }
-                    
-                    LabeledContent {
-                        Text(petEmotionText)
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.pet_emotion", defaultValue: "Pet emotion"))
                     }
                 }
             } label: {

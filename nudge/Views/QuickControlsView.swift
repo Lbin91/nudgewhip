@@ -8,7 +8,6 @@ import SwiftUI
 
 struct QuickControlsView: View {
     let menuBarViewModel: MenuBarViewModel
-    let petPresentationText: String
     let ttsStatusText: String
     let idleThresholdText: String
     let scheduleText: String
@@ -58,12 +57,6 @@ struct QuickControlsView: View {
                     Text(ttsStatusText)
                 } label: {
                     Text(localizedAppString("menu.dropdown.label.tts", defaultValue: "TTS"))
-                }
-                
-                LabeledContent {
-                    Text(petPresentationText)
-                } label: {
-                    Text(localizedAppString("menu.dropdown.label.pet_mode", defaultValue: "Pet mode"))
                 }
                 
                 LabeledContent {

@@ -24,6 +24,9 @@ final class OnboardingStorage: OnboardingStoring {
         static let launchAtLogin = "onboarding.draft.launch_at_login"
         static let ttsEnabled = "onboarding.draft.tts_enabled"
         static let petMode = "onboarding.draft.pet_mode"
+        static let scheduleEnabled = "onboarding.draft.schedule_enabled"
+        static let scheduleStart = "onboarding.draft.schedule_start"
+        static let scheduleEnd = "onboarding.draft.schedule_end"
         static let hasDraft = "onboarding.draft.has_value"
     }
     
@@ -50,7 +53,10 @@ final class OnboardingStorage: OnboardingStoring {
             idleThresholdSeconds: defaults.integer(forKey: Keys.idleThreshold),
             launchAtLoginEnabled: defaults.bool(forKey: Keys.launchAtLogin),
             ttsEnabled: defaults.bool(forKey: Keys.ttsEnabled),
-            petPresentationMode: PetPresentationMode(rawValue: defaults.string(forKey: Keys.petMode) ?? "") ?? .sprout
+            petPresentationMode: PetPresentationMode(rawValue: defaults.string(forKey: Keys.petMode) ?? "") ?? .sprout,
+            scheduleEnabled: defaults.bool(forKey: Keys.scheduleEnabled),
+            scheduleStartSecondsFromMidnight: defaults.object(forKey: Keys.scheduleStart) as? Int ?? 32_400,
+            scheduleEndSecondsFromMidnight: defaults.object(forKey: Keys.scheduleEnd) as? Int ?? 61_200
         )
     }
     
@@ -60,6 +66,9 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.set(draft.launchAtLoginEnabled, forKey: Keys.launchAtLogin)
         defaults.set(draft.ttsEnabled, forKey: Keys.ttsEnabled)
         defaults.set(draft.petPresentationMode.rawValue, forKey: Keys.petMode)
+        defaults.set(draft.scheduleEnabled, forKey: Keys.scheduleEnabled)
+        defaults.set(draft.scheduleStartSecondsFromMidnight, forKey: Keys.scheduleStart)
+        defaults.set(draft.scheduleEndSecondsFromMidnight, forKey: Keys.scheduleEnd)
     }
     
     func saveResumeStep(_ step: OnboardingStep?) {
@@ -84,6 +93,9 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.removeObject(forKey: Keys.launchAtLogin)
         defaults.removeObject(forKey: Keys.ttsEnabled)
         defaults.removeObject(forKey: Keys.petMode)
+        defaults.removeObject(forKey: Keys.scheduleEnabled)
+        defaults.removeObject(forKey: Keys.scheduleStart)
+        defaults.removeObject(forKey: Keys.scheduleEnd)
         defaults.set(false, forKey: Keys.hasDraft)
     }
 }

@@ -18,7 +18,6 @@ struct MenuBarDropdownView: View {
             
             QuickControlsView(
                 menuBarViewModel: menuBarViewModel,
-                petPresentationText: menuBarViewModel.petPresentationText,
                 ttsStatusText: menuBarViewModel.ttsStatusText,
                 idleThresholdText: menuBarViewModel.idleThresholdText,
                 scheduleText: menuBarViewModel.scheduleText,
@@ -29,9 +28,7 @@ struct MenuBarDropdownView: View {
             
             DailySummaryView(
                 todayStats: menuBarViewModel.todayStats,
-                whitelistCount: menuBarViewModel.whitelistCount,
-                petStageText: menuBarViewModel.petStageText,
-                petEmotionText: menuBarViewModel.petEmotionText
+                whitelistCount: menuBarViewModel.whitelistCount
             )
         }
     }

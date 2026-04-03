@@ -399,11 +399,8 @@ struct nudgeTests {
         
         #expect(viewModel.idleThresholdText.contains("10"))
         #expect(viewModel.ttsStatusText == "Disabled")
-        #expect(viewModel.petPresentationText == "Minimal")
         #expect(viewModel.scheduleEnabled)
         #expect(viewModel.whitelistCount == 1)
-        #expect(viewModel.petStageText == "Buddy")
-        #expect(viewModel.petEmotionText == "Happy")
         #expect(viewModel.todayStats.alertCount == 2)
     }
     
@@ -436,14 +433,14 @@ struct nudgeTests {
         
         viewModel.updateIdleThreshold(600)
         viewModel.updateTTS(false)
-        viewModel.updatePetPresentationMode(.minimal)
+        viewModel.updateScheduleEnabled(true)
         viewModel.updateLaunchAtLogin(true)
         viewModel.openOnboarding()
         
         let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
         #expect(settings.idleThresholdSeconds == 600)
         #expect(settings.ttsEnabled == false)
-        #expect(settings.petPresentationMode == .minimal)
+        #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
     }
@@ -577,7 +574,8 @@ struct nudgeTests {
     @MainActor
     @Test
     func idleMonitorResetsBaselineWhenScheduleWindowReopens() {
-        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let calendar = Calendar.current
+        let baseDate = calendar.startOfDay(for: Date(timeIntervalSince1970: 1_775_088_000))
         let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
         let runtimeController = RuntimeStateController()
         let idleMonitor = IdleMonitor(
@@ -825,7 +823,10 @@ struct nudgeTests {
             idleThresholdSeconds: 600,
             launchAtLoginEnabled: true,
             ttsEnabled: false,
-            petPresentationMode: .minimal
+            petPresentationMode: .minimal,
+            scheduleEnabled: true,
+            scheduleStartSecondsFromMidnight: 32_400,
+            scheduleEndSecondsFromMidnight: 61_200
         )
         storage.saveDraft(draft)
         storage.saveResumeStep(.basicSetup)
@@ -869,8 +870,13 @@ struct nudgeTests {
         viewModel.idleThresholdSeconds = 600
         viewModel.ttsEnabled = false
         viewModel.launchAtLoginEnabled = true
-        viewModel.petPresentationMode = .minimal
         viewModel.continueFromBasicSetup()
+        #expect(viewModel.step == .scheduleSetup)
+        
+        viewModel.scheduleEnabled = true
+        viewModel.scheduleStartSecondsFromMidnight = 32_400
+        viewModel.scheduleEndSecondsFromMidnight = 61_200
+        viewModel.continueFromScheduleSetup()
         #expect(viewModel.step == .completionReady)
         
         viewModel.finish()
@@ -880,7 +886,9 @@ struct nudgeTests {
         let settings = try container.mainContext.fetch(FetchDescriptor<UserSettings>())
         #expect(settings.first?.idleThresholdSeconds == 600)
         #expect(settings.first?.ttsEnabled == false)
-        #expect(settings.first?.petPresentationMode == .minimal)
+        #expect(settings.first?.scheduleEnabled == true)
+        #expect(settings.first?.scheduleStartSecondsFromMidnight == 32_400)
+        #expect(settings.first?.scheduleEndSecondsFromMidnight == 61_200)
         #expect(!storage.shouldPresentOnboarding)
     }
     
@@ -941,7 +949,9 @@ struct nudgeTests {
         
         #expect(grantedViewModel.preferredContentHeight == 540)
         grantedViewModel.continueFromPermission()
-        #expect(grantedViewModel.preferredContentHeight == 660)
+        #expect(grantedViewModel.preferredContentHeight == 520)
+        grantedViewModel.continueFromBasicSetup()
+        #expect(grantedViewModel.preferredContentHeight == 560)
     }
 
 }

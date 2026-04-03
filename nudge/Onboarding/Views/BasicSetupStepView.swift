@@ -4,7 +4,6 @@ struct BasicSetupStepView: View {
     @Binding var idleThresholdSeconds: Int
     @Binding var launchAtLoginEnabled: Bool
     @Binding var ttsEnabled: Bool
-    @Binding var petPresentationMode: PetPresentationMode
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -16,13 +15,13 @@ struct BasicSetupStepView: View {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                         thresholdButton(
                             title: localizedAppString("onboarding.setup.idle_threshold.10s", defaultValue: "10 sec (Test)"),
-                            subtitle: "테스트용",
+                            subtitle: localizedAppString("onboarding.setup.idle_threshold.10s.subtitle", defaultValue: "For testing"),
                             value: 10
                         )
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min"), subtitle: nil, value: 180)
                         thresholdButton(
                             title: localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min (Recommended)"),
-                            subtitle: "기본 추천",
+                            subtitle: localizedAppString("onboarding.setup.idle_threshold.5m.subtitle", defaultValue: "Recommended"),
                             value: 300
                         )
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.10m", defaultValue: "10 min"), subtitle: nil, value: 600)
@@ -41,16 +40,6 @@ struct BasicSetupStepView: View {
                         .toggleStyle(.checkbox)
                 }
             }
-            
-            OnboardingSectionCard(
-                title: localizedAppString("onboarding.setup.visual_mode.label", defaultValue: "Visual mode"),
-                subtitle: localizedAppString("onboarding.setup.visual_mode.subtitle", defaultValue: "Pick the presentation style that feels the least distracting.")
-            ) {
-                HStack(spacing: 10) {
-                    modeButton(title: localizedAppString("onboarding.setup.visual_mode.sprout", defaultValue: "Sprout"), subtitle: "캐릭터와 함께", mode: .sprout)
-                    modeButton(title: localizedAppString("onboarding.setup.visual_mode.minimal", defaultValue: "Minimal"), subtitle: "더 조용하게", mode: .minimal)
-                }
-            }
         }
     }
     
@@ -64,13 +53,4 @@ struct BasicSetupStepView: View {
         }
     }
     
-    private func modeButton(title: String, subtitle: String?, mode: PetPresentationMode) -> some View {
-        OnboardingSelectableCard(
-            title: title,
-            subtitle: subtitle,
-            isSelected: petPresentationMode == mode
-        ) {
-            petPresentationMode = mode
-        }
-    }
 }

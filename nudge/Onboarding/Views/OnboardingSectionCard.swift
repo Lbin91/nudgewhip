@@ -21,6 +21,8 @@ struct OnboardingSectionCard<Content: View>: View {
                 Text(title)
                     .font(.headline)
                     .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 if let subtitle, !subtitle.isEmpty {
                     Text(subtitle)

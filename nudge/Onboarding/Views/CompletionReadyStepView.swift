@@ -2,9 +2,9 @@ import SwiftUI
 
 struct CompletionReadyStepView: View {
     let idleThresholdText: String
+    let scheduleText: String
     let launchAtLoginText: String
     let ttsText: String
-    let visualModeText: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -19,9 +19,9 @@ struct CompletionReadyStepView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 8) {
                         LabeledContent(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), value: idleThresholdText)
+                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.schedule", defaultValue: "Schedule"), value: scheduleText)
                         LabeledContent(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), value: launchAtLoginText)
                         LabeledContent(localizedAppString("onboarding.completion.ready.summary.tts", defaultValue: "Voice nudges"), value: ttsText)
-                        LabeledContent(localizedAppString("onboarding.completion.ready.summary.visual_mode", defaultValue: "Visual mode"), value: visualModeText)
                     }
                 }
             }

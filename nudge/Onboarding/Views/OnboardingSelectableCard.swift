@@ -10,7 +10,7 @@ struct OnboardingSelectableCard: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(.primary)
                 
                 if let subtitle, !subtitle.isEmpty {
@@ -21,9 +21,9 @@ struct OnboardingSelectableCard: View {
                 
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
             .background(
                 isSelected ? Color.accentColor.opacity(0.16) : Color(nsColor: .windowBackgroundColor),
                 in: RoundedRectangle(cornerRadius: 14, style: .continuous)

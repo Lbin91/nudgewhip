@@ -64,6 +64,8 @@ struct OnboardingRootView: View {
             localizedAppString("onboarding.permission.header", defaultValue: "Accessibility permission")
         case .basicSetup:
             localizedAppString("onboarding.setup.header", defaultValue: "Set your starting defaults")
+        case .scheduleSetup:
+            localizedAppString("onboarding.schedule.header", defaultValue: "Choose your monitoring hours")
         case .completionReady:
             localizedAppString("onboarding.completion.ready.header", defaultValue: "Ready to go")
         case .completionLimited:
@@ -81,6 +83,8 @@ struct OnboardingRootView: View {
                 : localizedAppString("onboarding.permission.subtitle", defaultValue: "Allow background input detection so Nudge can detect idle moments.")
         case .basicSetup:
             localizedAppString("onboarding.setup.subtitle", defaultValue: "Choose the defaults for your first sessions.")
+        case .scheduleSetup:
+            localizedAppString("onboarding.schedule.subtitle", defaultValue: "Set the hours when Nudge should actively monitor and nudge.")
         case .completionReady:
             localizedAppString("onboarding.completion.ready.subtitle", defaultValue: "Your first-run setup is complete.")
         case .completionLimited:
@@ -99,15 +103,26 @@ struct OnboardingRootView: View {
             BasicSetupStepView(
                 idleThresholdSeconds: $viewModel.idleThresholdSeconds,
                 launchAtLoginEnabled: $viewModel.launchAtLoginEnabled,
-                ttsEnabled: $viewModel.ttsEnabled,
-                petPresentationMode: $viewModel.petPresentationMode
+                ttsEnabled: $viewModel.ttsEnabled
+            )
+        case .scheduleSetup:
+            ScheduleSetupStepView(
+                scheduleEnabled: $viewModel.scheduleEnabled,
+                scheduleStartTime: Binding(
+                    get: { dateFromSeconds(viewModel.scheduleStartSecondsFromMidnight) },
+                    set: { viewModel.scheduleStartSecondsFromMidnight = secondsFromMidnight(for: $0) }
+                ),
+                scheduleEndTime: Binding(
+                    get: { dateFromSeconds(viewModel.scheduleEndSecondsFromMidnight) },
+                    set: { viewModel.scheduleEndSecondsFromMidnight = secondsFromMidnight(for: $0) }
+                )
             )
         case .completionReady:
             CompletionReadyStepView(
                 idleThresholdText: idleThresholdText,
+                scheduleText: scheduleText,
                 launchAtLoginText: toggleText(viewModel.launchAtLoginEnabled),
-                ttsText: toggleText(viewModel.ttsEnabled),
-                visualModeText: visualModeText
+                ttsText: toggleText(viewModel.ttsEnabled)
             )
         case .completionLimited:
             CompletionLimitedStepView()
@@ -123,6 +138,8 @@ struct OnboardingRootView: View {
             permissionFooter
         case .basicSetup:
             basicSetupFooter
+        case .scheduleSetup:
+            scheduleSetupFooter
         case .completionReady:
             completionReadyFooter
         case .completionLimited:
@@ -180,6 +197,17 @@ struct OnboardingRootView: View {
         )
     }
     
+    private var scheduleSetupFooter: some View {
+        OnboardingFooterView(
+            primaryTitle: localizedAppString("onboarding.schedule.cta.continue", defaultValue: "Continue"),
+            primaryAction: viewModel.continueFromScheduleSetup,
+            secondaryTitle: nil,
+            secondaryAction: nil,
+            tertiaryTitle: nil,
+            tertiaryAction: nil
+        )
+    }
+    
     private var completionReadyFooter: some View {
         OnboardingFooterView(
             primaryTitle: localizedAppString("onboarding.completion.ready.cta.finish", defaultValue: "Continue to Menu Bar"),
@@ -211,18 +239,35 @@ struct OnboardingRootView: View {
         return "\(minutes)분"
     }
     
-    private var visualModeText: String {
-        switch viewModel.petPresentationMode {
-        case .sprout:
-            localizedAppString("onboarding.setup.visual_mode.sprout", defaultValue: "Sprout")
-        case .minimal:
-            localizedAppString("onboarding.setup.visual_mode.minimal", defaultValue: "Minimal")
+    private var scheduleText: String {
+        guard viewModel.scheduleEnabled else {
+            return localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
         }
+        return "\(formattedClock(dateFromSeconds(viewModel.scheduleStartSecondsFromMidnight))) - \(formattedClock(dateFromSeconds(viewModel.scheduleEndSecondsFromMidnight)))"
     }
     
     private func toggleText(_ isOn: Bool) -> String {
         isOn
             ? localizedAppString("onboarding.common.toggle.on", defaultValue: "On")
             : localizedAppString("onboarding.common.toggle.off", defaultValue: "Off")
+    }
+    
+    private func dateFromSeconds(_ seconds: Int) -> Date {
+        let startOfDay = Calendar.current.startOfDay(for: .now)
+        return startOfDay.addingTimeInterval(TimeInterval(seconds))
+    }
+    
+    private func secondsFromMidnight(for date: Date) -> Int {
+        let calendar = Calendar.current
+        return calendar.component(.hour, from: date) * 3600
+            + calendar.component(.minute, from: date) * 60
+    }
+    
+    private func formattedClock(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.timeStyle = .short
+        formatter.dateStyle = .none
+        return formatter.string(from: date)
     }
 }

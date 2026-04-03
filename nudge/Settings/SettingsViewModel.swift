@@ -92,13 +92,6 @@ final class SettingsViewModel {
         save(settings)
     }
     
-    func updatePetPresentationMode(_ mode: PetPresentationMode) {
-        guard let settings else { return }
-        settings.petPresentationMode = mode
-        settings.updatedAt = .now
-        save(settings)
-    }
-    
     func updateScheduleEnabled(_ enabled: Bool) {
         menuBarViewModel.updateScheduleEnabled(enabled)
     }

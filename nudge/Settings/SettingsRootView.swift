@@ -19,7 +19,6 @@ struct SettingsRootView: View {
                 
                 monitoringSection
                 scheduleSection
-                appearanceSection
                 accessibilitySection
                 appSection
                 
@@ -46,10 +45,10 @@ struct SettingsRootView: View {
                     .font(.headline)
                 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    thresholdButton(title: "10초", value: 10)
-                    thresholdButton(title: "3분", value: 180)
-                    thresholdButton(title: "5분", value: 300)
-                    thresholdButton(title: "10분", value: 600)
+                    thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "10 sec"), value: 10)
+                    thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.3m", defaultValue: "3 min"), value: 180)
+                    thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5 min"), value: 300)
+                    thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10m", defaultValue: "10 min"), value: 600)
                 }
                 
                 Toggle(
@@ -112,22 +111,6 @@ struct SettingsRootView: View {
             }
         } label: {
             Text(localizedAppString("settings.section.schedule", defaultValue: "Schedule"))
-        }
-    }
-    
-    private var appearanceSection: some View {
-        GroupBox {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(localizedAppString("settings.section.appearance.pet_mode", defaultValue: "Pet mode"))
-                    .font(.headline)
-                
-                HStack(spacing: 10) {
-                    modeButton(title: localizedAppString("settings.section.appearance.pet_mode.sprout", defaultValue: "Sprout"), mode: .sprout)
-                    modeButton(title: localizedAppString("settings.section.appearance.pet_mode.minimal", defaultValue: "Minimal"), mode: .minimal)
-                }
-            }
-        } label: {
-            Text(localizedAppString("settings.section.appearance", defaultValue: "Appearance"))
         }
     }
     
@@ -196,17 +179,6 @@ struct SettingsRootView: View {
         }
         .buttonStyle(.bordered)
         .tint(viewModel.settings?.idleThresholdSeconds == value ? .accentColor : .secondary)
-    }
-    
-    private func modeButton(title: String, mode: PetPresentationMode) -> some View {
-        Button {
-            viewModel.updatePetPresentationMode(mode)
-        } label: {
-            Text(title)
-                .frame(maxWidth: .infinity, minHeight: 36)
-        }
-        .buttonStyle(.bordered)
-        .tint(viewModel.settings?.petPresentationMode == mode ? .accentColor : .secondary)
     }
     
     private var permissionStatusText: String {

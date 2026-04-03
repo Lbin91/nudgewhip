@@ -5,6 +5,7 @@ enum OnboardingStep: String, CaseIterable, Sendable {
     case welcome
     case permission
     case basicSetup
+    case scheduleSetup
     case completionReady
     case completionLimited
     
@@ -13,7 +14,8 @@ enum OnboardingStep: String, CaseIterable, Sendable {
         case .welcome: 1
         case .permission: 2
         case .basicSetup: 3
-        case .completionReady, .completionLimited: 4
+        case .scheduleSetup: 4
+        case .completionReady, .completionLimited: 5
         }
     }
 }
@@ -23,6 +25,9 @@ struct OnboardingDraft: Equatable, Sendable {
     var launchAtLoginEnabled: Bool
     var ttsEnabled: Bool
     var petPresentationMode: PetPresentationMode
+    var scheduleEnabled: Bool
+    var scheduleStartSecondsFromMidnight: Int
+    var scheduleEndSecondsFromMidnight: Int
 }
 
 enum OnboardingWindowMetrics {
@@ -36,9 +41,11 @@ enum OnboardingWindowMetrics {
         case .welcome:
             return 460
         case .permission:
-            return permissionState == .granted ? 540 : 590
+            return permissionState == .granted ? 560 : 640
         case .basicSetup:
-            return 660
+            return 520
+        case .scheduleSetup:
+            return 560
         case .completionReady:
             return 560
         case .completionLimited:
