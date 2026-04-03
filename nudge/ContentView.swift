@@ -42,6 +42,14 @@ struct ContentView: View {
             settings.petPresentationMode.rawValue
         ].joined(separator: "|")
     }
+    
+    private var whitelistSyncKey: String {
+        let enabledBundleIdentifiers = whitelistApps
+            .filter(\.isEnabled)
+            .map(\.bundleIdentifier)
+            .sorted()
+        return enabledBundleIdentifiers.joined(separator: "|")
+    }
 
     var body: some View {
         MenuBarDropdownView(
@@ -60,6 +68,9 @@ struct ContentView: View {
             if let settings {
                 menuBarViewModel.apply(settings: settings)
             }
+        }
+        .task(id: whitelistSyncKey) {
+            menuBarViewModel.apply(whitelistApps: whitelistApps)
         }
     }
     

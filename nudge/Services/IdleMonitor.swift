@@ -20,6 +20,7 @@ final class IdleMonitor {
     let runtimeStateController: RuntimeStateController
     let eventMonitor: any EventMonitoring
     let lifecycleMonitor: any SystemLifecycleMonitoring
+    let frontmostAppProvider: any FrontmostAppProviding
     let alertManager: (any AlertManaging)?
     private(set) var idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
@@ -27,6 +28,7 @@ final class IdleMonitor {
     private(set) var scheduleEnabled: Bool
     private(set) var scheduleStart: TimeInterval
     private(set) var scheduleEnd: TimeInterval
+    private(set) var whitelistedBundleIdentifiers: Set<String> = []
     
     private var idleDeadlineWorkItem: DispatchWorkItem?
     private var alertEscalationWorkItem: DispatchWorkItem?
@@ -39,6 +41,7 @@ final class IdleMonitor {
         runtimeStateController: RuntimeStateController? = nil,
         eventMonitor: (any EventMonitoring)? = nil,
         lifecycleMonitor: (any SystemLifecycleMonitoring)? = nil,
+        frontmostAppProvider: (any FrontmostAppProviding)? = nil,
         alertManager: (any AlertManaging)? = nil,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
@@ -51,6 +54,7 @@ final class IdleMonitor {
         self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
         self.eventMonitor = eventMonitor ?? SystemEventMonitor()
         self.lifecycleMonitor = lifecycleMonitor ?? SystemLifecycleMonitor()
+        self.frontmostAppProvider = frontmostAppProvider ?? FrontmostAppProvider()
         self.alertManager = alertManager
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
@@ -75,6 +79,16 @@ final class IdleMonitor {
         }
     }
     
+    /// 저장된 화이트리스트 앱 목록을 runtime monitor에 반영
+    func applyWhitelistApps(_ apps: [WhitelistApp], at date: Date = .now) {
+        whitelistedBundleIdentifiers = Set(
+            apps
+                .filter(\.isEnabled)
+                .map(\.bundleIdentifier)
+        )
+        updateWhitelistMatch(for: frontmostAppProvider.currentBundleIdentifier, at: date)
+    }
+    
     /// 권한 확인 후 유휴 감시 시작
     /// 권한 확인 후 유휴 감시 시작
     func start(at date: Date = .now, promptForPermission: Bool = false) {
@@ -94,10 +108,12 @@ final class IdleMonitor {
         if permissionState == .granted {
             startEventMonitoringIfNeeded()
             startLifecycleMonitoringIfNeeded()
+            startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
         } else {
             stopEventMonitoring()
             stopLifecycleMonitoring()
+            stopFrontmostAppMonitoring()
             cancelAllDeadlines()
         }
     }
@@ -111,10 +127,12 @@ final class IdleMonitor {
         if state == .granted {
             startEventMonitoringIfNeeded()
             startLifecycleMonitoringIfNeeded()
+            startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
         } else {
             stopEventMonitoring()
             stopLifecycleMonitoring()
+            stopFrontmostAppMonitoring()
             cancelAllDeadlines()
         }
     }
@@ -358,6 +376,25 @@ final class IdleMonitor {
     /// 시스템 lifecycle 모니터 정지
     private func stopLifecycleMonitoring() {
         lifecycleMonitor.stop()
+    }
+    
+    /// frontmost app 변경 모니터 시작
+    private func startFrontmostAppMonitoringIfNeeded() {
+        guard !frontmostAppProvider.isMonitoring else { return }
+        frontmostAppProvider.start { [weak self] bundleIdentifier in
+            self?.updateWhitelistMatch(for: bundleIdentifier)
+        }
+    }
+    
+    /// frontmost app 변경 모니터 정지
+    private func stopFrontmostAppMonitoring() {
+        frontmostAppProvider.stop()
+    }
+    
+    /// 현재 frontmost app이 화이트리스트에 포함되는지 평가
+    private func updateWhitelistMatch(for bundleIdentifier: String?, at date: Date = .now) {
+        let matched = bundleIdentifier.map { whitelistedBundleIdentifiers.contains($0) } ?? false
+        setWhitelistMatched(matched, at: date)
     }
     
     /// alert side effects는 이벤트 핸들러에서 바로 무겁게 수행하지 않도록 비동기로 동기화

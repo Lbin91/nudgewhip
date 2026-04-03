@@ -61,8 +61,7 @@ final class AlertManager: AlertManaging {
             return
         }
         
-        if activeStyle != nextStyle {
-            guard canPresentVisualAlert else { return }
+        if activeStyle != nextStyle, canPresentVisualAlert {
             playSound(for: nextStyle)
             presenter.show(style: nextStyle)
             activeStyle = nextStyle

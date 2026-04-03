@@ -124,4 +124,9 @@ final class MenuBarViewModel {
     func apply(settings: UserSettings, at date: Date = .now) {
         idleMonitor.applySettings(settings, at: date)
     }
+    
+    /// SwiftData에 저장된 whitelist 앱 목록을 runtime monitor에 반영
+    func apply(whitelistApps: [WhitelistApp], at date: Date = .now) {
+        idleMonitor.applyWhitelistApps(whitelistApps, at: date)
+    }
 }

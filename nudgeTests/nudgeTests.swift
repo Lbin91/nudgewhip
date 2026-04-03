@@ -72,6 +72,33 @@ private final class TestSystemLifecycleMonitor: SystemLifecycleMonitoring {
 }
 
 @MainActor
+private final class TestFrontmostAppProvider: FrontmostAppProviding {
+    private(set) var isMonitoring = false
+    private(set) var startCount = 0
+    private(set) var stopCount = 0
+    var currentBundleIdentifier: String?
+    private var onBundleIdentifierChange: (@MainActor (String?) -> Void)?
+    
+    func start(onBundleIdentifierChange: @escaping @MainActor (String?) -> Void) {
+        isMonitoring = true
+        startCount += 1
+        self.onBundleIdentifierChange = onBundleIdentifierChange
+        onBundleIdentifierChange(currentBundleIdentifier)
+    }
+    
+    func stop() {
+        isMonitoring = false
+        stopCount += 1
+        onBundleIdentifierChange = nil
+    }
+    
+    func emit(bundleIdentifier: String?) {
+        currentBundleIdentifier = bundleIdentifier
+        onBundleIdentifierChange?(bundleIdentifier)
+    }
+}
+
+@MainActor
 private final class TestAlertPresenter: AlertPresenting {
     private(set) var showCount = 0
     private(set) var hideCount = 0
@@ -239,19 +266,23 @@ struct nudgeTests {
         let runtimeController = RuntimeStateController()
         let eventMonitor = TestEventMonitor()
         let lifecycleMonitor = TestSystemLifecycleMonitor()
+        let frontmostAppProvider = TestFrontmostAppProvider()
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             runtimeStateController: runtimeController,
             eventMonitor: eventMonitor,
             lifecycleMonitor: lifecycleMonitor,
+            frontmostAppProvider: frontmostAppProvider,
             idleThreshold: 300
         )
         
         idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
         #expect(eventMonitor.startCount == 1)
         #expect(lifecycleMonitor.startCount == 1)
+        #expect(frontmostAppProvider.startCount == 1)
         #expect(eventMonitor.isMonitoring)
         #expect(lifecycleMonitor.isMonitoring)
+        #expect(frontmostAppProvider.isMonitoring)
         
         eventMonitor.emitActivity()
         #expect(idleMonitor.lastInputAt != nil)
@@ -260,8 +291,10 @@ struct nudgeTests {
         idleMonitor.setAccessibilityPermission(.denied, at: baseDate.addingTimeInterval(1))
         #expect(eventMonitor.stopCount == 1)
         #expect(lifecycleMonitor.stopCount == 1)
+        #expect(frontmostAppProvider.stopCount == 1)
         #expect(!eventMonitor.isMonitoring)
         #expect(!lifecycleMonitor.isMonitoring)
+        #expect(!frontmostAppProvider.isMonitoring)
         #expect(runtimeController.snapshot.runtimeState == .limitedNoAX)
     }
     
@@ -537,6 +570,48 @@ struct nudgeTests {
         )
         
         #expect(notificationManager.deliverCount == 1)
+    }
+    
+    @MainActor
+    @Test
+    func idleMonitorPausesWhileWhitelistedFrontmostAppIsActive() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let eventMonitor = TestEventMonitor()
+        let lifecycleMonitor = TestSystemLifecycleMonitor()
+        let frontmostAppProvider = TestFrontmostAppProvider()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: eventMonitor,
+            lifecycleMonitor: lifecycleMonitor,
+            frontmostAppProvider: frontmostAppProvider,
+            idleThreshold: 300
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(300))
+        
+        idleMonitor.applyWhitelistApps(
+            [
+                WhitelistApp(bundleIdentifier: "com.apple.dt.Xcode"),
+                WhitelistApp(bundleIdentifier: "com.apple.Safari", isEnabled: false)
+            ],
+            at: baseDate.addingTimeInterval(1)
+        )
+        
+        frontmostAppProvider.emit(bundleIdentifier: "com.apple.dt.Xcode")
+        #expect(runtimeController.snapshot.runtimeState == .pausedWhitelist)
+        #expect(runtimeController.snapshot.whitelistMatched)
+        #expect(idleMonitor.idleDeadlineAt == nil)
+        
+        frontmostAppProvider.emit(bundleIdentifier: "com.apple.finder")
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(!runtimeController.snapshot.whitelistMatched)
+        #expect(idleMonitor.idleDeadlineAt != nil)
     }
     
     @MainActor

@@ -23,7 +23,7 @@
 ### A. Core Runtime Completion
 
 - [x] 시작시간/종료시간(schedule) runtime 구조 및 저장 반영
-- [ ] `nudge/Services/FrontmostAppProvider.swift` 작성
+- [x] `nudge/Services/FrontmostAppProvider.swift` 작성
 - [ ] 이벤트 핸들러에서 `lastInputAt` 갱신 외 무거운 작업 금지 구조를 더 강하게 분리
 - [x] sleep/wake 처리 추가
 - [x] lock/unlock 처리 추가
@@ -88,8 +88,8 @@
 - [ ] manual break mode 구현
 - [ ] `pausedManual` 상태 UI/로직 연결
 - [ ] whitelist UI 및 저장 모델 연결
-- [ ] `frontmostApplication.bundleIdentifier` 기반 whitelist pause 구현
-- [ ] 이름 기반이 아닌 bundle identifier 기반 강제
+- [x] `frontmostApplication.bundleIdentifier` 기반 whitelist pause 구현
+- [x] 이름 기반이 아닌 bundle identifier 기반 강제
 - [ ] custom idle threshold 구현
 
 ### H. Detailed Stats / Gamification
@@ -133,7 +133,7 @@
 - [ ] `Clock` injectable 구현 및 테스트 추가
 - [x] `EventMonitor` injectable 구현 및 테스트 추가
 - [x] `PermissionProvider` injectable 구현 및 테스트 추가
-- [ ] `FrontmostAppProvider` injectable 구현 및 테스트 추가
+- [x] `FrontmostAppProvider` injectable 구현 및 테스트 추가
 - [ ] `SpeechSynthesizer` injectable 구현 및 테스트 추가
 - [ ] `CloudKitClient` injectable 구현 및 테스트 추가
 
@@ -160,5 +160,5 @@
 
 ## Current Next Slice
 
-- [ ] `FrontmostAppProvider.swift` 작성
-- [ ] whitelist 기반 `pausedWhitelist` 진입/해제 연결
+- [x] `FrontmostAppProvider.swift` 작성
+- [x] whitelist 기반 `pausedWhitelist` 진입/해제 연결
