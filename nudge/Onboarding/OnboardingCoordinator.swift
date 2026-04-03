@@ -33,11 +33,19 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
         storage.shouldPresentOnboarding
     }
     
-    func present() {
+    func present(startAtWelcome: Bool = false) {
         if let onboardingWindow {
+            if startAtWelcome {
+                viewModel?.restartFromWelcome()
+                resizeWindow(toContentHeight: viewModel?.preferredContentHeight ?? OnboardingWindowMetrics.minimumContentHeight, animated: false)
+            }
             onboardingWindow.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
+        }
+        
+        if startAtWelcome {
+            storage.saveResumeStep(.welcome)
         }
         
         let viewModel = OnboardingViewModel(

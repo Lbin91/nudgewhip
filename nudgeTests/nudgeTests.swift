@@ -343,6 +343,39 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func idleMonitorIgnoresObservedActivityWhileMenuIsPresented() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let eventMonitor = TestEventMonitor()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: eventMonitor,
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        let originalDeadline = idleMonitor.idleDeadlineAt
+        
+        idleMonitor.setMenuPresentationActive(true)
+        eventMonitor.emitActivity()
+        
+        #expect(idleMonitor.lastInputAt == baseDate)
+        #expect(idleMonitor.idleDeadlineAt == originalDeadline)
+        
+        idleMonitor.setMenuPresentationActive(false)
+        eventMonitor.emitActivity()
+        
+        #expect(idleMonitor.lastInputAt != baseDate)
+        #expect(idleMonitor.idleDeadlineAt != originalDeadline)
+    }
+    
+    @MainActor
+    @Test
     func permissionManagerSupportsPromptAndSettingsCTAInjection() {
         var didPrompt = false
         var openedURL: URL?
@@ -448,6 +481,27 @@ struct nudgeTests {
         
         viewModel.resumeFromManualPause(at: baseDate.addingTimeInterval(2))
         #expect(!viewModel.isManualPauseActive)
+    }
+    
+    @MainActor
+    @Test
+    func menuBarViewModelTracksMenuPresentationGuardState() {
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider()
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+        
+        #expect(!viewModel.idleMonitor.isMenuPresentationActive)
+        
+        viewModel.setMenuPresentationActive(true)
+        #expect(viewModel.idleMonitor.isMenuPresentationActive)
+        
+        viewModel.setMenuPresentationActive(false)
+        #expect(!viewModel.idleMonitor.isMenuPresentationActive)
     }
     
     @MainActor
@@ -1015,6 +1069,28 @@ struct nudgeTests {
         #expect(storage.resumeStep == .basicSetup)
         #expect(storage.savedDraft?.idleThresholdSeconds == 180)
         #expect(storage.shouldPresentOnboarding)
+    }
+    
+    @MainActor
+    @Test
+    func onboardingViewModelCanRestartManualReentryFromWelcome() {
+        let defaults = UserDefaults(suiteName: "nudgeTests.onboarding.restart.\(UUID().uuidString)")!
+        let storage = OnboardingStorage(defaults: defaults)
+        let viewModel = OnboardingViewModel(
+            storage: storage,
+            modelContainer: NudgeModelContainer.preview,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+        
+        viewModel.continueFromWelcome()
+        viewModel.continueFromPermission()
+        #expect(viewModel.step == .basicSetup)
+        
+        viewModel.restartFromWelcome()
+        
+        #expect(viewModel.step == .welcome)
+        #expect(storage.resumeStep == .welcome)
     }
     
     @Test

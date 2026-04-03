@@ -46,7 +46,7 @@ enum OnboardingWindowMetrics {
         case .permission:
             return permissionState == .granted ? 560 : 640
         case .basicSetup:
-            return 520
+            return 680
         case .scheduleSetup:
             return 560
         case .completionReady:

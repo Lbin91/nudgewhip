@@ -95,6 +95,12 @@ final class OnboardingViewModel {
         storage.saveResumeStep(step)
     }
     
+    func restartFromWelcome() {
+        errorMessage = nil
+        step = .welcome
+        storage.saveResumeStep(step)
+    }
+    
     func continueFromWelcome() {
         step = .permission
         storage.saveResumeStep(step)

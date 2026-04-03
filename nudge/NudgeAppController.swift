@@ -43,7 +43,7 @@ final class NudgeAppController {
             launchAtLoginManager: LaunchAtLoginManager()
         ) {
             DispatchQueue.main.async {
-                onboardingCoordinator.present()
+                onboardingCoordinator.present(startAtWelcome: true)
             }
         }
     }
@@ -62,7 +62,7 @@ final class NudgeAppController {
     func presentOnboarding() {
         let coordinator = onboardingCoordinator
         DispatchQueue.main.async {
-            coordinator.present()
+            coordinator.present(startAtWelcome: true)
         }
     }
     
