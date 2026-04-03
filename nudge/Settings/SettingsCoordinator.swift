@@ -47,7 +47,7 @@ final class SettingsCoordinator: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = localizedAppString("settings.window.title", defaultValue: "Nudge Settings")
+        window.title = localizedAppString("settings.window.title", defaultValue: "Settings")
         window.isReleasedWhenClosed = false
         window.center()
         window.delegate = self

@@ -43,7 +43,7 @@ struct SettingsRootView: View {
                 Text(localizedAppString("settings.section.monitoring.idle_threshold", defaultValue: "Idle threshold"))
                     .font(.headline)
                 
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                HStack(spacing: 8) {
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "10 sec"), value: 10)
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.3m", defaultValue: "3 min"), value: 180)
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5 min"), value: 300)
@@ -146,17 +146,6 @@ struct SettingsRootView: View {
                         set: viewModel.updateLaunchAtLogin
                     )
                 )
-                
-                HStack {
-                    Button(localizedAppString("settings.section.app.open_onboarding", defaultValue: "Open setup guide")) {
-                        viewModel.openOnboarding()
-                    }
-                    
-                    Button(localizedAppString("settings.section.app.reset_idle_timer", defaultValue: "Reset idle timer")) {
-                        viewModel.resetIdleTimer()
-                    }
-                    .disabled(viewModel.runtimeState == .limitedNoAX)
-                }
             }
         }
     }
@@ -167,10 +156,10 @@ struct SettingsRootView: View {
             viewModel.updateIdleThreshold(value)
         } label: {
             Text(title)
-                .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
+                .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
                 .foregroundStyle(isSelected ? .white : .primary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
                 .frame(maxWidth: .infinity)
                 .background(
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
