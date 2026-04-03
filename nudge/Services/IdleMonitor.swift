@@ -15,6 +15,7 @@ final class IdleMonitor {
     private(set) var idleDeadlineAt: Date?
     private(set) var alertEscalationDeadlineAt: Date?
     private(set) var cooldownDeadlineAt: Date?
+    private(set) var manualPauseUntil: Date?
     
     let permissionManager: PermissionManager
     let runtimeStateController: RuntimeStateController
@@ -34,6 +35,7 @@ final class IdleMonitor {
     private var alertEscalationWorkItem: DispatchWorkItem?
     private var cooldownWorkItem: DispatchWorkItem?
     private var scheduleBoundaryWorkItem: DispatchWorkItem?
+    private var manualPauseResumeWorkItem: DispatchWorkItem?
     
     /// IdleMonitor 생성. 권한·상태·이벤트 모니터 주입 가능 (기본값 제공)
     init(
@@ -120,7 +122,7 @@ final class IdleMonitor {
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
-            cancelAllDeadlines()
+            cancelMonitoringDeadlines()
         }
     }
     
@@ -139,7 +141,7 @@ final class IdleMonitor {
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
-            cancelAllDeadlines()
+            cancelMonitoringDeadlines()
         }
     }
     
@@ -158,16 +160,23 @@ final class IdleMonitor {
         }
     }
     
-    /// 수동 일시정지 토글. 활성 시 모든 데드라인 취소
-    func setManualPause(_ enabled: Bool, at date: Date = .now) {
+    /// 수동 일시정지 토글. 활성 시 모든 모니터링 데드라인을 취소하고, 필요 시 자동 해제 시각을 예약
+    func setManualPause(_ enabled: Bool, until pauseUntil: Date? = nil, at date: Date = .now) {
         runtimeStateController.handle(enabled ? .manualPauseEnabled : .manualPauseDisabled, at: date)
-        scheduleAlertSync()
         
         if enabled {
-            cancelAllDeadlines()
+            manualPauseUntil = pauseUntil
+            scheduleManualPauseResumeIfNeeded(from: date)
+            cancelMonitoringDeadlines()
         } else {
-            scheduleIdleDeadline(from: lastInputAt ?? date)
+            cancelManualPauseResume()
+            manualPauseUntil = nil
+            lastInputAt = date
+            checkSchedule(at: date)
+            scheduleIdleDeadline(from: date)
         }
+        
+        scheduleAlertSync()
     }
     
     /// 화이트리스트 앱 매칭 상태 설정
@@ -176,7 +185,7 @@ final class IdleMonitor {
         scheduleAlertSync()
         
         if matched {
-            cancelAllDeadlines()
+            cancelMonitoringDeadlines()
         } else {
             scheduleIdleDeadline(from: lastInputAt ?? date)
         }
@@ -189,7 +198,7 @@ final class IdleMonitor {
         
         switch event {
         case .sleepDetected, .screenLocked, .fastUserSwitchingStarted:
-            cancelAllDeadlines()
+            cancelMonitoringDeadlines()
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
             lastInputAt = date
             checkSchedule(at: date)
@@ -231,6 +240,12 @@ final class IdleMonitor {
         cooldownWorkItem = nil
     }
     
+    /// 예약된 수동 일시정지 자동 해제를 처리
+    func fireManualPauseResume(at date: Date = .now) {
+        guard let manualPauseUntil, date >= manualPauseUntil else { return }
+        setManualPause(false, at: date)
+    }
+    
     /// 현재 시간이 스케줄 윈도우 내인지 확인하고 상태 전이
     func checkSchedule(at date: Date = .now) {
         guard scheduleEnabled else {
@@ -267,7 +282,7 @@ final class IdleMonitor {
         } else if !inWindow && !snapshot.schedulePaused {
             runtimeStateController.handle(.scheduleWindowEntered, at: date)
             scheduleAlertSync()
-            cancelAllDeadlines()
+            cancelMonitoringDeadlines()
         }
         
         scheduleNextBoundary(from: date)
@@ -325,8 +340,8 @@ final class IdleMonitor {
         alertEscalationDeadlineAt = nil
     }
     
-    /// 모든 예약된 데드라인(유휴/에스컬레이션/쿨다운) 취소
-    private func cancelAllDeadlines() {
+    /// 모든 예약된 모니터링 데드라인(유휴/에스컬레이션/쿨다운/스케줄) 취소
+    private func cancelMonitoringDeadlines() {
         idleDeadlineWorkItem?.cancel()
         idleDeadlineWorkItem = nil
         alertEscalationWorkItem?.cancel()
@@ -338,6 +353,27 @@ final class IdleMonitor {
         idleDeadlineAt = nil
         alertEscalationDeadlineAt = nil
         cooldownDeadlineAt = nil
+    }
+    
+    /// 예약된 수동 일시정지 자동 해제 타이머 취소
+    private func cancelManualPauseResume() {
+        manualPauseResumeWorkItem?.cancel()
+        manualPauseResumeWorkItem = nil
+    }
+    
+    /// timed manual pause라면 자동 해제 시각에 맞춰 타이머 예약
+    private func scheduleManualPauseResumeIfNeeded(from date: Date) {
+        cancelManualPauseResume()
+        guard let manualPauseUntil else { return }
+        
+        let delay = max(0, manualPauseUntil.timeIntervalSince(date))
+        let workItem = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                self?.fireManualPauseResume(at: .now)
+            }
+        }
+        manualPauseResumeWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
     }
     
     /// 알림 에스컬레이션 타이머 스케줄

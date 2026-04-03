@@ -25,8 +25,34 @@ struct NudgeApp: App {
     }
     
     var body: some Scene {
-        MenuBarExtra(menuTitle, image: "MenuBarIcon") {
+        MenuBarExtra {
             ContentView(menuBarViewModel: menuBarViewModel)
+            
+            Divider()
+            
+            if menuBarViewModel.isManualPauseActive {
+                Button(localizedAppString("menu.action.pause.resume", defaultValue: "Resume nudge")) {
+                    menuBarViewModel.resumeFromManualPause()
+                }
+            } else {
+                Menu(localizedAppString("menu.action.pause", defaultValue: "Pause nudge")) {
+                    Button(localizedAppString("menu.action.pause.until_resumed", defaultValue: "Until resumed")) {
+                        menuBarViewModel.pauseUntilResumed()
+                    }
+                    
+                    Button(localizedAppString("menu.action.pause.10m", defaultValue: "10 min")) {
+                        menuBarViewModel.pauseForMinutes(10)
+                    }
+                    
+                    Button(localizedAppString("menu.action.pause.30m", defaultValue: "30 min")) {
+                        menuBarViewModel.pauseForMinutes(30)
+                    }
+                    
+                    Button(localizedAppString("menu.action.pause.60m", defaultValue: "60 min")) {
+                        menuBarViewModel.pauseForMinutes(60)
+                    }
+                }
+            }
             
             Divider()
             
@@ -43,6 +69,11 @@ struct NudgeApp: App {
             Button(quitTitle) {
                 NSApplication.shared.terminate(nil)
             }
+        } label: {
+            MenuBarExtraLabelView(
+                menuBarViewModel: menuBarViewModel,
+                accessibilityLabel: menuTitle
+            )
         }
         .modelContainer(NudgeModelContainer.shared)
     }

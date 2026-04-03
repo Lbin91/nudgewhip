@@ -30,14 +30,28 @@ final class SystemEventMonitor: EventMonitoring {
         guard !isMonitoring else { return }
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
         
-        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: eventMask) { _ in
+        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: eventMask) { event in
             Task { @MainActor in
-                onActivity()
+                if Self.shouldTreatEventAsActivity(
+                    eventType: event.type,
+                    isAppActive: NSApp.isActive,
+                    hasActiveWindow: self.hasActiveWindow,
+                    isLocalEvent: false
+                ) {
+                    onActivity()
+                }
             }
         }
         
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: eventMask) { event in
-            onActivity()
+            if Self.shouldTreatEventAsActivity(
+                eventType: event.type,
+                isAppActive: NSApp.isActive,
+                hasActiveWindow: self.hasActiveWindow,
+                isLocalEvent: true
+            ) {
+                onActivity()
+            }
             return event
         }
     }
@@ -57,5 +71,30 @@ final class SystemEventMonitor: EventMonitoring {
     deinit {
         globalMonitor.map(NSEvent.removeMonitor)
         localMonitor.map(NSEvent.removeMonitor)
+    }
+    
+    private var hasActiveWindow: Bool {
+        NSApp.keyWindow != nil || NSApp.mainWindow != nil
+    }
+    
+    nonisolated static func shouldTreatEventAsActivity(
+        eventType: NSEvent.EventType,
+        isAppActive: Bool,
+        hasActiveWindow: Bool,
+        isLocalEvent: Bool
+    ) -> Bool {
+        // MenuBarExtra submenu tracking should not reset idle state or invalidate the
+        // menu while the user is moving across depth menus. This state usually appears
+        // as "app active, but no key/main window".
+        if isAppActive && !hasActiveWindow {
+            return false
+        }
+        
+        // Local events should be tied to our actual app windows only.
+        if isLocalEvent && !hasActiveWindow {
+            return false
+        }
+        
+        return true
     }
 }

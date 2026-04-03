@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AppKit
 import SwiftData
 import Testing
 @testable import nudge
@@ -269,6 +270,39 @@ struct nudgeTests {
     
     @MainActor
     @Test
+    func idleMonitorResumesTimedManualPauseWithFreshBaseline() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300
+        )
+        
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        idleMonitor.setManualPause(true, until: baseDate.addingTimeInterval(600), at: baseDate.addingTimeInterval(5))
+        
+        #expect(runtimeController.snapshot.manualPauseEnabled)
+        #expect(runtimeController.snapshot.runtimeState == .pausedManual)
+        #expect(idleMonitor.idleDeadlineAt == nil)
+        #expect(idleMonitor.manualPauseUntil == baseDate.addingTimeInterval(600))
+        
+        idleMonitor.fireManualPauseResume(at: baseDate.addingTimeInterval(600))
+        
+        #expect(!runtimeController.snapshot.manualPauseEnabled)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
+        #expect(idleMonitor.lastInputAt == baseDate.addingTimeInterval(600))
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(900))
+        #expect(idleMonitor.manualPauseUntil == nil)
+    }
+    
+    @MainActor
+    @Test
     func idleMonitorStartsAndStopsRealInputMonitoringWithPermissionState() {
         let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
         let permissionManager = PermissionManager(accessibilityPermissionState: .unknown)
@@ -332,6 +366,42 @@ struct nudgeTests {
         #expect(openedURL == permissionManager.accessibilitySettingsURL)
     }
     
+    @Test
+    func systemEventMonitorIgnoresMenuBarTrackingEventsWithoutWindow() {
+        #expect(
+            !SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .mouseMoved,
+                isAppActive: true,
+                hasActiveWindow: false,
+                isLocalEvent: false
+            )
+        )
+        #expect(
+            !SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .leftMouseDown,
+                isAppActive: true,
+                hasActiveWindow: false,
+                isLocalEvent: true
+            )
+        )
+        #expect(
+            SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .mouseMoved,
+                isAppActive: false,
+                hasActiveWindow: false,
+                isLocalEvent: false
+            )
+        )
+        #expect(
+            SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .keyDown,
+                isAppActive: true,
+                hasActiveWindow: true,
+                isLocalEvent: true
+            )
+        )
+    }
+    
     @MainActor
     @Test
     func menuBarViewModelReflectsRuntimeIconAndCountdown() {
@@ -353,6 +423,31 @@ struct nudgeTests {
         idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
         #expect(viewModel.systemImageName == "exclamationmark.circle")
         #expect(viewModel.countdownText(now: baseDate.addingTimeInterval(300)) == nil)
+    }
+    
+    @MainActor
+    @Test
+    func menuBarViewModelReflectsManualPauseMenuState() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .granted)
+        let runtimeController = RuntimeStateController()
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider()
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+        
+        viewModel.startIfNeeded(at: baseDate)
+        #expect(!viewModel.isManualPauseActive)
+        
+        viewModel.pauseForMinutes(10, at: baseDate.addingTimeInterval(1))
+        #expect(viewModel.isManualPauseActive)
+        
+        viewModel.resumeFromManualPause(at: baseDate.addingTimeInterval(2))
+        #expect(!viewModel.isManualPauseActive)
     }
     
     @MainActor

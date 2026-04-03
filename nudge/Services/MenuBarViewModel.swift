@@ -46,6 +46,11 @@ final class MenuBarViewModel {
         idleMonitor.runtimeStateController.snapshot.contentState
     }
     
+    /// 사용자가 수동 일시정지를 활성화했는지 여부
+    var isManualPauseActive: Bool {
+        idleMonitor.runtimeStateController.snapshot.manualPauseEnabled
+    }
+    
     /// 런타임 상태에 대응하는 SF Symbol 이름
     var systemImageName: String {
         switch runtimeState {
@@ -110,6 +115,21 @@ final class MenuBarViewModel {
     /// 유휴 타이머 수동 리셋
     func resetIdleTimer(at date: Date = .now) {
         idleMonitor.recordInput(at: date)
+    }
+    
+    /// 사용자가 다시 켤 때까지 수동 일시정지
+    func pauseUntilResumed(at date: Date = .now) {
+        idleMonitor.setManualPause(true, at: date)
+    }
+    
+    /// 지정된 분 수만큼 수동 일시정지
+    func pauseForMinutes(_ minutes: Int, at date: Date = .now) {
+        idleMonitor.setManualPause(true, until: date.addingTimeInterval(TimeInterval(minutes * 60)), at: date)
+    }
+    
+    /// 수동 일시정지 해제
+    func resumeFromManualPause(at date: Date = .now) {
+        idleMonitor.setManualPause(false, at: date)
     }
     
     /// 내부: 프롬프트 옵션과 함께 권한 새로고침
