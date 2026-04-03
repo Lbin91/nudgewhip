@@ -99,6 +99,11 @@ final class OnboardingViewModel {
         storage.saveResumeStep(step)
     }
     
+    func continueFromPermission() {
+        step = .basicSetup
+        storage.saveResumeStep(step)
+    }
+    
     func continueFromBasicSetup() {
         step = permissionManager.isAccessibilityGranted ? .completionReady : .completionLimited
         storage.saveResumeStep(step)

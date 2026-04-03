@@ -5,32 +5,38 @@ struct PermissionStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            PermissionStateBadge(permissionState: permissionState)
+            OnboardingHeroView(
+                systemImage: permissionState == .granted ? "checkmark.circle.fill" : "hand.raised.fill",
+                accentColor: permissionState == .granted ? .green : .orange,
+                title: PermissionStateBadge(permissionState: permissionState).titleText,
+                message: localizedAppString(
+                    "onboarding.permission.body.reason",
+                    defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
+                )
+            )
             
-            GroupBox {
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.permission.section.reason", defaultValue: "Why Nudge needs this")
+            ) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(localizedAppString("onboarding.permission.section.reason", defaultValue: "Why Nudge needs this"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    
                     Text(localizedAppString(
                         "onboarding.permission.body.reason",
                         defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
                     ))
-                    
-                    Divider()
-                    
-                    Text(localizedAppString("onboarding.permission.section.privacy", defaultValue: "What Nudge does not collect"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                    
+                    .foregroundStyle(.primary)
+                }
+            }
+            
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.permission.section.privacy", defaultValue: "What Nudge does not collect")
+            ) {
+                VStack(alignment: .leading, spacing: 10) {
                     Text(localizedAppString(
                         "onboarding.permission.body.privacy",
                         defaultValue: "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
                     ))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                 }
-                .fixedSize(horizontal: false, vertical: true)
             }
             
             Label(localizedAppString(

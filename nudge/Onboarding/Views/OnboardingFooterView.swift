@@ -9,9 +9,8 @@ struct OnboardingFooterView: View {
     let tertiaryAction: (() -> Void)?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Divider()
-                .padding(.bottom, 4)
             
             Button(primaryTitle, action: primaryAction)
                 .buttonStyle(.borderedProminent)
@@ -31,6 +30,6 @@ struct OnboardingFooterView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 4)
+        .padding(.top, 8)
     }
 }

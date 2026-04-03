@@ -4,7 +4,7 @@ struct PermissionStateBadge: View {
     let permissionState: AccessibilityPermissionState
     
     var body: some View {
-        Label(title, systemImage: iconName)
+        Label(titleText, systemImage: iconName)
             .font(.subheadline.weight(.medium))
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
@@ -12,7 +12,7 @@ struct PermissionStateBadge: View {
             .foregroundStyle(backgroundColor)
     }
     
-    private var title: String {
+    var titleText: String {
         switch permissionState {
         case .unknown:
             localizedAppString("onboarding.permission.state.unknown", defaultValue: "Not checked")

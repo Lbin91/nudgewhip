@@ -14,26 +14,28 @@ struct OnboardingRootView: View {
                 .ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
-                OnboardingCardView {
-                    OnboardingHeaderView(
-                        title: headerTitle,
-                        subtitle: headerSubtitle,
-                        progressText: viewModel.progressText,
-                        showsBackButton: viewModel.showsBackButton,
-                        backAction: viewModel.goBack
-                    )
-                    
-                    currentStepView
-                    
-                    if let errorMessage = viewModel.errorMessage {
-                        Text(errorMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
+                VStack {
+                    OnboardingCardView {
+                        OnboardingHeaderView(
+                            title: headerTitle,
+                            subtitle: headerSubtitle,
+                            progressText: viewModel.progressText,
+                            showsBackButton: viewModel.showsBackButton,
+                            backAction: viewModel.goBack
+                        )
+                        
+                        currentStepView
+                        
+                        if let errorMessage = viewModel.errorMessage {
+                            Text(errorMessage)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                        }
+                        
+                        footerView
                     }
-                    
-                    footerView
                 }
-                .frame(maxWidth: .infinity, alignment: .top)
+                .frame(maxWidth: .infinity, minHeight: 540, alignment: .center)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -101,58 +103,97 @@ struct OnboardingRootView: View {
     private var footerView: some View {
         switch viewModel.step {
         case .welcome:
-            OnboardingFooterView(
-                primaryTitle: localizedAppString("onboarding.welcome.cta.continue", defaultValue: "Get Started"),
-                primaryAction: viewModel.continueFromWelcome,
-                secondaryTitle: nil,
-                secondaryAction: nil,
-                tertiaryTitle: nil,
-                tertiaryAction: nil
-            )
+            welcomeFooter
         case .permission:
-            OnboardingFooterView(
-                primaryTitle: localizedAppString("onboarding.permission.cta.request", defaultValue: "Request Access"),
-                primaryAction: viewModel.requestPermission,
-                secondaryTitle: localizedAppString("onboarding.permission.cta.open_settings", defaultValue: "Open Settings"),
-                secondaryAction: { _ = viewModel.openAccessibilitySettings() },
-                tertiaryTitle: localizedAppString("onboarding.permission.cta.later", defaultValue: "Set Up Later"),
-                tertiaryAction: viewModel.setUpLater
-            )
+            permissionFooter
         case .basicSetup:
-            OnboardingFooterView(
-                primaryTitle: localizedAppString("onboarding.setup.cta.continue", defaultValue: "Continue"),
-                primaryAction: viewModel.continueFromBasicSetup,
-                secondaryTitle: nil,
-                secondaryAction: nil,
-                tertiaryTitle: nil,
-                tertiaryAction: nil
-            )
+            basicSetupFooter
         case .completionReady:
-            OnboardingFooterView(
-                primaryTitle: localizedAppString("onboarding.completion.ready.cta.finish", defaultValue: "Continue to Menu Bar"),
-                primaryAction: viewModel.finish,
-                secondaryTitle: nil,
-                secondaryAction: nil,
-                tertiaryTitle: nil,
-                tertiaryAction: nil
-            )
+            completionReadyFooter
         case .completionLimited:
-            OnboardingFooterView(
-                primaryTitle: localizedAppString("onboarding.completion.limited.cta.finish", defaultValue: "Continue in Menu Bar"),
-                primaryAction: viewModel.finish,
-                secondaryTitle: localizedAppString("onboarding.completion.limited.cta.retry", defaultValue: "Set Up Permission Again"),
-                secondaryAction: viewModel.retryPermission,
-                tertiaryTitle: nil,
-                tertiaryAction: nil
+            completionLimitedFooter
+        }
+    }
+    
+    private var welcomeFooter: some View {
+        OnboardingFooterView(
+            primaryTitle: localizedAppString("onboarding.welcome.cta.continue", defaultValue: "Get Started"),
+            primaryAction: viewModel.continueFromWelcome,
+            secondaryTitle: nil,
+            secondaryAction: nil,
+            tertiaryTitle: nil,
+            tertiaryAction: nil
+        )
+    }
+    
+    private var permissionFooter: some View {
+        let isGranted = viewModel.permissionState == .granted
+        
+        if isGranted {
+            return AnyView(
+                OnboardingFooterView(
+                    primaryTitle: localizedAppString("onboarding.setup.cta.continue", defaultValue: "Continue"),
+                    primaryAction: viewModel.continueFromPermission,
+                    secondaryTitle: nil,
+                    secondaryAction: nil,
+                    tertiaryTitle: nil,
+                    tertiaryAction: nil
+                )
+            )
+        } else {
+            return AnyView(
+                OnboardingFooterView(
+                    primaryTitle: localizedAppString("onboarding.permission.cta.request", defaultValue: "Request Access"),
+                    primaryAction: viewModel.requestPermission,
+                    secondaryTitle: localizedAppString("onboarding.permission.cta.open_settings", defaultValue: "Open Settings"),
+                    secondaryAction: { _ = viewModel.openAccessibilitySettings() },
+                    tertiaryTitle: localizedAppString("onboarding.permission.cta.later", defaultValue: "Set Up Later"),
+                    tertiaryAction: viewModel.setUpLater
+                )
             )
         }
     }
     
+    private var basicSetupFooter: some View {
+        OnboardingFooterView(
+            primaryTitle: localizedAppString("onboarding.setup.cta.continue", defaultValue: "Continue"),
+            primaryAction: viewModel.continueFromBasicSetup,
+            secondaryTitle: nil,
+            secondaryAction: nil,
+            tertiaryTitle: nil,
+            tertiaryAction: nil
+        )
+    }
+    
+    private var completionReadyFooter: some View {
+        OnboardingFooterView(
+            primaryTitle: localizedAppString("onboarding.completion.ready.cta.finish", defaultValue: "Continue to Menu Bar"),
+            primaryAction: viewModel.finish,
+            secondaryTitle: nil,
+            secondaryAction: nil,
+            tertiaryTitle: nil,
+            tertiaryAction: nil
+        )
+    }
+    
+    private var completionLimitedFooter: some View {
+        OnboardingFooterView(
+            primaryTitle: localizedAppString("onboarding.completion.limited.cta.finish", defaultValue: "Continue in Menu Bar"),
+            primaryAction: viewModel.finish,
+            secondaryTitle: localizedAppString("onboarding.completion.limited.cta.retry", defaultValue: "Set Up Permission Again"),
+            secondaryAction: viewModel.retryPermission,
+            tertiaryTitle: nil,
+            tertiaryAction: nil
+        )
+    }
+    
     private var idleThresholdText: String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: TimeInterval(viewModel.idleThresholdSeconds)) ?? "\(viewModel.idleThresholdSeconds / 60)m"
+        if viewModel.idleThresholdSeconds < 60 {
+            return "\(viewModel.idleThresholdSeconds)초"
+        }
+        
+        let minutes = viewModel.idleThresholdSeconds / 60
+        return "\(minutes)분"
     }
     
     private var visualModeText: String {

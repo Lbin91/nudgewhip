@@ -8,7 +8,7 @@ struct OnboardingHeaderView: View {
     let backAction: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
                 if showsBackButton {
                     Button(action: backAction) {
@@ -17,22 +17,24 @@ struct OnboardingHeaderView: View {
                     .buttonStyle(.link)
                 } else {
                     Text(localizedAppString("app.menu.title", defaultValue: "Nudge"))
-                        .font(.caption.weight(.semibold))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
                 }
                 
                 Spacer()
                 
                 Text(progressText)
-                    .font(.caption)
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(.secondary.opacity(0.12), in: Capsule())
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.secondary.opacity(0.12), in: Capsule())
             }
             
             Text(title)
-                .font(.system(size: 28, weight: .bold))
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(.primary)
             
             Text(subtitle)
                 .font(.body)

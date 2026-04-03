@@ -8,18 +8,15 @@ struct CompletionReadyStepView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            GroupBox {
+            OnboardingHeroView(
+                systemImage: "checkmark.circle.fill",
+                accentColor: .green,
+                title: localizedAppString("onboarding.completion.ready.title", defaultValue: "Nudge is ready to monitor"),
+                message: localizedAppString("onboarding.completion.ready.body", defaultValue: "You can now check status and countdown from the menu bar.")
+            )
+            
+            OnboardingSectionCard(title: localizedAppString("onboarding.completion.ready.header", defaultValue: "Ready to go")) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Label(localizedAppString("onboarding.completion.ready.title", defaultValue: "Nudge is ready to monitor"), systemImage: "checkmark.circle.fill")
-                        .font(.title2.weight(.semibold))
-                        .foregroundStyle(.green)
-                    
-                    Text(localizedAppString("onboarding.completion.ready.body", defaultValue: "You can now check status and countdown from the menu bar."))
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                    
-                    Divider()
-                    
                     VStack(alignment: .leading, spacing: 8) {
                         LabeledContent(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), value: idleThresholdText)
                         LabeledContent(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), value: launchAtLoginText)
