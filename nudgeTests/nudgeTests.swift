@@ -128,6 +128,15 @@ private final class TestNotificationNudgeManager: NotificationNudgeManaging {
     }
 }
 
+@MainActor
+private final class TestOnboardingOpener {
+    private(set) var callCount = 0
+    
+    func open() {
+        callCount += 1
+    }
+}
+
 @Suite(.serialized)
 struct nudgeTests {
 
@@ -396,6 +405,47 @@ struct nudgeTests {
         #expect(viewModel.petStageText == "Buddy")
         #expect(viewModel.petEmotionText == "Happy")
         #expect(viewModel.todayStats.alertCount == 2)
+    }
+    
+    @MainActor
+    @Test
+    func settingsViewModelPersistsSettingsAndLaunchAtLogin() throws {
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeDataBootstrap.ensureDefaults(in: context)
+        
+        let menuBarViewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        let opener = TestOnboardingOpener()
+        let launchAtLoginManager = TestLaunchAtLoginManager()
+        let viewModel = SettingsViewModel(
+            modelContext: context,
+            menuBarViewModel: menuBarViewModel,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: launchAtLoginManager,
+            onOpenOnboarding: opener.open
+        )
+        
+        viewModel.updateIdleThreshold(600)
+        viewModel.updateTTS(false)
+        viewModel.updatePetPresentationMode(.minimal)
+        viewModel.updateLaunchAtLogin(true)
+        viewModel.openOnboarding()
+        
+        let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        #expect(settings.idleThresholdSeconds == 600)
+        #expect(settings.ttsEnabled == false)
+        #expect(settings.petPresentationMode == .minimal)
+        #expect(launchAtLoginManager.isEnabled)
+        #expect(opener.callCount == 1)
     }
     
     @MainActor

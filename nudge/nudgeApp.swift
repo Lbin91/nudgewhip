@@ -30,6 +30,10 @@ struct NudgeApp: App {
             
             Divider()
             
+            Button(localizedAppString("menu.action.open_settings", defaultValue: "Settings")) {
+                NudgeAppController.shared.presentSettings()
+            }
+            
             Button(localizedAppString("menu.action.open_onboarding", defaultValue: "Open setup guide")) {
                 NudgeAppController.shared.presentOnboarding()
             }

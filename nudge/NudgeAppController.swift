@@ -8,6 +8,7 @@ final class NudgeAppController {
     
     let menuBarViewModel: MenuBarViewModel
     private let onboardingCoordinator: OnboardingCoordinator
+    private let settingsCoordinator: SettingsCoordinator
     private var hasStarted = false
     
     private init() {
@@ -18,7 +19,7 @@ final class NudgeAppController {
         self.menuBarViewModel = menuBarViewModel
         let modelContext = NudgeModelContainer.shared.mainContext
         
-        onboardingCoordinator = OnboardingCoordinator(
+        let onboardingCoordinator = OnboardingCoordinator(
             storage: OnboardingStorage.shared,
             modelContainer: NudgeModelContainer.shared,
             permissionManager: permissionManager,
@@ -32,6 +33,18 @@ final class NudgeAppController {
             }
             menuBarViewModel.startIfNeeded()
             menuBarViewModel.refreshPermission()
+        }
+        self.onboardingCoordinator = onboardingCoordinator
+        
+        self.settingsCoordinator = SettingsCoordinator(
+            modelContainer: NudgeModelContainer.shared,
+            menuBarViewModel: menuBarViewModel,
+            permissionManager: permissionManager,
+            launchAtLoginManager: LaunchAtLoginManager()
+        ) {
+            DispatchQueue.main.async {
+                onboardingCoordinator.present()
+            }
         }
     }
     
@@ -48,6 +61,13 @@ final class NudgeAppController {
     
     func presentOnboarding() {
         let coordinator = onboardingCoordinator
+        DispatchQueue.main.async {
+            coordinator.present()
+        }
+    }
+    
+    func presentSettings() {
+        let coordinator = settingsCoordinator
         DispatchQueue.main.async {
             coordinator.present()
         }
