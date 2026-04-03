@@ -215,6 +215,79 @@
 - iOS는 읽기 최적화된 projection을 소비한다.
 - push 미수신 시 foreground fetch로 정합성을 회복해야 한다.
 
+### 12.4 Dashboard Metrics and Collection Boundary
+
+- iOS dashboard는 상태 전이 raw log를 재생하는 화면이 아니라, Mac에서 계산된 **읽기 최적화 projection**을 소비하는 화면이어야 한다.
+- CloudKit은 여전히 상태 동기화용 최소 metadata 운반 계층으로 유지한다.
+- 행동 지표는 가능하면 Mac 로컬에서 집계하고, iOS에는 일/주 단위 요약치만 전달한다.
+- iOS가 sync stream만으로 행동 지표를 재구성하려는 구조는 피한다.
+
+### 12.5 MVP Metric Set
+
+아래 지표는 iOS dashboard MVP에서 의미가 있으면서도, 기존 privacy boundary와 비교적 잘 맞는 집계 지표다.
+
+- **총 집중 시간 (`totalFocusDuration`)**: 일별 총 집중 시간.
+- **완료 세션 수 (`completedSessionCount`)**: 일별 완료 세션 수.
+- **알림 횟수 (`alertCount`)**: 일별 alert 발생 횟수.
+- **최장 집중 블록 (`longestFocusDuration`)**: 알림 없이 이어진 최장 집중 시간.
+- **복귀 시간 요약치 (`recoveryDurationTotal`, `recoverySampleCount`, `recoveryDurationMax`)**:
+- 평균 복귀 시간은 `recoveryDurationTotal / recoverySampleCount`로 계산한다.
+- `recoveryDurationMax`는 일 단위 최장 복귀 시간으로 제한한다.
+- **집중 유지 지표 (`sessionsOver30mCount`)**: 예: 30분 이상 유지한 세션 수.
+- **시간대별 알림 분포 (`hourlyAlertCounts[24]`)**: 1시간 버킷 기준 일별 alert 분포.
+- **원격 후속 알림 이후 복귀 비율(추정치)**:
+- `remoteEscalationSentCount`
+- `remoteEscalationRecoveredWithinWindowCount`
+- 인과(causal) 효과가 아니라, 원격 후속 알림 이후 일정 시간 안에 복귀가 있었는지 보는 coarse metric으로 정의한다.
+
+### 12.6 Defer-Later / Excluded Metrics
+
+- MVP 제외:
+- 이탈 직전 frontmost app
+- exact timestamp timeline
+- per-alert 상세 히스토리 분석
+- push receipt/open attribution
+- “왜 산만해졌는지”를 추론하는 app/category breakdown
+
+제외 이유:
+
+- privacy boundary를 빠르게 넘기 쉽다.
+- 현재 shared model과 sync contract로는 복원/정의가 불안정하다.
+- companion dashboard가 behavioral surveillance product처럼 보일 위험이 있다.
+
+### 12.7 Projection Schema Recommendation
+
+- `MacState` record는 상태 동기화용 최소 필드만 유지한다.
+- iOS dashboard용 읽기 모델은 별도 projection record로 분리한다.
+- 권장 record type: `DashboardDayProjection`
+- 권장 identity: `macDeviceID + dayStart`
+
+권장 필드:
+
+- `dayStart`
+- `updatedAt`
+- `schemaVersion`
+- `totalFocusDuration`
+- `completedSessionCount`
+- `alertCount`
+- `ttsCount`
+- `longestFocusDuration`
+- `recoverySampleCount`
+- `recoveryDurationTotal`
+- `recoveryDurationMax`
+- `sessionsOver30mCount`
+- `hourlyAlertCounts[24]`
+- `remoteEscalationSentCount`
+- `remoteEscalationRecoveredWithinWindowCount`
+
+### 12.8 Collection and Sync Rules
+
+- Mac SwiftData가 source of truth다.
+- Dashboard projection은 Mac에서 계산하고 저장/업로드한다.
+- iOS는 최근 `DashboardDayProjection` 7개와 현재 `MacState`를 조합해 화면을 구성한다.
+- exact input event, exact mouse/keyboard timeline, screen contents, app usage text는 수집/동기화하지 않는다.
+- frontmost app 관련 정보는 MVP에서 수집하지 않는다.
+
 ## 13. Pairing and Onboarding
 
 - 첫 실행 시 `Mac용 Nudge와 연결`을 메인 흐름으로 둔다.
