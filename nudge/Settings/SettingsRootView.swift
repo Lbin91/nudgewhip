@@ -38,12 +38,12 @@ struct SettingsRootView: View {
     }
     
     private var monitoringSection: some View {
-        GroupBox {
+        SettingsSection(title: localizedAppString("settings.section.monitoring", defaultValue: "Monitoring")) {
             VStack(alignment: .leading, spacing: 12) {
                 Text(localizedAppString("settings.section.monitoring.idle_threshold", defaultValue: "Idle threshold"))
                     .font(.headline)
                 
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "10 sec"), value: 10)
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.3m", defaultValue: "3 min"), value: 180)
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5 min"), value: 300)
@@ -58,13 +58,11 @@ struct SettingsRootView: View {
                     )
                 )
             }
-        } label: {
-            Text(localizedAppString("settings.section.monitoring", defaultValue: "Monitoring"))
         }
     }
     
     private var scheduleSection: some View {
-        GroupBox {
+        SettingsSection(title: localizedAppString("settings.section.schedule", defaultValue: "Schedule")) {
             VStack(alignment: .leading, spacing: 12) {
                 Toggle(
                     localizedAppString("settings.section.schedule.enabled", defaultValue: "Use schedule"),
@@ -108,13 +106,11 @@ struct SettingsRootView: View {
                     .disabled(!viewModel.scheduleEnabledValue)
                 }
             }
-        } label: {
-            Text(localizedAppString("settings.section.schedule", defaultValue: "Schedule"))
         }
     }
     
     private var accessibilitySection: some View {
-        GroupBox {
+        SettingsSection(title: localizedAppString("settings.section.accessibility", defaultValue: "Accessibility")) {
             VStack(alignment: .leading, spacing: 12) {
                 Label(permissionStatusText, systemImage: permissionStatusIcon)
                     .font(.headline)
@@ -137,13 +133,11 @@ struct SettingsRootView: View {
                     }
                 }
             }
-        } label: {
-            Text(localizedAppString("settings.section.accessibility", defaultValue: "Accessibility"))
         }
     }
     
     private var appSection: some View {
-        GroupBox {
+        SettingsSection(title: localizedAppString("settings.section.app", defaultValue: "App"), showsDivider: false) {
             VStack(alignment: .leading, spacing: 12) {
                 Toggle(
                     localizedAppString("settings.section.app.launch_at_login", defaultValue: "Launch at login"),
@@ -164,8 +158,6 @@ struct SettingsRootView: View {
                     .disabled(viewModel.runtimeState == .limitedNoAX)
                 }
             }
-        } label: {
-            Text(localizedAppString("settings.section.app", defaultValue: "App"))
         }
     }
     
@@ -175,14 +167,18 @@ struct SettingsRootView: View {
             viewModel.updateIdleThreshold(value)
         } label: {
             Text(title)
-                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                 .foregroundStyle(isSelected ? .white : .primary)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
                 .frame(maxWidth: .infinity)
                 .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(isSelected ? Color.accentColor : Color(nsColor: .controlBackgroundColor))
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(isSelected ? Color.accentColor : Color.clear)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.22), lineWidth: 1)
                 )
         }
         .buttonStyle(.plain)
@@ -218,6 +214,32 @@ struct SettingsRootView: View {
             return .green
         case .denied:
             return .orange
+        }
+    }
+}
+
+private struct SettingsSection<Content: View>: View {
+    let title: String
+    let showsDivider: Bool
+    @ViewBuilder let content: Content
+    
+    init(title: String, showsDivider: Bool = true, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.showsDivider = showsDivider
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+            
+            content
+            
+            if showsDivider {
+                Divider()
+                    .padding(.top, 4)
+            }
         }
     }
 }
