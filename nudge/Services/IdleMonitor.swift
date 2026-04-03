@@ -66,15 +66,20 @@ final class IdleMonitor {
     
     /// 저장된 사용자 설정을 runtime monitor에 반영
     func applySettings(_ settings: UserSettings, at date: Date = .now) {
+        let oldThreshold = idleThreshold
         idleThreshold = TimeInterval(settings.idleThresholdSeconds)
         scheduleEnabled = settings.scheduleEnabled
         scheduleStart = TimeInterval(settings.scheduleStartSecondsFromMidnight)
         scheduleEnd = TimeInterval(settings.scheduleEndSecondsFromMidnight)
         alertManager?.apply(settings: settings)
-        
+
         checkSchedule(at: date)
-        
-        if runtimeStateController.snapshot.runtimeState == .monitoring {
+
+        // threshold가 실제로 변경된 경우에만 deadline 재스케줄.
+        // 변경 없이 재호출되면 delay=0으로 즉시 fireIdleDeadline이 트리거되어
+        // 드롭다운 렌더링과 충돌하며 메인 스레드가 블로킹된다.
+        if runtimeStateController.snapshot.runtimeState == .monitoring,
+           abs(oldThreshold - idleThreshold) > 0.001 || idleDeadlineAt == nil {
             scheduleIdleDeadline(from: lastInputAt ?? date)
         }
     }

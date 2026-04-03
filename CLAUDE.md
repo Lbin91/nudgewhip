@@ -123,3 +123,7 @@ Commit messages are written in **Korean** (한국어). Format: `type: 설명` (f
 ## Current State
 
 Early stage — Xcode project template with `MenuBarExtra` configured. `Item.swift` is a placeholder SwiftData model that will be replaced with actual domain models (`FocusSession`, `UserSettings`, `PetState`, `DailyStats`).
+
+## 작업완료 시
+작업이 완료되면 아래의 shell 스크립트를 동작 시킨다.
+~/Documents/Project/bots/.claude_done.sh
