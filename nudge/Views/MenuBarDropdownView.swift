@@ -1,9 +1,3 @@
-// MenuBarDropdownView.swift
-// 메뉴바 드롭다운의 전체 레이아웃을 구성하는 뷰.
-//
-// StatusSummaryView, QuickControlsView, DailySummaryView를 수직으로 배치한다.
-// 설정과 펫 상태에서 로컬라이즈된 표시 문자열을 계산해 하위 뷰에 전달한다.
-
 import SwiftUI
 
 struct MenuBarDropdownView: View {
@@ -11,11 +5,11 @@ struct MenuBarDropdownView: View {
     var scheduleEnabled: Binding<Bool>
     var scheduleStartTime: Binding<Date>
     var scheduleEndTime: Binding<Date>
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: NudgeSpacing.s4) {
             StatusSummaryView(menuBarViewModel: menuBarViewModel)
-            
+
             QuickControlsView(
                 menuBarViewModel: menuBarViewModel,
                 idleThresholdText: menuBarViewModel.idleThresholdText,
@@ -24,11 +18,13 @@ struct MenuBarDropdownView: View {
                 scheduleStartTime: scheduleStartTime,
                 scheduleEndTime: scheduleEndTime
             )
-            
+
             DailySummaryView(
                 todayStats: menuBarViewModel.todayStats,
                 whitelistCount: menuBarViewModel.whitelistCount
             )
         }
+        .padding(NudgeSpacing.s3)
+        .frame(width: NudgeLayout.popoverWidth)
     }
 }

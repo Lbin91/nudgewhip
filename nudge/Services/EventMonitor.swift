@@ -10,6 +10,8 @@ protocol EventMonitoring: AnyObject {
 
 @MainActor
 final class SystemEventMonitor: EventMonitoring {
+    nonisolated static let menuTrackingSuppressionInterval: TimeInterval = 0.1
+
     nonisolated static let monitoredEventTypes: [NSEvent.EventType] = [
         .mouseMoved,
         .leftMouseDown,
@@ -30,6 +32,7 @@ final class SystemEventMonitor: EventMonitoring {
     
     private var globalMonitor: Any?
     private var localMonitor: Any?
+    private var lastMenuTrackingLocalEventAt: TimeInterval?
     
     var isMonitoring: Bool {
         globalMonitor != nil || localMonitor != nil
@@ -41,6 +44,15 @@ final class SystemEventMonitor: EventMonitoring {
         
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: eventMask) { event in
             Task { @MainActor in
+                let now = ProcessInfo.processInfo.systemUptime
+                if Self.shouldSuppressGlobalMenuTrackingDuplicate(
+                    eventType: event.type,
+                    now: now,
+                    lastMenuTrackingLocalEventAt: self.lastMenuTrackingLocalEventAt
+                ) {
+                    return
+                }
+
                 if Self.shouldTreatEventAsActivity(
                     eventType: event.type,
                     isAppActive: NSApp.isActive,
@@ -53,6 +65,11 @@ final class SystemEventMonitor: EventMonitoring {
         }
         
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: eventMask) { event in
+            if !self.hasActiveWindow {
+                self.lastMenuTrackingLocalEventAt = ProcessInfo.processInfo.systemUptime
+                return event
+            }
+
             if Self.shouldTreatEventAsActivity(
                 eventType: event.type,
                 isAppActive: NSApp.isActive,
@@ -75,6 +92,8 @@ final class SystemEventMonitor: EventMonitoring {
             NSEvent.removeMonitor(localMonitor)
             self.localMonitor = nil
         }
+
+        lastMenuTrackingLocalEventAt = nil
     }
     
     deinit {
@@ -98,5 +117,15 @@ final class SystemEventMonitor: EventMonitoring {
         }
         
         return true
+    }
+
+    nonisolated static func shouldSuppressGlobalMenuTrackingDuplicate(
+        eventType: NSEvent.EventType,
+        now: TimeInterval,
+        lastMenuTrackingLocalEventAt: TimeInterval?
+    ) -> Bool {
+        guard let lastMenuTrackingLocalEventAt else { return false }
+        guard monitoredEventTypes.contains(eventType) else { return false }
+        return (now - lastMenuTrackingLocalEventAt) <= menuTrackingSuppressionInterval
     }
 }

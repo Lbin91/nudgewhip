@@ -1,56 +1,63 @@
-// DailySummaryView.swift
-// 오늘의 포커스 통계와 워크스페이스 정보를 표시하는 뷰.
-//
-// Today 그룹: 총 포커스 시간, 완료 세션 수, 알림 횟수.
-// Workspace 그룹: 화이트리스트 앱 수.
-
 import SwiftUI
 
 struct DailySummaryView: View {
     let todayStats: DailyStats
     let whitelistCount: Int
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            GroupBox {
-                VStack(alignment: .leading, spacing: 8) {
-                    LabeledContent {
-                        Text(formattedDuration(todayStats.totalFocusDuration))
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.focus_time", defaultValue: "Focus time"))
-                    }
-                    
-                    LabeledContent {
-                        Text("\(todayStats.completedSessionCount)")
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.completed_sessions", defaultValue: "Completed sessions"))
-                    }
-                    
-                    LabeledContent {
-                        Text("\(todayStats.alertCount)")
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.alerts", defaultValue: "Alerts"))
-                    }
-                }
-            } label: {
-                Text(localizedAppString("menu.dropdown.group.today", defaultValue: "Today"))
+        VStack(alignment: .leading, spacing: NudgeSpacing.s3) {
+            Text(localizedAppString("menu.dropdown.group.today", defaultValue: "Today"))
+                .font(.caption)
+                .foregroundStyle(Color.nudgeTextMuted)
+                .textCase(.uppercase)
+                .padding(.horizontal, NudgeSpacing.s4)
+
+            HStack(spacing: NudgeSpacing.s3) {
+                statCard(
+                    value: formattedDuration(todayStats.totalFocusDuration),
+                    label: localizedAppString("menu.dropdown.label.focus_time", defaultValue: "Focus time")
+                )
+
+                statCard(
+                    value: "\(todayStats.completedSessionCount)",
+                    label: localizedAppString("menu.dropdown.label.completed_sessions", defaultValue: "Sessions")
+                )
+
+                statCard(
+                    value: "\(todayStats.alertCount)",
+                    label: localizedAppString("menu.dropdown.label.alerts", defaultValue: "Alerts")
+                )
             }
-            
-            GroupBox {
-                VStack(alignment: .leading, spacing: 8) {
-                    LabeledContent {
-                        Text("\(whitelistCount)")
-                    } label: {
-                        Text(localizedAppString("menu.dropdown.label.whitelist_apps", defaultValue: "Whitelist apps"))
-                    }
-                }
-            } label: {
-                Text(localizedAppString("menu.dropdown.group.workspace", defaultValue: "Workspace"))
+
+            HStack(spacing: NudgeSpacing.s3) {
+                statCard(
+                    value: "\(whitelistCount)",
+                    label: localizedAppString("menu.dropdown.label.whitelist_apps", defaultValue: "Whitelist")
+                )
             }
         }
     }
-    
-    /// TimeInterval을 "1h 23m" 형식의 읽기 쉬운 문자열로 포맷
+
+    private func statCard(value: String, label: String) -> some View {
+        VStack(spacing: NudgeSpacing.s1) {
+            Text(value)
+                .font(.title3.monospacedDigit())
+                .foregroundStyle(Color.nudgeTextPrimary)
+
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(Color.nudgeTextMuted)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(NudgeSpacing.s3)
+        .background(Color.nudgeBgSurface)
+        .clipShape(RoundedRectangle(cornerRadius: NudgeRadius.default))
+        .overlay(
+            RoundedRectangle(cornerRadius: NudgeRadius.default)
+                .stroke(Color.nudgeStrokeDefault, lineWidth: 1)
+        )
+    }
+
     private func formattedDuration(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]

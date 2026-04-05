@@ -1,46 +1,79 @@
-// StatusSummaryView.swift
-// 현재 모니터링 상태와 카운트다운을 표시하는 뷰.
-//
-// 런타임/콘텐츠 상태에 따라 아이콘·타이틀·상세 설명을 갱신한다.
-// TimelineView로 카운트다운을 초 단위로 갱신한다.
-
 import SwiftUI
 
 struct StatusSummaryView: View {
     let menuBarViewModel: MenuBarViewModel
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label {
-                VStack(alignment: .leading, spacing: 2) {
+        VStack(spacing: 0) {
+            LinearGradient(
+                colors: [Color.nudgeFocus.opacity(0.15), Color.nudgeAccent.opacity(0.08)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(height: 4)
+            .clipShape(UnevenRoundedRectangle(topLeadingRadius: NudgeRadius.card, topTrailingRadius: NudgeRadius.card))
+
+            HStack(spacing: NudgeSpacing.s3) {
+                CircularGaugeView(
+                    progress: gaugeProgress,
+                    tint: gaugeColor
+                )
+
+                VStack(alignment: .leading, spacing: NudgeSpacing.s1) {
                     Text(runtimeStateTitle)
                         .font(.headline)
+                        .foregroundStyle(Color.nudgeTextPrimary)
+
                     Text(contentStateTitle)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.nudgeTextSecondary)
+
+                    if let countdown = menuBarViewModel.countdownText() {
+                        Text(countdown)
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(gaugeColor)
+                    } else {
+                        Text(statusDetail)
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgeTextMuted)
+                            .lineLimit(2)
+                    }
                 }
-            } icon: {
-                Image(systemName: menuBarViewModel.systemImageName)
-                    .font(.title2)
-                    .foregroundStyle(.tint)
+
+                Spacer()
+
+                AnimatedASCIICharacterView(
+                    hatchStage: .egg,
+                    character: .partyMask,
+                    emotion: .happy
+                )
             }
-            
-            if let countdown = menuBarViewModel.countdownText() {
-                LabeledContent {
-                    Text(countdown)
-                        .monospacedDigit()
-                } label: {
-                    Text(localizedAppString("menu.status.label.next_check", defaultValue: "Next check"))
-                }
-            } else {
-                Text(statusDetail)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+            .padding(NudgeSpacing.s4)
+        }
+        .nudgeCard()
+    }
+
+    private var gaugeProgress: Double {
+        switch menuBarViewModel.runtimeState {
+        case .monitoring: return menuBarViewModel.countdownText() != nil ? 0.4 : 0.0
+        case .alerting: return 1.0
+        case .pausedManual, .pausedSchedule, .pausedWhitelist, .suspendedSleepOrLock: return 0.0
+        case .limitedNoAX: return 0.0
         }
     }
-    
-    /// 런타임 상태에 대응하는 로컬라이즈 타이틀
+
+    private var gaugeColor: Color {
+        switch menuBarViewModel.contentState {
+        case .focus: Color.nudgeFocus
+        case .idleDetected: Color.nudgeFocus.opacity(0.6)
+        case .gentleNudge: Color.nudgeFocus
+        case .strongNudge: Color.nudgeAlert
+        case .recovery: Color.nudgeFocus
+        case .break: Color.nudgeRest
+        case .remoteEscalation: Color.nudgeAlert
+        }
+    }
+
     private var runtimeStateTitle: String {
         switch menuBarViewModel.runtimeState {
         case .limitedNoAX:
@@ -59,8 +92,7 @@ struct StatusSummaryView: View {
             return localizedAppString("menu.status.value.runtime.suspended", defaultValue: "Suspended")
         }
     }
-    
-    /// 콘텐츠 상태에 대응하는 로컬라이즈 타이틀
+
     private var contentStateTitle: String {
         switch menuBarViewModel.contentState {
         case .focus:
@@ -79,8 +111,7 @@ struct StatusSummaryView: View {
             return localizedAppString("menu.status.value.content.remote_escalation", defaultValue: "Remote escalation")
         }
     }
-    
-    /// 런타임 상태별 상세 설명 문구
+
     private var statusDetail: String {
         switch menuBarViewModel.runtimeState {
         case .limitedNoAX:

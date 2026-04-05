@@ -214,7 +214,7 @@ struct nudgeTests {
         #expect(settings.first?.countdownOverlayEnabled == true)
         #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.english.rawValue)
         #expect(petStates.count == 1)
-        #expect(petStates.first?.stage == .sprout)
+        #expect(petStates.first?.hatchStage == .egg)
         #expect(petStates.first?.emotion == .sleep)
     }
     
@@ -571,7 +571,7 @@ struct nudgeTests {
         settings.petPresentationMode = .minimal
         
         let petState = try #require(try context.fetch(FetchDescriptor<PetState>()).first)
-        petState.stage = .buddy
+        petState.hatchStage = .hatched
         petState.emotion = .happy
         
         context.insert(WhitelistApp(bundleIdentifier: "com.apple.dt.Xcode"))

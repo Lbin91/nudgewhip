@@ -22,7 +22,8 @@ final class MenuBarViewModel {
     private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
     private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
     private(set) var whitelistCount = 0
-    private(set) var petStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+    private(set) var petHatchStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+    private(set) var petCharacterText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
     private(set) var petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
     private(set) var todayStats = DailyStats.derive(for: [], on: .now)
     
@@ -289,18 +290,32 @@ final class MenuBarViewModel {
     
     private func applyPetSnapshot(_ petState: PetState?) {
         guard let petState else {
-            petStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+            petHatchStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+            petCharacterText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
             petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
             return
         }
         
-        switch petState.stage {
-        case .sprout:
-            petStageText = localizedAppString("menu.dropdown.value.pet_stage.sprout", defaultValue: "Sprout")
-        case .buddy:
-            petStageText = localizedAppString("menu.dropdown.value.pet_stage.buddy", defaultValue: "Buddy")
-        case .guide:
-            petStageText = localizedAppString("menu.dropdown.value.pet_stage.guide", defaultValue: "Guide")
+        switch petState.hatchStage {
+        case .egg:
+            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.egg", defaultValue: "Egg")
+        case .cracking:
+            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.cracking", defaultValue: "Cracking")
+        case .hatched:
+            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
+        }
+        
+        switch petState.characterType {
+        case .partyMask:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Party Mask")
+        case .rat:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rat", defaultValue: "Rat")
+        case .ox:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.ox", defaultValue: "Ox")
+        case .tiger:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.tiger", defaultValue: "Tiger")
+        case .rabbit:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rabbit", defaultValue: "Rabbit")
         }
         
         switch petState.emotion {
