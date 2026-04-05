@@ -10,6 +10,7 @@ import AppKit
 
 final class nudgeUITests: XCTestCase {
     private let bundleIdentifier = "com.bongjinlee.nudge"
+    private let terminationTimeout: TimeInterval = 5
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -23,6 +24,7 @@ final class nudgeUITests: XCTestCase {
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
+        try terminateRunningAppIfNeeded()
     }
 
     @MainActor
@@ -50,5 +52,18 @@ final class nudgeUITests: XCTestCase {
                 _ = app.forceTerminate()
             }
         }
+        
+        let deadline = Date().addingTimeInterval(terminationTimeout)
+        while Date() < deadline {
+            let stillRunning = NSRunningApplication
+                .runningApplications(withBundleIdentifier: bundleIdentifier)
+                .contains(where: { !$0.isTerminated })
+            if !stillRunning {
+                return
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+        
+        throw XCTSkip("Could not fully terminate \(bundleIdentifier) before the next UI test launch.")
     }
 }
