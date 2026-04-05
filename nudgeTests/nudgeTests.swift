@@ -391,8 +391,14 @@ struct nudgeTests {
         
         idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(2), isAppActive: false)
         
-        #expect(idleMonitor.lastInputAt != baseDate)
-        #expect(idleMonitor.idleDeadlineAt != originalDeadline)
+        #expect(idleMonitor.lastInputAt == baseDate)
+        #expect(idleMonitor.idleDeadlineAt == originalDeadline)
+
+        idleMonitor.setMenuPresentationActive(false)
+        idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(3), isAppActive: false)
+
+        #expect(idleMonitor.lastInputAt == baseDate.addingTimeInterval(3))
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(303))
     }
     
     @MainActor

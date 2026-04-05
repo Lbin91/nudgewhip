@@ -168,9 +168,11 @@ final class IdleMonitor {
     }
 
     func handleObservedActivity(at date: Date = .now, isAppActive: Bool) {
-        // MenuBarExtra content can stay mounted longer than the actual open menu.
-        // Ignore observed activity only while the app is actively presenting that menu.
-        guard !(isMenuPresentationActive && isAppActive) else { return }
+        // MenuBarExtra submenu hover can be reported through the global monitor.
+        // Once the menu is being presented, treat all observed activity as UI tracking,
+        // regardless of whether AppKit still reports the app as active.
+        _ = isAppActive
+        guard !isMenuPresentationActive else { return }
         recordInput(at: date)
     }
     
