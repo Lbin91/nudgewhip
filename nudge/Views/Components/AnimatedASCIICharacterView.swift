@@ -5,6 +5,7 @@ struct AnimatedASCIICharacterView: View {
     var character: PetCharacterType?
     var emotion: PetEmotion = .happy
     var frameInterval: TimeInterval = 1.0
+    var animate = true
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -14,7 +15,7 @@ struct AnimatedASCIICharacterView: View {
 
     var body: some View {
         Group {
-            if reduceMotion {
+            if reduceMotion || !animate {
                 frameText(frames.first ?? "")
             } else {
                 TimelineView(.periodic(from: .now, by: frameInterval)) { timeline in
