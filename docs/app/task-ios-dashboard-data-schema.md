@@ -246,7 +246,23 @@
 - [ ] Mac sleep/offline 전환 중 projection 누락 방지 규칙 정의
 - [ ] cross-midnight session이 day boundary를 넘을 때 어떤 기준으로 split/count 하는지 정의
 
-### 10.4 Edge-case Rules
+### 10.4 Cross-midnight Session Rules
+
+자정을 넘나드는 focus session의 projection 계산 규칙:
+
+- `completedSessionCount`: 세션 **시작일**에 귀속한다. 자정 이후에 끝난 세션이 다음 날 count에 포함되지 않는다.
+- `totalFocusDuration`: `FocusSession.focusDuration(overlapping:)`을 사용해 각 일의 DateInterval과의 교집합으로 분할 계산한다. 세션이 두 날에 걸치면 각 일에 실제 초 단위로 분배한다.
+- `longestFocusDuration`: 일 단위로 자른 세그먼트 기준이 아닌, 세션 전체 duration 기준으로 판단한다. 하루 경계에서 잘린 세션이 longest가 될 수 있다.
+- `sessionsOver30mCount`: 세션 전체 duration이 30분 초과인지로 판단한다. 하루 분할 여부와 무관하게 세션 시작일에 1건으로 계산한다.
+- `hourlyAlertCounts`: alert 발생 시각 기준으로 해당 시간 bin에 귀속한다. 세션 경계와 무관하다.
+- `alertCount`, `ttsCount`: 이벤트 발생 시각 기준으로 해당 일에 귀속한다.
+
+완료 기준:
+
+- 엔지니어가 자정 경계 처리를 질문 없이 구현 가능하다.
+- `FocusSession.focusDuration(overlapping:)`이 분할 계산에 사용됨이 명시되어 있다.
+
+### 10.5 Edge-case Rules
 
 - sleep/wake 중 상태 전이 누락 시 다음 복구 시점에 projection 보정
 - offline 상태에서는 local source of truth 기준으로 projection 유지 후 나중에 업로드

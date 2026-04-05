@@ -55,6 +55,27 @@
 - 탭 구조가 더 이상 흔들리지 않는다.
 - 각 탭이 “무엇을 보여주기 위한 화면인지” 한 문장으로 설명 가능하다.
 
+## 4.4 Mac → iOS 상태 매핑
+
+Mac `NudgeRuntimeState` 7개 상태를 iOS 표시 상태 6개로 매핑한다.
+
+| Mac RuntimeState | iOS Display State | 근거 |
+|---|---|---|
+| `monitoring` | Monitoring | 정상 집중 중 |
+| `alerting` | Alerting | idle 임계값 초과 |
+| `pausedManual` | Break | 사용자 수동 휴식 |
+| `pausedSchedule` | Break | 스케줄 기반 휴식 |
+| `pausedWhitelist` | Break (화이트리스트) | 화이트리스트 앱 사용 중 자동 휴식. iOS에서는 Break로 표시하되 subtitle로 구분 권장 |
+| `limitedNoAX` | Mac Setup Needed | 접근성 권한 미승인 |
+| `suspendedSleepOrLock` | Offline | Mac sleep/잠금 상태 |
+
+매핑 규칙:
+
+- `pausedManual`, `pausedSchedule`, `pausedWhitelist`는 iOS에서 모두 `Break` 라벨을 사용한다.
+- `pausedWhitelist`는 `Break` 하위에 "허용된 앱 사용 중" 같은 subtitle로 구분을 권장한다. (MVP에서는 subtitle 없이 Break로 통합 가능)
+- `suspendedSleepOrLock`과 `limitedNoAX`는 서로 다른 원인이므로 iOS에서 반드시 구분된 라벨을 사용한다.
+- `alerting`과 Break 계열이 동시 발생할 수 없으므로, 표시 상태 간 충돌은 없다.
+
 ## 5. Screen Contracts
 
 ### 5.1 Home
@@ -83,10 +104,18 @@
 
 - 상태 label
 - 마지막 상태 변경 시각
-- `totalFocusDuration`
-- `alertCount`
-- `recoveryDurationTotal / recoverySampleCount`
-- `sessionsOver30mCount`
+- `totalFocusDuration` (Free)
+- `alertCount` (Free)
+- `completedSessionCount` (Free)
+- `longestFocusDuration` (Free)
+- `recoveryDurationTotal / recoverySampleCount` (Pro)
+- `sessionsOver30mCount` (Pro)
+
+Free/Pro 분기:
+
+- Free: hero status card, today summary cards (totalFocusDuration, alertCount, completedSessionCount, longestFocusDuration), sync health card
+- Pro: 위 항목 + insight card (recoveryDurationTotal/recoverySampleCount), recent follow-up card (remoteEscalation summary)
+- Free 사용자는 insight card와 recent follow-up card가 숨김 처리되거나 "Pro에서 확인 가능" CTA로 대체
 
 CTA:
 
@@ -122,13 +151,20 @@ Acceptance:
 
 필수 필드:
 
-- `totalFocusDuration`
-- `longestFocusDuration`
-- `recoveryDurationTotal`
-- `recoverySampleCount`
-- `hourlyAlertCounts[24]`
-- `remoteEscalationSentCount`
-- `remoteEscalationRecoveredWithinWindowCount`
+- `totalFocusDuration` (Free)
+- `longestFocusDuration` (Free)
+- `completedSessionCount` (Free)
+- `recoveryDurationTotal` (Pro)
+- `recoverySampleCount` (Pro)
+- `hourlyAlertCounts[24]` (Pro)
+- `remoteEscalationSentCount` (Pro)
+- `remoteEscalationRecoveredWithinWindowCount` (Pro)
+
+Free/Pro 분기:
+
+- Free: KPI strip (totalFocusDuration, completedSessionCount, alertCount, longestFocusDuration), focus chart, stats footnote
+- Pro: 위 항목 + recovery chart, alert distribution (hourlyAlertCounts), remote escalation metrics
+- Free 사용자는 recovery chart와 alert distribution 섹션이 숨김 처리되거나 "Pro에서 확인 가능" CTA로 대체
 
 CTA:
 
@@ -162,10 +198,17 @@ Acceptance:
 - short message
 - state summary
 
+Free/Pro 분기:
+
+- Alerts 탭 전체가 Pro 기능이다.
+- Free 사용자는 탭은 표시되나, 내부에 “Pro 기능” 안내와 업그레이드 CTA만 표시된다.
+- Free 사용자의 Home recent follow-up card도 숨김 처리된다.
+
 Acceptance:
 
 - 사용자가 “언제 follow-up이 왔는지”를 시간 순서로 이해 가능하다.
 - missed notification을 앱 안에서 복기할 수 있다.
+- Free 사용자에게 Alerts 탭이 Pro 기능임이 명확히 전달된다.
 
 ### 5.4 Settings
 
@@ -183,6 +226,12 @@ Acceptance:
 4. notification permission
 5. Pro status
 6. privacy explanation
+
+Free/Pro 분기:
+
+- Settings는 Free/Pro 공통 화면이다.
+- Pro status 섹션에서 현재 플랜 상태와 Pro 기능 목록(recovery metrics, hourly distribution, alerts history)을 보여준다.
+- Free 사용자는 Pro status 섹션에서 업그레이드 CTA를 본다.
 
 필수 필드:
 

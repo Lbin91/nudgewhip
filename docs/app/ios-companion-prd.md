@@ -260,7 +260,8 @@
 - `MacState` record는 상태 동기화용 최소 필드만 유지한다.
 - iOS dashboard용 읽기 모델은 별도 projection record로 분리한다.
 - 권장 record type: `DashboardDayProjection`
-- 권장 identity: `macDeviceID + dayStart`
+- 권장 identity: `macDeviceID + localDayKey` (예: `deviceId@2026-04-04@Asia/Seoul`)
+- `dayStart`는 데이터 필드로만 사용하고 identity key에서 제외한다.
 
 권장 필드:
 
