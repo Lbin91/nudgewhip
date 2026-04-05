@@ -25,56 +25,32 @@ struct NudgeApp: App {
     }
     
     var body: some Scene {
+        // CRITICAL NON-REGRESSION:
+        // This MenuBarExtra MUST stay in `.window` style, and pause actions MUST
+        // stay inside the custom window content as plain buttons.
+        //
+        // Reverting this scene back to default menu tracking or reintroducing a
+        // nested `Menu` for pause actions caused repeat regressions:
+        // 1. hover invalidated the submenu,
+        // 2. entering Pause flickered or dismissed the UI,
+        // 3. countdown / redraw churn destabilized pause selection.
+        //
+        // If someone wants to change this again, they must prove full manual QA
+        // for pause entry/hover/selection before touching this architecture.
         MenuBarExtra {
-            ContentView(menuBarViewModel: menuBarViewModel)
-            
-            Divider()
-            
-            if menuBarViewModel.isManualPauseActive {
-                Button(localizedAppString("menu.action.pause.resume", defaultValue: "Resume NudgeWhip")) {
-                    menuBarViewModel.resumeFromManualPause()
-                }
-            } else {
-                Menu(localizedAppString("menu.action.pause", defaultValue: "Pause NudgeWhip")) {
-                    Button(localizedAppString("menu.action.pause.until_resumed", defaultValue: "Until resumed")) {
-                        menuBarViewModel.pauseUntilResumed()
-                    }
-                    
-                    Button(localizedAppString("menu.action.pause.10m", defaultValue: "10 min")) {
-                        menuBarViewModel.pauseForMinutes(10)
-                    }
-                    
-                    Button(localizedAppString("menu.action.pause.30m", defaultValue: "30 min")) {
-                        menuBarViewModel.pauseForMinutes(30)
-                    }
-                    
-                    Button(localizedAppString("menu.action.pause.60m", defaultValue: "60 min")) {
-                        menuBarViewModel.pauseForMinutes(60)
-                    }
-                }
-            }
-            
-            Divider()
-            
-            Button(localizedAppString("menu.action.open_settings", defaultValue: "Settings")) {
-                NudgeAppController.shared.presentSettings()
-            }
-            
-            Button(localizedAppString("menu.action.open_onboarding", defaultValue: "Open setup guide")) {
-                NudgeAppController.shared.presentOnboarding()
-            }
-            
-            Divider()
-            
-            Button(quitTitle) {
-                NSApplication.shared.terminate(nil)
-            }
+            ContentView(
+                menuBarViewModel: menuBarViewModel,
+                onOpenSettings: { NudgeAppController.shared.presentSettings() },
+                onOpenOnboarding: { NudgeAppController.shared.presentOnboarding() },
+                onQuit: { NSApplication.shared.terminate(nil) }
+            )
         } label: {
             MenuBarExtraLabelView(
                 menuBarViewModel: menuBarViewModel,
                 accessibilityLabel: menuTitle
             )
         }
+        .menuBarExtraStyle(.window)
         .modelContainer(NudgeModelContainer.shared)
     }
 }

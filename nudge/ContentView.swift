@@ -8,41 +8,28 @@ import SwiftUI
 
 struct ContentView: View {
     let menuBarViewModel: MenuBarViewModel
+    let onOpenSettings: () -> Void
+    let onOpenOnboarding: () -> Void
+    let onQuit: () -> Void
 
     var body: some View {
         MenuBarDropdownView(
             menuBarViewModel: menuBarViewModel,
-            scheduleEnabled: scheduleEnabledBinding,
-            scheduleStartTime: scheduleStartTimeBinding,
-            scheduleEndTime: scheduleEndTimeBinding
+            onOpenSettings: onOpenSettings,
+            onOpenOnboarding: onOpenOnboarding,
+            onQuit: onQuit
         )
         .padding(16)
         .frame(width: 320)
         .trackMenuPresentation(using: menuBarViewModel)
     }
-    
-    private var scheduleEnabledBinding: Binding<Bool> {
-        Binding(
-            get: { menuBarViewModel.scheduleEnabled },
-            set: { menuBarViewModel.updateScheduleEnabled($0) }
-        )
-    }
-    
-    private var scheduleStartTimeBinding: Binding<Date> {
-        Binding(
-            get: { menuBarViewModel.scheduleStartTime },
-            set: { menuBarViewModel.updateScheduleStartTime($0) }
-        )
-    }
-    
-    private var scheduleEndTimeBinding: Binding<Date> {
-        Binding(
-            get: { menuBarViewModel.scheduleEndTime },
-            set: { menuBarViewModel.updateScheduleEndTime($0) }
-        )
-    }
 }
 
 #Preview {
-    ContentView(menuBarViewModel: MenuBarViewModel())
+    ContentView(
+        menuBarViewModel: MenuBarViewModel(),
+        onOpenSettings: {},
+        onOpenOnboarding: {},
+        onQuit: {}
+    )
 }

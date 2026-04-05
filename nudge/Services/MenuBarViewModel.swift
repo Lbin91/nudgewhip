@@ -22,8 +22,11 @@ final class MenuBarViewModel {
     private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
     private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
     private(set) var whitelistCount = 0
-    private(set) var petHatchStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
-    private(set) var petCharacterText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+    private(set) var petHatchStage = PetHatchStage.hatched
+    private(set) var petCharacter: PetCharacterType? = .partyMask
+    private(set) var petEmotion = PetEmotion.sleep
+    private(set) var petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
+    private(set) var petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
     private(set) var petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
     private(set) var todayStats = DailyStats.derive(for: [], on: .now)
     
@@ -290,11 +293,18 @@ final class MenuBarViewModel {
     
     private func applyPetSnapshot(_ petState: PetState?) {
         guard let petState else {
-            petHatchStageText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
-            petCharacterText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
-            petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
+            petHatchStage = .hatched
+            petCharacter = .partyMask
+            petEmotion = .sleep
+            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
+            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.sleep", defaultValue: "Sleep")
             return
         }
+
+        petHatchStage = petState.hatchStage
+        petCharacter = petState.characterType
+        petEmotion = petState.emotion
         
         switch petState.hatchStage {
         case .egg:
@@ -307,7 +317,7 @@ final class MenuBarViewModel {
         
         switch petState.characterType {
         case .partyMask:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Party Mask")
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
         case .rat:
             petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rat", defaultValue: "Rat")
         case .ox:
