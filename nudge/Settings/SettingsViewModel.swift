@@ -14,6 +14,8 @@ final class SettingsViewModel {
     private(set) var permissionState: AccessibilityPermissionState
     private(set) var launchAtLoginEnabled: Bool
     private(set) var idleThresholdSecondsValue: Int
+    private(set) var countdownOverlayEnabledValue: Bool
+    private(set) var preferredLanguage: AppLanguage
     private(set) var ttsEnabledValue: Bool
     private(set) var errorMessage: String?
     
@@ -34,7 +36,10 @@ final class SettingsViewModel {
         try? NudgeDataBootstrap.ensureDefaults(in: modelContext)
         let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 300
+        self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
+        self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
         self.ttsEnabledValue = currentSettings?.ttsEnabled ?? true
+        AppLanguageStore.shared.refresh(from: currentSettings)
         menuBarViewModel.refreshMenuSnapshot()
     }
     
@@ -99,6 +104,24 @@ final class SettingsViewModel {
         settings.updatedAt = .now
         save(settings)
     }
+
+    func updateCountdownOverlayEnabled(_ enabled: Bool) {
+        countdownOverlayEnabledValue = enabled
+        menuBarViewModel.updateCountdownOverlayEnabled(enabled)
+        refreshSettingsSnapshot()
+    }
+
+    func updatePreferredLanguage(_ language: AppLanguage) {
+        preferredLanguage = language
+        AppLanguageStore.shared.apply(preferredLocaleIdentifier: language.rawValue)
+        guard let settings else {
+            menuBarViewModel.refreshMenuSnapshot()
+            return
+        }
+        settings.preferredLocaleIdentifier = language.rawValue
+        settings.updatedAt = .now
+        save(settings)
+    }
     
     func updateScheduleEnabled(_ enabled: Bool) {
         menuBarViewModel.updateScheduleEnabled(enabled)
@@ -138,6 +161,8 @@ final class SettingsViewModel {
     private func refreshSettingsSnapshot(from settings: UserSettings? = nil) {
         let resolvedSettings = settings ?? self.settings
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
+        countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
+        preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
         ttsEnabledValue = resolvedSettings?.ttsEnabled ?? ttsEnabledValue
     }
 }

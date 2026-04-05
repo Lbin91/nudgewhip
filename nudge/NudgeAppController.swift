@@ -10,9 +10,7 @@ final class NudgeAppController {
     private let onboardingCoordinator: OnboardingCoordinator
     private let settingsCoordinator: SettingsCoordinator
     private var hasStarted = false
-    #if DEBUG
-    private let debugIdleTimerOverlayController: DebugIdleTimerOverlayController?
-    #endif
+    private let countdownOverlayController: CountdownOverlayController?
     
     private init() {
         let permissionManager = PermissionManager()
@@ -21,13 +19,11 @@ final class NudgeAppController {
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
         self.menuBarViewModel = menuBarViewModel
         let modelContext = NudgeModelContainer.shared.mainContext
-        #if DEBUG
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
-            self.debugIdleTimerOverlayController = DebugIdleTimerOverlayController(menuBarViewModel: menuBarViewModel)
+            self.countdownOverlayController = CountdownOverlayController(menuBarViewModel: menuBarViewModel)
         } else {
-            self.debugIdleTimerOverlayController = nil
+            self.countdownOverlayController = nil
         }
-        #endif
         
         let onboardingCoordinator = OnboardingCoordinator(
             storage: OnboardingStorage.shared,
@@ -66,9 +62,7 @@ final class NudgeAppController {
         
         DispatchQueue.main.async { [weak self] in
             self?.startFlow()
-            #if DEBUG
-            self?.debugIdleTimerOverlayController?.show()
-            #endif
+            self?.countdownOverlayController?.showIfNeeded()
         }
     }
     
@@ -100,6 +94,8 @@ final class NudgeAppController {
     }
     
     private func syncPersistedRuntimeState() {
+        let settings = try? NudgeModelContainer.shared.mainContext.fetch(FetchDescriptor<UserSettings>()).first
+        AppLanguageStore.shared.refresh(from: settings)
         menuBarViewModel.refreshMenuSnapshot()
     }
 }

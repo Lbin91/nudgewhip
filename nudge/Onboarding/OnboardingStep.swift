@@ -24,6 +24,8 @@ struct OnboardingDraft: Equatable, Sendable {
     var idleThresholdSeconds: Int
     var launchAtLoginEnabled: Bool
     var ttsEnabled: Bool
+    var countdownOverlayEnabled: Bool
+    var preferredLanguage: AppLanguage
     var petPresentationMode: PetPresentationMode
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
@@ -46,7 +48,7 @@ enum OnboardingWindowMetrics {
         case .permission:
             return permissionState == .granted ? 560 : 640
         case .basicSetup:
-            return 680
+            return 620
         case .scheduleSetup:
             return 560
         case .completionReady:

@@ -213,6 +213,8 @@ struct nudgeTests {
         
         #expect(settings.count == 1)
         #expect(settings.first?.petPresentationMode == .sprout)
+        #expect(settings.first?.countdownOverlayEnabled == true)
+        #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.english.rawValue)
         #expect(petStates.count == 1)
         #expect(petStates.first?.stage == .sprout)
         #expect(petStates.first?.emotion == .sleep)
@@ -500,7 +502,8 @@ struct nudgeTests {
         let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
 
         #expect(viewModel.configuredIdleThresholdText == "03:00")
-        #expect(viewModel.debugRuntimeStateText == "Accessibility required")
+        #expect(viewModel.overlayRuntimeStateText == "Accessibility required")
+        #expect(viewModel.overlayCountdownText(now: Date(timeIntervalSince1970: 0)) == nil)
     }
     
     @MainActor
@@ -625,6 +628,26 @@ struct nudgeTests {
         #expect(viewModel.configuredIdleThresholdText == "03:00")
         #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(180))
     }
+
+    @MainActor
+    @Test
+    func menuBarViewModelUsesMinutesThenSecondsForOverlayCountdown() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 180
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+
+        viewModel.startIfNeeded(at: baseDate)
+
+        #expect(viewModel.overlayCountdownText(now: baseDate) == "3m")
+        #expect(viewModel.overlayCountdownText(now: baseDate.addingTimeInterval(121)) == "59s")
+    }
     
     @MainActor
     @Test
@@ -655,17 +678,20 @@ struct nudgeTests {
         
         viewModel.updateIdleThreshold(600)
         viewModel.updateTTS(false)
+        viewModel.updateCountdownOverlayEnabled(false)
         viewModel.updateScheduleEnabled(true)
         viewModel.updateLaunchAtLogin(true)
         viewModel.openOnboarding()
-        
+
         let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
         #expect(settings.idleThresholdSeconds == 600)
         #expect(settings.ttsEnabled == false)
+        #expect(settings.countdownOverlayEnabled == false)
         #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
+        #expect(viewModel.countdownOverlayEnabledValue == false)
         #expect(viewModel.ttsEnabledValue == false)
     }
     
@@ -1082,6 +1108,8 @@ struct nudgeTests {
             idleThresholdSeconds: 600,
             launchAtLoginEnabled: true,
             ttsEnabled: false,
+            countdownOverlayEnabled: false,
+            preferredLanguage: .korean,
             petPresentationMode: .minimal,
             scheduleEnabled: true,
             scheduleStartSecondsFromMidnight: 32_400,
@@ -1128,6 +1156,8 @@ struct nudgeTests {
         
         viewModel.idleThresholdSeconds = 600
         viewModel.ttsEnabled = false
+        viewModel.countdownOverlayEnabled = false
+        viewModel.preferredLanguage = .korean
         viewModel.launchAtLoginEnabled = true
         viewModel.continueFromBasicSetup()
         #expect(viewModel.step == .scheduleSetup)
@@ -1145,6 +1175,8 @@ struct nudgeTests {
         let settings = try container.mainContext.fetch(FetchDescriptor<UserSettings>())
         #expect(settings.first?.idleThresholdSeconds == 600)
         #expect(settings.first?.ttsEnabled == false)
+        #expect(settings.first?.countdownOverlayEnabled == false)
+        #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.korean.rawValue)
         #expect(settings.first?.scheduleEnabled == true)
         #expect(settings.first?.scheduleStartSecondsFromMidnight == 32_400)
         #expect(settings.first?.scheduleEndSecondsFromMidnight == 61_200)
@@ -1178,6 +1210,7 @@ struct nudgeTests {
         #expect(shouldStartApp)
         #expect(storage.resumeStep == .basicSetup)
         #expect(storage.savedDraft?.idleThresholdSeconds == 180)
+        #expect(storage.savedDraft?.preferredLanguage == .english)
         #expect(storage.shouldPresentOnboarding)
     }
     
@@ -1237,7 +1270,7 @@ struct nudgeTests {
         
         #expect(grantedViewModel.preferredContentHeight == 560)
         grantedViewModel.continueFromPermission()
-        #expect(grantedViewModel.preferredContentHeight == 520)
+        #expect(grantedViewModel.preferredContentHeight == 620)
         grantedViewModel.handleDidBecomeActive()
         #expect(grantedViewModel.step == .basicSetup)
         grantedViewModel.continueFromBasicSetup()

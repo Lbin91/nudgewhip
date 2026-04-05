@@ -4,6 +4,8 @@ struct BasicSetupStepView: View {
     @Binding var idleThresholdSeconds: Int
     @Binding var launchAtLoginEnabled: Bool
     @Binding var ttsEnabled: Bool
+    @Binding var countdownOverlayEnabled: Bool
+    @Binding var preferredLanguage: AppLanguage
     
     @State private var activePreviewStyle: AlertVisualStyle? = nil
     
@@ -40,15 +42,32 @@ struct BasicSetupStepView: View {
                         .toggleStyle(.checkbox)
                     Toggle(localizedAppString("onboarding.setup.tts.label", defaultValue: "Use voice nudges"), isOn: $ttsEnabled)
                         .toggleStyle(.checkbox)
+                    Toggle(localizedAppString("onboarding.setup.overlay.label", defaultValue: "Show top countdown overlay"), isOn: $countdownOverlayEnabled)
+                        .toggleStyle(.checkbox)
                 }
+            }
+
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.setup.language.title", defaultValue: "Language"),
+                subtitle: localizedAppString("onboarding.setup.language.subtitle", defaultValue: "Choose the language Nudge should use across the app.")
+            ) {
+                Picker(
+                    localizedAppString("onboarding.setup.language.title", defaultValue: "Language"),
+                    selection: $preferredLanguage
+                ) {
+                    ForEach(AppLanguage.allCases, id: \.rawValue) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
             
             NudgePreviewCard(
                 idleThresholdSeconds: $idleThresholdSeconds,
                 ttsEnabled: $ttsEnabled,
                 activePreviewStyle: $activePreviewStyle
-            )
-        }
+        )
+    }
         .overlay {
             if let style = activePreviewStyle {
                 NudgePreviewOverlay(style: style) {

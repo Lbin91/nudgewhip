@@ -8,18 +8,18 @@ struct ScheduleSetupStepView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.schedule.title", defaultValue: "모니터링 시간 정하기"),
-                subtitle: localizedAppString("onboarding.schedule.body", defaultValue: "업무 시간에만 넛지를 받고 싶다면 시작/종료 시간을 정해둘 수 있어요.")
+                title: localizedAppString("onboarding.schedule.title", defaultValue: "Choose your monitoring hours"),
+                subtitle: localizedAppString("onboarding.schedule.body", defaultValue: "If you want nudges only during work hours, choose your start and end times.")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(
-                        localizedAppString("onboarding.schedule.enabled", defaultValue: "시간대 사용"),
+                        localizedAppString("onboarding.schedule.enabled", defaultValue: "Use schedule"),
                         isOn: $scheduleEnabled
                     )
                     .toggleStyle(.checkbox)
                     
                     HStack {
-                        Text(localizedAppString("onboarding.schedule.start", defaultValue: "시작"))
+                        Text(localizedAppString("onboarding.schedule.start", defaultValue: "Start"))
                             .foregroundStyle(.secondary)
                         Spacer()
                         DatePicker(
@@ -33,7 +33,7 @@ struct ScheduleSetupStepView: View {
                     }
                     
                     HStack {
-                        Text(localizedAppString("onboarding.schedule.end", defaultValue: "종료"))
+                        Text(localizedAppString("onboarding.schedule.end", defaultValue: "End"))
                             .foregroundStyle(.secondary)
                         Spacer()
                         DatePicker(
@@ -49,11 +49,11 @@ struct ScheduleSetupStepView: View {
             }
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.schedule.helper.title", defaultValue: "이렇게 동작해요")
+                title: localizedAppString("onboarding.schedule.helper.title", defaultValue: "How this works")
             ) {
                 VStack(alignment: .leading, spacing: 8) {
-                    helperRow(localizedAppString("onboarding.schedule.helper.outside", defaultValue: "설정한 시간대 밖에서는 monitoring과 alert가 자동으로 멈춥니다."))
-                    helperRow(localizedAppString("onboarding.schedule.helper.inside", defaultValue: "시간대 안으로 다시 들어오면 현재 시각 기준으로 안전하게 다시 시작합니다."))
+                    helperRow(localizedAppString("onboarding.schedule.helper.outside", defaultValue: "Outside the selected hours, monitoring and nudges automatically pause."))
+                    helperRow(localizedAppString("onboarding.schedule.helper.inside", defaultValue: "When you re-enter the schedule window, Nudge safely resumes from the current time."))
                 }
             }
         }

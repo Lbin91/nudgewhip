@@ -24,6 +24,15 @@ final class OnboardingViewModel {
     var ttsEnabled: Bool {
         didSet { persistDraft() }
     }
+    var countdownOverlayEnabled: Bool {
+        didSet { persistDraft() }
+    }
+    var preferredLanguage: AppLanguage {
+        didSet {
+            AppLanguageStore.shared.apply(preferredLocaleIdentifier: preferredLanguage.rawValue)
+            persistDraft()
+        }
+    }
     var petPresentationMode: PetPresentationMode {
         didSet { persistDraft() }
     }
@@ -61,10 +70,13 @@ final class OnboardingViewModel {
         self.idleThresholdSeconds = initialDraft.idleThresholdSeconds
         self.launchAtLoginEnabled = initialDraft.launchAtLoginEnabled
         self.ttsEnabled = initialDraft.ttsEnabled
+        self.countdownOverlayEnabled = initialDraft.countdownOverlayEnabled
+        self.preferredLanguage = initialDraft.preferredLanguage
         self.petPresentationMode = initialDraft.petPresentationMode
         self.scheduleEnabled = initialDraft.scheduleEnabled
         self.scheduleStartSecondsFromMidnight = initialDraft.scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = initialDraft.scheduleEndSecondsFromMidnight
+        AppLanguageStore.shared.apply(preferredLocaleIdentifier: initialDraft.preferredLanguage.rawValue)
         
         persistDraft()
     }
@@ -192,6 +204,8 @@ final class OnboardingViewModel {
         if let settings = try context.fetch(FetchDescriptor<UserSettings>()).first {
             settings.idleThresholdSeconds = idleThresholdSeconds
             settings.ttsEnabled = ttsEnabled
+            settings.countdownOverlayEnabled = countdownOverlayEnabled
+            settings.preferredLocaleIdentifier = preferredLanguage.rawValue
             settings.petPresentationMode = petPresentationMode
             settings.scheduleEnabled = scheduleEnabled
             settings.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
@@ -209,6 +223,8 @@ final class OnboardingViewModel {
                 idleThresholdSeconds: idleThresholdSeconds,
                 launchAtLoginEnabled: launchAtLoginEnabled,
                 ttsEnabled: ttsEnabled,
+                countdownOverlayEnabled: countdownOverlayEnabled,
+                preferredLanguage: preferredLanguage,
                 petPresentationMode: petPresentationMode,
                 scheduleEnabled: scheduleEnabled,
                 scheduleStartSecondsFromMidnight: scheduleStartSecondsFromMidnight,
@@ -234,6 +250,8 @@ final class OnboardingViewModel {
             idleThresholdSeconds: settings?.idleThresholdSeconds ?? 300,
             launchAtLoginEnabled: storage.shouldPresentOnboarding ? true : launchAtLoginManager.isEnabled,
             ttsEnabled: settings?.ttsEnabled ?? true,
+            countdownOverlayEnabled: settings?.countdownOverlayEnabled ?? true,
+            preferredLanguage: AppLanguage.resolve(settings?.preferredLocaleIdentifier),
             petPresentationMode: settings?.petPresentationMode ?? .sprout,
             scheduleEnabled: settings?.scheduleEnabled ?? false,
             scheduleStartSecondsFromMidnight: settings?.scheduleStartSecondsFromMidnight ?? 32_400,

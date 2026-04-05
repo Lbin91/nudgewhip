@@ -116,7 +116,9 @@ struct OnboardingRootView: View {
             BasicSetupStepView(
                 idleThresholdSeconds: $viewModel.idleThresholdSeconds,
                 launchAtLoginEnabled: $viewModel.launchAtLoginEnabled,
-                ttsEnabled: $viewModel.ttsEnabled
+                ttsEnabled: $viewModel.ttsEnabled,
+                countdownOverlayEnabled: $viewModel.countdownOverlayEnabled,
+                preferredLanguage: $viewModel.preferredLanguage
             )
         case .scheduleSetup:
             ScheduleSetupStepView(
@@ -135,7 +137,9 @@ struct OnboardingRootView: View {
                 idleThresholdText: idleThresholdText,
                 scheduleText: scheduleText,
                 launchAtLoginText: toggleText(viewModel.launchAtLoginEnabled),
-                ttsText: toggleText(viewModel.ttsEnabled)
+                ttsText: toggleText(viewModel.ttsEnabled),
+                overlayText: toggleText(viewModel.countdownOverlayEnabled),
+                languageText: viewModel.preferredLanguage.displayName
             )
         case .completionLimited:
             CompletionLimitedStepView()
@@ -244,12 +248,15 @@ struct OnboardingRootView: View {
     }
     
     private var idleThresholdText: String {
-        if viewModel.idleThresholdSeconds < 60 {
-            return "\(viewModel.idleThresholdSeconds)초"
-        }
-        
-        let minutes = viewModel.idleThresholdSeconds / 60
-        return "\(minutes)분"
+        let formatter = DateComponentsFormatter()
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
+        formatter.calendar = calendar
+        formatter.allowedUnits = viewModel.idleThresholdSeconds >= 3600 ? [.hour, .minute] : [.minute, .second]
+        formatter.unitsStyle = .abbreviated
+        formatter.zeroFormattingBehavior = [.pad]
+        return formatter.string(from: TimeInterval(viewModel.idleThresholdSeconds))
+            ?? "\(viewModel.idleThresholdSeconds)s"
     }
     
     private var scheduleText: String {
@@ -278,7 +285,7 @@ struct OnboardingRootView: View {
     
     private func formattedClock(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = .current
+        formatter.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
         formatter.timeStyle = .short
         formatter.dateStyle = .none
         return formatter.string(from: date)

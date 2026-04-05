@@ -25,6 +25,7 @@ final class UserSettings {
     var proUnlocked: Bool
     var preferredLocaleIdentifier: String?
     var petPresentationRawValue: String
+    var countdownOverlayEnabled: Bool
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
     var scheduleEndSecondsFromMidnight: Int
@@ -48,8 +49,9 @@ final class UserSettings {
         ttsEnabled: Bool = true,
         breakSuggestionEnabled: Bool = true,
         proUnlocked: Bool = false,
-        preferredLocaleIdentifier: String? = nil,
+        preferredLocaleIdentifier: String? = AppLanguage.english.rawValue,
         petPresentationMode: PetPresentationMode = .sprout,
+        countdownOverlayEnabled: Bool = true,
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,
         scheduleEndSecondsFromMidnight: Int = 61200,
@@ -67,6 +69,7 @@ final class UserSettings {
         self.proUnlocked = proUnlocked
         self.preferredLocaleIdentifier = preferredLocaleIdentifier
         self.petPresentationRawValue = petPresentationMode.rawValue
+        self.countdownOverlayEnabled = countdownOverlayEnabled
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight

@@ -18,6 +18,7 @@ final class MenuBarViewModel {
     private(set) var ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     private(set) var petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     private(set) var scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+    private(set) var countdownOverlayEnabled = true
     private(set) var scheduleEnabled = false
     private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
     private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
@@ -46,13 +47,13 @@ final class MenuBarViewModel {
         idleMonitor.runtimeStateController.snapshot.contentState
     }
 
-    /// 디버그 오버레이에서 표시할 현재 임계값 텍스트
+    /// 오버레이에서 표시할 현재 임계값 텍스트
     var configuredIdleThresholdText: String {
-        formatCountdown(max(0, Int(idleMonitor.idleThreshold.rounded())))
+        formatClockStyleCountdown(max(0, Int(idleMonitor.idleThreshold.rounded())))
     }
 
-    /// 디버그 오버레이에서 표시할 현재 모니터링 상태 설명
-    var debugRuntimeStateText: String {
+    /// 오버레이에서 표시할 현재 모니터링 상태 설명
+    var overlayRuntimeStateText: String {
         switch runtimeState {
         case .limitedNoAX:
             return "Accessibility required"
@@ -69,6 +70,20 @@ final class MenuBarViewModel {
         case .suspendedSleepOrLock:
             return "System suspended"
         }
+    }
+
+    /// 오버레이가 보여줄 카운트다운 텍스트. 1분 이상은 분 단위, 1분 미만은 초 단위로 표시
+    func overlayCountdownText(now: Date = .now) -> String? {
+        guard runtimeState == .monitoring, let deadline = idleMonitor.idleDeadlineAt else {
+            return nil
+        }
+
+        let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()))
+        if remaining < 60 {
+            return "\(remaining)s"
+        }
+
+        return "\(remaining / 60)m"
     }
     
     /// 사용자가 수동 일시정지를 활성화했는지 여부
@@ -178,7 +193,7 @@ final class MenuBarViewModel {
         }
 
         let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()))
-        return formatCountdown(remaining)
+        return formatClockStyleCountdown(remaining)
     }
     
     /// SwiftData에 저장된 사용자 설정을 runtime monitor에 반영
@@ -217,6 +232,14 @@ final class MenuBarViewModel {
         try? modelContext.save()
         apply(settings: settings, at: date)
     }
+
+    func updateCountdownOverlayEnabled(_ enabled: Bool, at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.countdownOverlayEnabled = enabled
+        settings.updatedAt = date
+        try? modelContext.save()
+        apply(settings: settings, at: date)
+    }
     
     func updateScheduleStartTime(_ dateValue: Date, at date: Date = .now) {
         guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
@@ -244,6 +267,7 @@ final class MenuBarViewModel {
             ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
             petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
             scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
+            countdownOverlayEnabled = true
             scheduleEnabled = false
             return
         }
@@ -256,6 +280,7 @@ final class MenuBarViewModel {
             ? localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
             : localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
         
+        countdownOverlayEnabled = settings.countdownOverlayEnabled
         scheduleEnabled = settings.scheduleEnabled
         scheduleStartTime = dateFromSeconds(settings.scheduleStartSecondsFromMidnight)
         scheduleEndTime = dateFromSeconds(settings.scheduleEndSecondsFromMidnight)
@@ -297,6 +322,9 @@ final class MenuBarViewModel {
     
     private func formattedDuration(_ duration: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
+        var calendar = Calendar.current
+        calendar.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
+        formatter.calendar = calendar
         formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
         formatter.unitsStyle = .abbreviated
         formatter.zeroFormattingBehavior = [.pad]
@@ -306,7 +334,7 @@ final class MenuBarViewModel {
     
     private func formattedClock(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = .current
+        formatter.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
         formatter.timeStyle = .short
         formatter.dateStyle = .none
         return formatter.string(from: date)
@@ -323,7 +351,7 @@ final class MenuBarViewModel {
             + calendar.component(.minute, from: date) * 60
     }
 
-    private func formatCountdown(_ remaining: Int) -> String {
+    private func formatClockStyleCountdown(_ remaining: Int) -> String {
         let hours = remaining / 3_600
         let minutes = (remaining % 3_600) / 60
         let seconds = remaining % 60

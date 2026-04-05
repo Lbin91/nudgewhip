@@ -57,6 +57,14 @@ struct SettingsRootView: View {
                         set: viewModel.updateTTS
                     )
                 )
+
+                Toggle(
+                    localizedAppString("settings.section.monitoring.overlay", defaultValue: "Show top countdown overlay"),
+                    isOn: Binding(
+                        get: { viewModel.countdownOverlayEnabledValue },
+                        set: viewModel.updateCountdownOverlayEnabled
+                    )
+                )
             }
         }
     }
@@ -139,6 +147,24 @@ struct SettingsRootView: View {
     private var appSection: some View {
         SettingsSection(title: localizedAppString("settings.section.app", defaultValue: "App"), showsDivider: false) {
             VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(localizedAppString("settings.section.app.language", defaultValue: "Language"))
+                        .foregroundStyle(.secondary)
+
+                    Picker(
+                        localizedAppString("settings.section.app.language", defaultValue: "Language"),
+                        selection: Binding(
+                            get: { viewModel.preferredLanguage },
+                            set: viewModel.updatePreferredLanguage
+                        )
+                    ) {
+                        ForEach(AppLanguage.allCases, id: \.rawValue) { language in
+                            Text(language.displayName).tag(language)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 Toggle(
                     localizedAppString("settings.section.app.launch_at_login", defaultValue: "Launch at login"),
                     isOn: Binding(
