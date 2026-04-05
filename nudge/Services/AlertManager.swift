@@ -173,26 +173,62 @@ final class NotificationNudgeManager: NotificationNudgeManaging {
 
 @MainActor
 final class PerimeterPulsePresenter: AlertPresenting {
-    private var panel: NSPanel?
+    private let screenFramesProvider: @MainActor () -> [CGRect]
+    private let panelFactory: @MainActor (CGRect) -> NSPanel
+    private var panelsByFrameKey: [String: NSPanel] = [:]
+    
+    init(
+        screenFramesProvider: @escaping @MainActor () -> [CGRect] = {
+            NSScreen.screens.map(\.frame)
+        },
+        panelFactory: @escaping @MainActor (CGRect) -> NSPanel = { frame in
+            makeAlertPanel(contentRect: frame)
+        }
+    ) {
+        self.screenFramesProvider = screenFramesProvider
+        self.panelFactory = panelFactory
+    }
     
     func show(style: AlertVisualStyle) {
-        guard let screen = NSScreen.main else { return }
+        let frames = screenFramesProvider()
+        guard !frames.isEmpty else { return }
         
-        let panel = panel ?? makePanel(for: screen)
-        panel.contentView = NSHostingView(rootView: AlertOverlayView(style: style))
-        panel.orderFrontRegardless()
-        self.panel = panel
+        var nextPanelsByFrameKey: [String: NSPanel] = [:]
+        for frame in frames {
+            let key = Self.frameKey(for: frame)
+            let panel = panelsByFrameKey[key] ?? panelFactory(frame)
+            panel.setFrame(frame, display: false)
+            panel.contentView = NSHostingView(rootView: AlertOverlayView(style: style))
+            panel.orderFrontRegardless()
+            nextPanelsByFrameKey[key] = panel
+        }
+        
+        let staleKeys = Set(panelsByFrameKey.keys).subtracting(nextPanelsByFrameKey.keys)
+        for staleKey in staleKeys {
+            panelsByFrameKey[staleKey]?.orderOut(nil)
+            panelsByFrameKey[staleKey]?.close()
+        }
+        
+        panelsByFrameKey = nextPanelsByFrameKey
     }
     
     func hide() {
-        panel?.orderOut(nil)
-        panel?.close()
-        panel = nil
+        for panel in panelsByFrameKey.values {
+            panel.orderOut(nil)
+            panel.close()
+        }
+        panelsByFrameKey.removeAll()
     }
     
-    private func makePanel(for screen: NSScreen) -> NSPanel {
+    private static func frameKey(for frame: CGRect) -> String {
+        "\(frame.origin.x),\(frame.origin.y),\(frame.size.width),\(frame.size.height)"
+    }
+}
+
+@MainActor
+private func makeAlertPanel(contentRect: CGRect) -> NSPanel {
         let panel = NSPanel(
-            contentRect: screen.frame,
+            contentRect: contentRect,
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -204,7 +240,6 @@ final class PerimeterPulsePresenter: AlertPresenting {
         panel.ignoresMouseEvents = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         return panel
-    }
 }
 
 private struct AlertOverlayView: View {
