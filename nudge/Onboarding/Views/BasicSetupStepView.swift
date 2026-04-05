@@ -34,8 +34,8 @@ struct BasicSetupStepView: View {
             }
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.setup.section.behavior", defaultValue: "How Nudge starts"),
-                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether Nudge opens automatically and whether voice nudges stay on.")
+                title: localizedAppString("onboarding.setup.section.behavior", defaultValue: "How NudgeWhip starts"),
+                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether NudgeWhip opens automatically and whether voice nudges stay on.")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(localizedAppString("onboarding.setup.launch_at_login.label", defaultValue: "Launch at login"), isOn: $launchAtLoginEnabled)
@@ -49,7 +49,7 @@ struct BasicSetupStepView: View {
 
             OnboardingSectionCard(
                 title: localizedAppString("onboarding.setup.language.title", defaultValue: "Language"),
-                subtitle: localizedAppString("onboarding.setup.language.subtitle", defaultValue: "Choose the language Nudge should use across the app.")
+                subtitle: localizedAppString("onboarding.setup.language.subtitle", defaultValue: "Choose the language NudgeWhip should use across the app.")
             ) {
                 Picker(
                     localizedAppString("onboarding.setup.language.title", defaultValue: "Language"),

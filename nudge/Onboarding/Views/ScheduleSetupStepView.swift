@@ -53,7 +53,7 @@ struct ScheduleSetupStepView: View {
             ) {
                 VStack(alignment: .leading, spacing: 8) {
                     helperRow(localizedAppString("onboarding.schedule.helper.outside", defaultValue: "Outside the selected hours, monitoring and nudges automatically pause."))
-                    helperRow(localizedAppString("onboarding.schedule.helper.inside", defaultValue: "When you re-enter the schedule window, Nudge safely resumes from the current time."))
+                    helperRow(localizedAppString("onboarding.schedule.helper.inside", defaultValue: "When you re-enter the schedule window, NudgeWhip safely resumes from the current time."))
                 }
             }
         }

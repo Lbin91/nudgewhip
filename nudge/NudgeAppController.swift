@@ -57,6 +57,8 @@ final class NudgeAppController {
     func startup() {
         guard !hasStarted else { return }
         hasStarted = true
+        
+        resetOnboardingIfFirstLaunch()
         try? NudgeDataBootstrap.ensureDefaults(in: NudgeModelContainer.shared.mainContext)
         syncPersistedRuntimeState()
         
@@ -64,6 +66,16 @@ final class NudgeAppController {
             self?.startFlow()
             self?.countdownOverlayController?.showIfNeeded()
         }
+    }
+    
+    private func resetOnboardingIfFirstLaunch() {
+        let context = NudgeModelContainer.shared.mainContext
+        let hasExistingSettings: Bool = {
+            (try? context.fetch(FetchDescriptor<UserSettings>()).first) != nil
+        }()
+        
+        guard !hasExistingSettings else { return }
+        OnboardingStorage.shared.reset()
     }
     
     func presentOnboarding() {

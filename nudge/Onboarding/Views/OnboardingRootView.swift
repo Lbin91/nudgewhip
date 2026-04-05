@@ -72,7 +72,7 @@ struct OnboardingRootView: View {
     private var headerTitle: String {
         switch viewModel.step {
         case .welcome:
-            localizedAppString("onboarding.welcome.header", defaultValue: "Welcome to Nudge")
+            localizedAppString("onboarding.welcome.header", defaultValue: "Welcome to NudgeWhip")
         case .permission:
             localizedAppString("onboarding.permission.header", defaultValue: "Accessibility permission")
         case .basicSetup:
@@ -89,15 +89,15 @@ struct OnboardingRootView: View {
     private var headerSubtitle: String {
         switch viewModel.step {
         case .welcome:
-            localizedAppString("onboarding.welcome.subtitle", defaultValue: "Set up Nudge once, then stay in the menu bar.")
+            localizedAppString("onboarding.welcome.subtitle", defaultValue: "Set up NudgeWhip once, then stay in the menu bar.")
         case .permission:
             viewModel.permissionState == .granted
                 ? localizedAppString("onboarding.permission.subtitle.granted", defaultValue: "Permission is already granted. Continue to finish your first-run setup.")
-                : localizedAppString("onboarding.permission.subtitle", defaultValue: "Allow background input detection so Nudge can detect idle moments.")
+                : localizedAppString("onboarding.permission.subtitle", defaultValue: "Allow background input detection so NudgeWhip can detect idle moments.")
         case .basicSetup:
             localizedAppString("onboarding.setup.subtitle", defaultValue: "Choose the defaults for your first sessions.")
         case .scheduleSetup:
-            localizedAppString("onboarding.schedule.subtitle", defaultValue: "Set the hours when Nudge should actively monitor and nudge.")
+            localizedAppString("onboarding.schedule.subtitle", defaultValue: "Set the hours when NudgeWhip should actively monitor and nudge.")
         case .completionReady:
             localizedAppString("onboarding.completion.ready.subtitle", defaultValue: "Your first-run setup is complete.")
         case .completionLimited:

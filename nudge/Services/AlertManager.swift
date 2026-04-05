@@ -159,7 +159,7 @@ final class NotificationNudgeManager: NotificationNudgeManaging {
         clearPendingNudges()
         
         let content = UNMutableNotificationContent()
-        content.title = localizedAppString("app.menu.title", defaultValue: "Nudge")
+        content.title = localizedAppString("app.menu.title", defaultValue: "NudgeWhip")
         content.body = localizedAppString(
             "alert.notification.third_stage.body",
             defaultValue: "You've been away for a while. Come back to your focus flow."

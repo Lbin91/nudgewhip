@@ -1,153 +1,190 @@
 <p align="center">
-  <img src="docs/assets/readme/nudge-launch-screen.png" alt="Nudge launch screen" width="1200" />
+  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip launch screen" width="1200" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/Lbin91/nudge/releases">
-    <img alt="Public Beta" src="https://img.shields.io/badge/status-public%20beta-E67E22?style=for-the-badge">
+  <a href="docs/release/v0.1.0.md">
+    <img alt="v0.1.0 Public Beta" src="https://img.shields.io/badge/release-v0.1.0%20public%20beta-E35D3D?style=for-the-badge">
   </a>
   <img alt="macOS 15+" src="https://img.shields.io/badge/platform-macOS%2015%2B-111827?style=for-the-badge&logo=apple">
-  <img alt="Swift" src="https://img.shields.io/badge/built%20with-Swift-F97316?style=for-the-badge&logo=swift&logoColor=white">
-  <img alt="Privacy First" src="https://img.shields.io/badge/privacy-local--first-0F766E?style=for-the-badge">
+  <img alt="SwiftUI + AppKit" src="https://img.shields.io/badge/stack-SwiftUI%20%2B%20AppKit-F97316?style=for-the-badge&logo=swift&logoColor=white">
+  <img alt="Local First" src="https://img.shields.io/badge/privacy-local--first-0F766E?style=for-the-badge">
 </p>
 
-<h1 align="center">Nudge (넛지)</h1>
+<h1 align="center">NudgeWhip</h1>
 
 <p align="center">
-  <strong>The moment attention drifts, Nudge brings you back.</strong>
-</p>
-
-<p align="center">
-  Not a blocker. Not a guilt machine. Not surveillance.<br />
-  A calm, privacy-first macOS menu bar app that catches the quiet moment when work slips away and gives you a clean path back in.
+  <strong>Sharper than a reminder. Lighter than a blocker.</strong>
 </p>
 
 <p align="center">
-  <a href="#-the-pitch">The Pitch</a> •
-  <a href="#-core-features">Features</a> •
-  <a href="#-how-it-works">How it Works</a> •
-  <a href="#-roadmap">Roadmap</a> •
-  <a href="#-privacy">Privacy</a> •
-  <a href="#-korean">한국어</a>
+  NudgeWhip is a privacy-first macOS menu bar app for serious desktop work.<br />
+  It catches the quiet moment when your hands stop moving, your attention slips, and your work starts to drift, then pulls you back before a short pause turns into a lost hour.
 </p>
 
----
+<p align="center">
+  <a href="docs/release/v0.1.0.md"><strong>Release Notes</strong></a>
+  ·
+  <a href="docs/privacy/accessibility-and-data-disclosure.md"><strong>Privacy</strong></a>
+  ·
+  <a href="https://github.com/Lbin91/nudge/issues"><strong>Issues</strong></a>
+  ·
+  <a href="https://github.com/Lbin91/nudge/releases"><strong>Releases</strong></a>
+</p>
 
-## 🎯 The Pitch
+## Why NudgeWhip
 
-Most focus tools are built like walls. **Nudge is built like a tap on the shoulder.**
+Most focus tools do one of two things:
 
-It lives in your menu bar, observing idle moments through global input activity. When your rhythm breaks, it responds with a gentle nudge. The goal isn't to punish distraction—it's to shorten the distance between drifting and returning.
+- they politely whisper and get ignored
+- they turn into full-blown blockers and create friction
 
-> "Designed for developers, designers, writers, and anyone living in long, attention-sensitive desktop workflows."
+NudgeWhip sits in the middle.
 
----
+It is built as a crisp recovery tool for people who already spend their day inside demanding Mac workflows: developers, designers, writers, founders, researchers, and anyone whose job depends on getting back into flow fast.
 
-## ✨ Core Features
+The idea is simple:
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <h4>🕵️ Quiet Detection</h4>
-      Detects idle/offline distraction via global input activity (mouse/keyboard) without reading what you type.
-    </td>
-    <td width="50%" valign="top">
-      <h4>🔔 Gentle Recovery</h4>
-      Multi-stage nudges from subtle visual cues to optional voice alerts to bring you back to the flow.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h4>📊 Focus Insights</h4>
-      Local-first daily summary stats to help you understand your focus patterns over time.
-    </td>
-    <td width="50%" valign="top">
-      <h4>⚙️ Schedule & Whitelist</h4>
-      Full control over when Nudge is active and which applications are exempt from monitoring.
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h4>🔒 Privacy by Design</h4>
-      No screen recording, no keystroke logging, no cloud syncing (unless you opt-in for Pro).
-    </td>
-    <td width="50%" valign="top">
-      <h4>🚀 Native Experience</h4>
-      Built with SwiftUI and AppKit for a lightweight, energy-efficient macOS native performance.
-    </td>
-  </tr>
-</table>
+- drifting is normal
+- recovery is the moment that matters
+- the intervention should be immediate, clear, and local
 
----
+## What You Get In `v0.1.0`
 
-## 🛠 How It Works
+This public beta already includes a real working core loop:
 
-Nudge uses a sophisticated but lightweight local loop to manage your attention:
+- menu bar app with no Dock icon
+- Accessibility permission onboarding
+- visible limited mode when permission is denied
+- global idle detection from keyboard and mouse activity
+- one-shot idle deadlines instead of noisy polling
+- local visual nudges
+- optional voice nudges
+- runtime status and countdown in the dropdown
+- schedule controls
+- local daily summary stats
+- settings window
+- launch at login
+- Korean and English strings
 
-```mermaid
-graph LR
-    A[Input Activity] -->|Detected| B(Reset Idle Timer)
-    A -->|Idle| C{Deadline Reached?}
-    C -->|Yes| D[Trigger Nudge]
-    D -->|Activity Returns| E(Record Session & Reset)
-    C -->|No| F[Wait]
-```
+## Screenshot
 
-1.  **Observe:** Records the last observed activity timestamp using `NSEvent` global monitors.
-2.  **Wait:** Schedules a one-shot idle deadline based on your settings.
-3.  **Nudge:** Triggers a recovery flow (visual/audio) when the deadline passes.
-4.  **Recover:** Resets the timer and logs the focus session locally upon your return.
+<p align="center">
+  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip macOS launch surface" width="1100" />
+</p>
 
----
+<p align="center">
+  <em>Current beta launch surface captured from the UI test run.</em>
+</p>
 
-## 🗺 Roadmap
+## What Makes It Different
 
-- [x] **v0.1.0 Core Loop:** Menu bar runtime, global idle detection, local nudges.
-- [x] **v0.1.0 Onboarding:** Accessibility permission flow and schedule controls.
-- [ ] **Next Up: iPhone Companion:** Cross-device escalation for when you drift away from the Mac entirely.
-- [ ] **CloudKit Sync:** Private database sync between macOS and iOS devices.
-- [ ] **Gamification:** Virtual pet system that grows as you maintain your focus.
+### Local-first
 
----
+NudgeWhip is designed around the Mac itself, not around a cloud dashboard.
 
-## 🛡 Privacy
+### Privacy-first
 
-Nudge draws a hard line on data collection:
-- **Keystrokes:** We detect *that* you typed, not *what* you typed.
-- **Screen:** We never capture screenshots or record your screen.
-- **Browsing:** Your history remains private; we don't inspect URLs.
-- **Local First:** All data stays on your machine by default.
+Accessibility permission is used only to detect global input activity. NudgeWhip does **not** read typed text, capture your screen, inspect browsing history, or collect message content.
 
-Full disclosure: [Privacy & Data Disclosure](docs/privacy/accessibility-and-data-disclosure.md)
+### Recovery-first
 
----
+This is not a punishment machine. It is an intervention layer designed to shorten the distance between distraction and return.
 
-## 🏗 Tech Stack
+## Current Product Scope
 
-| Layer | Technology |
-|---|---|
-| **UI** | SwiftUI (macOS 15.0+) |
-| **Engine** | AppKit (NSEvent Global Monitoring) |
-| **Persistence** | SwiftData |
-| **Sync** | CloudKit (Planned) |
-| **Automation** | Xcodebuild & XCTest |
+### In the public beta
 
----
+- menu bar runtime status
+- Accessibility permission setup
+- local idle detection
+- local alert flow
+- schedule-based pause windows
+- daily stats
+- local settings
 
-## 🚀 Getting Started
+### Planned next
 
-**Build from source:**
+- iPhone companion flow
+- CloudKit sync
+- richer exception handling
+- more advanced whitelist and break behavior
+- expanded feedback systems
+
+Future scope is intentionally kept separate from the current beta promise.
+
+## Privacy Notes
+
+NudgeWhip draws a hard line:
+
+- it uses global input activity
+- it does not inspect content
+- it stores summary data locally
+- it avoids raw input logging
+
+Full disclosure: [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md)
+
+## Build From Source
+
+Current install path is source-first.
+
 ```bash
 xcodebuild build -scheme nudge -destination 'platform=macOS'
 ```
 
-**Run Tests:**
+Run the full suite:
+
 ```bash
 xcodebuild test -scheme nudge -destination 'platform=macOS'
 ```
 
----
+Run only UI tests:
 
-<p align="center">
-  Built with ❤️ for the focused mind.
-</p>
+```bash
+xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeUITests
+```
+
+## Requirements
+
+- macOS `15.0+`
+- Xcode `17+`
+
+## Technical Shape
+
+Core stack:
+
+- `SwiftUI` for menu bar and settings UI
+- `AppKit` for global event monitoring and alert/panel coordination
+- `SwiftData` for local persistence
+
+At a high level:
+
+1. NudgeWhip records the last observed activity timestamp.
+2. It schedules a one-shot idle deadline.
+3. When the deadline is reached, it starts a local nudge flow.
+4. When activity returns, it resets the timer and records local summary data.
+
+## Repository Layout
+
+```text
+nudge/
+├── nudge/                  # app source
+├── nudgeTests/             # unit and runtime tests
+├── nudgeUITests/           # UI tests
+└── docs/                   # product, architecture, privacy, and release notes
+```
+
+## Beta Reality
+
+This repository is not a concept dump.
+
+It is an active public-beta / portfolio-stage product:
+
+- the core loop is real
+- the app builds and runs
+- the design direction is intentional
+- the surface area is still tightening
+
+## License
+
+License selection is not finalized yet for the public release branch.

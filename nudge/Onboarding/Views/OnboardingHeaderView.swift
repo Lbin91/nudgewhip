@@ -16,7 +16,7 @@ struct OnboardingHeaderView: View {
                     }
                     .buttonStyle(.link)
                 } else {
-                    Text(localizedAppString("app.menu.title", defaultValue: "Nudge"))
+                    Text(localizedAppString("app.menu.title", defaultValue: "NudgeWhip"))
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)

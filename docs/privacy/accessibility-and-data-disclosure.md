@@ -7,7 +7,7 @@
 
 ## 1. Accessibility Permission Rationale
 
-Nudge needs Accessibility permission because macOS does not expose reliable global keyboard and mouse activity monitoring without it. The app uses that permission only to detect idle and active transitions, then trigger local nudges and state changes.
+NudgeWhip needs Accessibility permission because macOS does not expose reliable global keyboard and mouse activity monitoring without it. The app uses that permission only to detect idle and active transitions, then trigger local nudges and state changes.
 
 ### User-facing rationale
 
@@ -63,8 +63,8 @@ Nudge needs Accessibility permission because macOS does not expose reliable glob
 
 ### EN
 
-- `Accessibility permission is used only to detect global input activity so Nudge can identify idle periods and show local nudges.`
-- `Nudge does not collect keystroke content, screen contents, files, messages, or browsing history.`
+- `Accessibility permission is used only to detect global input activity so NudgeWhip can identify idle periods and show local nudges.`
+- `NudgeWhip does not collect keystroke content, screen contents, files, messages, or browsing history.`
 - `iCloud sync is used only for Pro features and only for state-transition metadata.`
 - `If you deny the permission, the app continues to run in limited mode.`
 

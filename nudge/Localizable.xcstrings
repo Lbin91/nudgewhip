@@ -88,13 +88,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge"
+            "value" : "NudgeWhip"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지"
+            "value" : "넛지휩"
           }
         }
       }
@@ -141,7 +141,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pause nudge"
+            "value" : "Pause NudgeWhip"
           }
         },
         "ko" : {
@@ -213,7 +213,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Resume nudge"
+            "value" : "Resume NudgeWhip"
           }
         },
         "ko" : {
@@ -843,7 +843,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge escalation is active until activity returns."
+            "value" : "NudgeWhip escalation is active until activity returns."
           }
         },
         "ko" : {
@@ -1278,13 +1278,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge Setup"
+            "value" : "NudgeWhip Setup"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지 설정"
+            "value" : "넛지휩 설정"
           }
         }
       }
@@ -1296,7 +1296,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Without Accessibility permission, Nudge cannot detect global background input activity."
+            "value" : "Without Accessibility permission, NudgeWhip cannot detect global background input activity."
           }
         },
         "ko" : {
@@ -1704,7 +1704,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge is ready to monitor"
+            "value" : "NudgeWhip is ready to monitor"
           }
         },
         "ko" : {
@@ -1757,7 +1757,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
+            "value" : "NudgeWhip does not collect keystroke content, screen contents, files, messages, or browsing history."
           }
         },
         "ko" : {
@@ -1775,13 +1775,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
+            "value" : "NudgeWhip uses this permission only to detect global input activity, identify idle moments, and show local nudges."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지는 전역 입력 활동을 감지해 무입력 상태를 파악하고, 로컬 넛지를 표시하기 위해서만 이 권한을 사용합니다."
+            "value" : "넛지휩은 전역 입력 활동을 감지해 무입력 상태를 파악하고, 로컬 넛지를 표시하기 위해서만 이 권한을 사용합니다."
           }
         }
       }
@@ -1882,7 +1882,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "What Nudge does not collect"
+            "value" : "What NudgeWhip does not collect"
           }
         },
         "ko" : {
@@ -1900,7 +1900,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Why Nudge needs this"
+            "value" : "Why NudgeWhip needs this"
           }
         },
         "ko" : {
@@ -1972,13 +1972,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow background input detection so Nudge can detect idle moments."
+            "value" : "Allow background input detection so NudgeWhip can detect idle moments."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "백그라운드 입력 감지를 허용하면 넛지가 무입력 상태를 감지할 수 있어요."
+            "value" : "백그라운드 입력 감지를 허용하면 넛지휩이 무입력 상태를 감지할 수 있어요."
           }
         }
       }
@@ -2329,7 +2329,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When you return to the active window, Nudge safely restarts from the current time."
+            "value" : "When you return to the active window, NudgeWhip safely restarts from the current time."
           }
         },
         "ko" : {
@@ -2397,13 +2397,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set the hours when Nudge should actively monitor and nudge."
+            "value" : "Set the hours when NudgeWhip should actively monitor and nudge."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지가 실제로 모니터링하고 알려줄 시간을 정해주세요."
+            "value" : "넛지휩이 실제로 모니터링하고 알려줄 시간을 정해주세요."
           }
         }
       }
@@ -2630,7 +2630,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "How Nudge starts"
+            "value" : "How NudgeWhip starts"
           }
         },
         "ko" : {
@@ -2648,13 +2648,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose whether Nudge opens automatically and whether voice nudges stay on."
+            "value" : "Choose whether NudgeWhip opens automatically and whether voice nudges stay on."
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지 자동 실행 및 음성 알림 여부를 선택합니다."
+            "value" : "넛지휩 자동 실행 및 음성 알림 여부를 선택합니다."
           }
         }
       }
@@ -2665,7 +2665,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose the language Nudge should use across the app."
+            "value" : "Choose the language NudgeWhip should use across the app."
           }
         },
         "ko" : {
@@ -2879,7 +2879,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge does not collect keystroke content."
+            "value" : "NudgeWhip does not collect keystroke content."
           }
         },
         "ko" : {
@@ -2897,7 +2897,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge does not collect screen contents or screenshots."
+            "value" : "NudgeWhip does not collect screen contents or screenshots."
           }
         },
         "ko" : {
@@ -2933,13 +2933,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Welcome to Nudge"
+            "value" : "Welcome to NudgeWhip"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지 시작하기"
+            "value" : "넛지휩 시작하기"
           }
         }
       }
@@ -2969,7 +2969,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set up Nudge once, then stay in the menu bar."
+            "value" : "Set up NudgeWhip once, then stay in the menu bar."
           }
         },
         "ko" : {
@@ -2987,7 +2987,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The moment attention drifts, Nudge brings you back"
+            "value" : "The moment attention drifts, NudgeWhip brings you back"
           }
         },
         "ko" : {
@@ -3041,7 +3041,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accessibility permission is used only to detect global input activity so Nudge can identify idle periods and show local nudges."
+            "value" : "Accessibility permission is used only to detect global input activity so NudgeWhip can identify idle periods and show local nudges."
           }
         },
         "ko" : {
@@ -3059,7 +3059,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
+            "value" : "NudgeWhip does not collect keystroke content, screen contents, files, messages, or browsing history."
           }
         },
         "ko" : {
@@ -3649,13 +3649,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge Settings"
+            "value" : "NudgeWhip Settings"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nudge 설정"
+            "value" : "넛지휩 설정"
           }
         }
       }

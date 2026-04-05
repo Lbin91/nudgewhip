@@ -13,7 +13,7 @@ struct CompletionReadyStepView: View {
             OnboardingHeroView(
                 systemImage: "checkmark.circle.fill",
                 accentColor: .green,
-                title: localizedAppString("onboarding.completion.ready.title", defaultValue: "Nudge is ready to monitor"),
+                title: localizedAppString("onboarding.completion.ready.title", defaultValue: "NudgeWhip is ready to monitor"),
                 message: localizedAppString("onboarding.completion.ready.body", defaultValue: "You can now check status and countdown from the menu bar.")
             )
             

@@ -1,4 +1,4 @@
-# Nudge Product & Technical Spec vNext
+# NudgeWhip Product & Technical Spec vNext
 
 - Version: vNext (draft-1)
 - Last Updated: 2026-04-02
@@ -6,7 +6,7 @@
 
 ## 1. Product Definition
 
-- Product Name: Nudge (넛지)
+- Product Name: NudgeWhip (넛지휩)
 - Category: `attention recall tool`
 - One-liner: 딴짓을 막는 앱이 아니라, 딴짓이 시작된 순간 다시 돌아오게 하는 앱
 - Core Value: 사용자 입력이 멈춘 오프라인 이탈 순간을 감지해 부드럽게 작업 복귀를 유도
@@ -130,6 +130,13 @@
 
 - Local `SwiftData`를 source of truth로 사용
 - `UserDefaults`는 device-local UI/운영 플래그만 저장
+
+### 8.2 Onboarding First-Launch Contract
+
+- 온보딩 완료 상태(`onboarding.completed`)는 `UserDefaults`에 저장
+- SwiftData 저장소(`default.store`) 삭제 시 UserDefaults도 함께 초기화되어야 온보딩이 재실행됨
+- **자동 리셋 규칙**: 앱 시작 시 SwiftData에 `UserSettings`가 존재하지 않으면(신규 설치 or 수동 초기화) `OnboardingStorage.reset()`을 호출하여 온보딩을 재표시
+- 이 규칙은 개발 중 데이터 초기화 테스트와 실제 신규 사용자 온보딩을 동일한 플로우로 통합
 
 ### 8.2 MVP Models
 

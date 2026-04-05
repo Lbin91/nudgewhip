@@ -8,7 +8,7 @@ struct WelcomeStepView: View {
                 accentColor: .accentColor,
                 title: localizedAppString(
                     "onboarding.welcome.title",
-                    defaultValue: "The moment attention drifts, Nudge brings you back"
+                    defaultValue: "The moment attention drifts, NudgeWhip brings you back"
                 ),
                 message: localizedAppString(
                     "onboarding.welcome.body",
@@ -23,13 +23,13 @@ struct WelcomeStepView: View {
                     trustRow(
                         text: localizedAppString(
                             "onboarding.welcome.bullet.keystrokes",
-                            defaultValue: "Nudge does not collect keystroke content."
+                            defaultValue: "NudgeWhip does not collect keystroke content."
                         )
                     )
                     trustRow(
                         text: localizedAppString(
                             "onboarding.welcome.bullet.screen",
-                            defaultValue: "Nudge does not collect screen contents or screenshots."
+                            defaultValue: "NudgeWhip does not collect screen contents or screenshots."
                         )
                     )
                 }

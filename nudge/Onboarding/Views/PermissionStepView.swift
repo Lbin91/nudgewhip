@@ -11,17 +11,17 @@ struct PermissionStepView: View {
                 title: PermissionStateBadge(permissionState: permissionState).titleText,
                 message: localizedAppString(
                     "onboarding.permission.body.reason",
-                    defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
+                    defaultValue: "NudgeWhip uses this permission only to detect global input activity, identify idle moments, and show local nudges."
                 )
             )
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.permission.section.reason", defaultValue: "Why Nudge needs this")
+                title: localizedAppString("onboarding.permission.section.reason", defaultValue: "Why NudgeWhip needs this")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Text(localizedAppString(
                         "onboarding.permission.body.reason",
-                        defaultValue: "Nudge uses this permission only to detect global input activity, identify idle moments, and show local nudges."
+                        defaultValue: "NudgeWhip uses this permission only to detect global input activity, identify idle moments, and show local nudges."
                     ))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
@@ -30,12 +30,12 @@ struct PermissionStepView: View {
             }
             
             OnboardingSectionCard(
-                title: localizedAppString("onboarding.permission.section.privacy", defaultValue: "What Nudge does not collect")
+                title: localizedAppString("onboarding.permission.section.privacy", defaultValue: "What NudgeWhip does not collect")
             ) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(localizedAppString(
                         "onboarding.permission.body.privacy",
-                        defaultValue: "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
+                        defaultValue: "NudgeWhip does not collect keystroke content, screen contents, files, messages, or browsing history."
                     ))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)

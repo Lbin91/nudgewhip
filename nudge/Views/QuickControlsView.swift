@@ -22,13 +22,13 @@ struct QuickControlsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(localizedAppString(
                             "permission.accessibility.disclosure.primary",
-                            defaultValue: "Accessibility permission is used only to detect global input activity so Nudge can identify idle periods and show local nudges."
+                            defaultValue: "Accessibility permission is used only to detect global input activity so NudgeWhip can identify idle periods and show local nudges."
                         ))
                         .font(.footnote)
                         
                         Text(localizedAppString(
                             "permission.accessibility.disclosure.secondary",
-                            defaultValue: "Nudge does not collect keystroke content, screen contents, files, messages, or browsing history."
+                            defaultValue: "NudgeWhip does not collect keystroke content, screen contents, files, messages, or browsing history."
                         ))
                         .font(.footnote)
                         .foregroundStyle(.secondary)

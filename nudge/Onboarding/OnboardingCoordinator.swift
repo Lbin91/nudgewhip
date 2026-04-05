@@ -73,7 +73,7 @@ final class OnboardingCoordinator: NSObject, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = localizedAppString("onboarding.common.window_title", defaultValue: "Nudge Setup")
+        window.title = localizedAppString("onboarding.common.window_title", defaultValue: "NudgeWhip Setup")
         window.isReleasedWhenClosed = false
         window.contentMinSize = NSSize(width: OnboardingWindowMetrics.contentWidth, height: OnboardingWindowMetrics.minimumContentHeight)
         window.contentMaxSize = NSSize(width: OnboardingWindowMetrics.contentWidth, height: clampedContentHeight(for: OnboardingWindowMetrics.maximumContentHeight))

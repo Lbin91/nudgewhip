@@ -17,7 +17,7 @@ struct NudgeApp: App {
     }
     
     private var menuTitle: String {
-        localizedAppString("app.menu.title", defaultValue: "Nudge")
+        localizedAppString("app.menu.title", defaultValue: "NudgeWhip")
     }
     
     private var quitTitle: String {
@@ -31,11 +31,11 @@ struct NudgeApp: App {
             Divider()
             
             if menuBarViewModel.isManualPauseActive {
-                Button(localizedAppString("menu.action.pause.resume", defaultValue: "Resume nudge")) {
+                Button(localizedAppString("menu.action.pause.resume", defaultValue: "Resume NudgeWhip")) {
                     menuBarViewModel.resumeFromManualPause()
                 }
             } else {
-                Menu(localizedAppString("menu.action.pause", defaultValue: "Pause nudge")) {
+                Menu(localizedAppString("menu.action.pause", defaultValue: "Pause NudgeWhip")) {
                     Button(localizedAppString("menu.action.pause.until_resumed", defaultValue: "Until resumed")) {
                         menuBarViewModel.pauseUntilResumed()
                     }

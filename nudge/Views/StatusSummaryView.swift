@@ -101,7 +101,7 @@ struct StatusSummaryView: View {
         case .alerting:
             return localizedAppString(
                 "menu.status.detail.alerting",
-                defaultValue: "Nudge escalation is active until activity returns."
+                defaultValue: "NudgeWhip escalation is active until activity returns."
             )
         case .pausedSchedule:
             return localizedAppString(
