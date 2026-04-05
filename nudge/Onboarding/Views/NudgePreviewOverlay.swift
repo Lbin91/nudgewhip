@@ -3,10 +3,11 @@ import SwiftUI
 struct NudgePreviewOverlay: View {
     let style: AlertVisualStyle
     var onComplete: () -> Void
-    
+
     @State private var isActive = false
     @State private var showCenterMessage = false
-    
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -24,17 +25,38 @@ struct NudgePreviewOverlay: View {
                 if style != .perimeterPulse {
                     centerMessageView
                 }
+
+                // "Preview" badge — runtime alert과 구분
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text(String(localized: "preview.badge", defaultValue: "Preview"))
+                            .font(.caption.bold())
+                            .foregroundStyle(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .shadow(color: .black.opacity(0.3), radius: 4)
+                            .padding(.top, 16)
+                            .padding(.trailing, 16)
+                    }
+                    Spacer()
+                }
             }
             .onAppear {
-                withAnimation(animation.repeatForever(autoreverses: true)) {
+                if reduceMotion {
                     isActive = true
+                } else {
+                    withAnimation(animation.repeatForever(autoreverses: true)) {
+                        isActive = true
+                    }
                 }
                 if style != .perimeterPulse {
                     withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
                         showCenterMessage = true
                     }
                 }
-                
+
                 let duration: TimeInterval = style == .perimeterPulse ? 2.0 : 3.0
                 DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                     onComplete()
