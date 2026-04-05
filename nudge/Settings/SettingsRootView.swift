@@ -53,7 +53,7 @@ struct SettingsRootView: View {
                 Toggle(
                     localizedAppString("settings.section.monitoring.tts", defaultValue: "Use voice nudges"),
                     isOn: Binding(
-                        get: { viewModel.settings?.ttsEnabled ?? false },
+                        get: { viewModel.ttsEnabledValue },
                         set: viewModel.updateTTS
                     )
                 )
@@ -151,7 +151,7 @@ struct SettingsRootView: View {
     }
     
     private func thresholdButton(title: String, value: Int) -> some View {
-        let isSelected = viewModel.settings?.idleThresholdSeconds == value
+        let isSelected = viewModel.idleThresholdSecondsValue == value
         return Button {
             viewModel.updateIdleThreshold(value)
         } label: {
@@ -169,8 +169,10 @@ struct SettingsRootView: View {
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .stroke(isSelected ? Color.accentColor : Color.secondary.opacity(0.22), lineWidth: 1)
                 )
+                .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
+        .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
     
     private var permissionStatusText: String {

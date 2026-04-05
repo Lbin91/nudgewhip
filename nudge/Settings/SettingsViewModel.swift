@@ -13,6 +13,8 @@ final class SettingsViewModel {
     
     private(set) var permissionState: AccessibilityPermissionState
     private(set) var launchAtLoginEnabled: Bool
+    private(set) var idleThresholdSecondsValue: Int
+    private(set) var ttsEnabledValue: Bool
     private(set) var errorMessage: String?
     
     init(
@@ -30,6 +32,9 @@ final class SettingsViewModel {
         self.permissionState = permissionManager.accessibilityPermissionState
         self.launchAtLoginEnabled = launchAtLoginManager.isEnabled
         try? NudgeDataBootstrap.ensureDefaults(in: modelContext)
+        let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
+        self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 300
+        self.ttsEnabledValue = currentSettings?.ttsEnabled ?? true
         menuBarViewModel.refreshMenuSnapshot()
     }
     
@@ -57,12 +62,14 @@ final class SettingsViewModel {
         permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: false)
         menuBarViewModel.refreshPermission()
         menuBarViewModel.refreshMenuSnapshot()
+        refreshSettingsSnapshot()
     }
     
     func requestAccessibilityPermission() {
         permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: true)
         menuBarViewModel.requestAccessibilityPermission()
         menuBarViewModel.refreshMenuSnapshot()
+        refreshSettingsSnapshot()
     }
     
     @discardableResult
@@ -79,6 +86,7 @@ final class SettingsViewModel {
     }
     
     func updateIdleThreshold(_ value: Int) {
+        idleThresholdSecondsValue = value
         guard let settings else { return }
         settings.idleThresholdSeconds = value
         settings.updatedAt = .now
@@ -119,10 +127,17 @@ final class SettingsViewModel {
         do {
             try modelContext.save()
             errorMessage = nil
+            refreshSettingsSnapshot(from: settings)
             menuBarViewModel.apply(settings: settings)
             menuBarViewModel.refreshMenuSnapshot()
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+    
+    private func refreshSettingsSnapshot(from settings: UserSettings? = nil) {
+        let resolvedSettings = settings ?? self.settings
+        idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
+        ttsEnabledValue = resolvedSettings?.ttsEnabled ?? ttsEnabledValue
     }
 }

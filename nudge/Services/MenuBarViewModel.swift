@@ -45,6 +45,31 @@ final class MenuBarViewModel {
     var contentState: NudgeContentState {
         idleMonitor.runtimeStateController.snapshot.contentState
     }
+
+    /// 디버그 오버레이에서 표시할 현재 임계값 텍스트
+    var configuredIdleThresholdText: String {
+        formatCountdown(max(0, Int(idleMonitor.idleThreshold.rounded())))
+    }
+
+    /// 디버그 오버레이에서 표시할 현재 모니터링 상태 설명
+    var debugRuntimeStateText: String {
+        switch runtimeState {
+        case .limitedNoAX:
+            return "Accessibility required"
+        case .monitoring:
+            return "Monitoring input"
+        case .pausedManual:
+            return "Paused manually"
+        case .pausedWhitelist:
+            return "Whitelisted app"
+        case .alerting:
+            return "Idle detected"
+        case .pausedSchedule:
+            return "Outside schedule"
+        case .suspendedSleepOrLock:
+            return "System suspended"
+        }
+    }
     
     /// 사용자가 수동 일시정지를 활성화했는지 여부
     var isManualPauseActive: Bool {
@@ -151,17 +176,9 @@ final class MenuBarViewModel {
         guard runtimeState == .monitoring, let deadline = idleMonitor.idleDeadlineAt else {
             return nil
         }
-        
+
         let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()))
-        let hours = remaining / 3_600
-        let minutes = (remaining % 3_600) / 60
-        let seconds = remaining % 60
-        
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-        }
-        
-        return String(format: "%02d:%02d", minutes, seconds)
+        return formatCountdown(remaining)
     }
     
     /// SwiftData에 저장된 사용자 설정을 runtime monitor에 반영
@@ -185,6 +202,9 @@ final class MenuBarViewModel {
         todayStats = DailyStats.derive(for: focusSessions, on: now)
         whitelistCount = whitelistApps.count
         
+        if let settings {
+            idleMonitor.applySettings(settings, at: now)
+        }
         applyMenuSettingsSnapshot(settings)
         applyPetSnapshot(petState)
         idleMonitor.applyWhitelistApps(whitelistApps, at: now)
@@ -301,5 +321,17 @@ final class MenuBarViewModel {
         let calendar = Calendar.current
         return calendar.component(.hour, from: date) * 3600
             + calendar.component(.minute, from: date) * 60
+    }
+
+    private func formatCountdown(_ remaining: Int) -> String {
+        let hours = remaining / 3_600
+        let minutes = (remaining % 3_600) / 60
+        let seconds = remaining % 60
+
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        }
+
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 }
