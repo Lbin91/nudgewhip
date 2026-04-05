@@ -10,14 +10,23 @@ protocol EventMonitoring: AnyObject {
 
 @MainActor
 final class SystemEventMonitor: EventMonitoring {
-    private let eventMask: NSEvent.EventTypeMask = [
+    nonisolated static let monitoredEventTypes: [NSEvent.EventType] = [
         .mouseMoved,
         .leftMouseDown,
         .rightMouseDown,
         .otherMouseDown,
+        .leftMouseDragged,
+        .rightMouseDragged,
+        .otherMouseDragged,
         .scrollWheel,
         .keyDown
     ]
+    
+    private var eventMask: NSEvent.EventTypeMask {
+        Self.monitoredEventTypes.reduce(into: []) { mask, type in
+            mask.insert(NSEvent.EventTypeMask(rawValue: 1 << type.rawValue))
+        }
+    }
     
     private var globalMonitor: Any?
     private var localMonitor: Any?
@@ -83,13 +92,6 @@ final class SystemEventMonitor: EventMonitoring {
         hasActiveWindow: Bool,
         isLocalEvent: Bool
     ) -> Bool {
-        // MenuBarExtra submenu tracking should not reset idle state or invalidate the
-        // menu while the user is moving across depth menus. This state usually appears
-        // as "app active, but no key/main window".
-        if isAppActive && !hasActiveWindow {
-            return false
-        }
-        
         // Local events should be tied to our actual app windows only.
         if isLocalEvent && !hasActiveWindow {
             return false

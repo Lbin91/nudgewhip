@@ -5,6 +5,7 @@
 // 유휴 임계값 도달 → 알림 에스컬레이션 → 쿨다운 사이클을 스케줄한다.
 // 수동 일시정지, 화이트리스트 매칭, 시스템 이벤트(수면/잠금)도 처리한다.
 
+import AppKit
 import Foundation
 import Observation
 
@@ -163,7 +164,13 @@ final class IdleMonitor {
     
     /// Event monitor에서 들어온 활동을 처리한다. 메뉴바 메뉴가 열려 있을 때는 무시한다.
     func handleObservedActivity(at date: Date = .now) {
-        guard !isMenuPresentationActive else { return }
+        handleObservedActivity(at: date, isAppActive: NSApp.isActive)
+    }
+
+    func handleObservedActivity(at date: Date = .now, isAppActive: Bool) {
+        // MenuBarExtra content can stay mounted longer than the actual open menu.
+        // Ignore observed activity only while the app is actively presenting that menu.
+        guard !(isMenuPresentationActive && isAppActive) else { return }
         recordInput(at: date)
     }
     
