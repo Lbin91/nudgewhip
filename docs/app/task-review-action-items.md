@@ -123,3 +123,49 @@ Phase 3 (코드, Phase 2 완료 후):
 - 각 항목의 완료 기준 충족
 - 변경 사항이 관련 task 문서에 반영됨
 - S1~S8은 별도 티켓으로 분리 또는 후속 작업에서 처리
+
+## 7. Completion Log
+
+- 2026-04-05: Phase 1 완료 (A2, A4, A6, A7) — `e439118`
+- 2026-04-05: Phase 2 완료 (A1, A5) — `a1b2c3d`
+- 2026-04-05: Phase 3 완료 (A3) — `bedd102`
+
+### A1: AlertingSegment 로컬 모델 설계
+
+- `nudge/Shared/Models/AlertingSegment.swift` 생성
+- `FocusSession`에 `alertingSegments` relationship 추가
+- `DailyStats.derive()`에 recoverySampleCount/DurationTotal/DurationMax 집계 로직 추가
+- **잔여**: FocusSession lifecycle management가 아직 구현되지 않아 AlertingSegment 실제 생성/종료 연결 필요
+
+### A2: Identity Key 통일
+
+- `ios-companion-prd.md`에서 `macDeviceID + dayStart` → `macDeviceID + localDayKey`로 통일
+
+### A3: NudgePreviewOverlay "Preview" 배지
+
+- overlay 우상단에 "Preview" / "미리보기" 배지 추가
+- `@Environment(\.accessibilityReduceMotion)` 적용
+- KR/EN 로컬라이제이션 추가
+
+### A4: Mac → iOS 상태 매핑
+
+- IA 문서에 NudgeRuntimeState 7개 → iOS 표시 상태 6개 매핑 테이블 추가
+- pausedWhitelist subtitle 구분 권장사항 포함
+
+### A5: RemoteEscalationEvent 스키마
+
+- data schema 문서에 `RemoteEscalationEvent` record type 정의 (section 7.5)
+- occurredAt, macDeviceID, escalationStep, contentState, recovery tracking 포함
+
+### A6: Free/Pro 분기
+
+- Home: Free(summary cards), Pro(+insight card, follow-up card)
+- Stats: Free(KPI strip, focus chart), Pro(+recovery chart, alert distribution)
+- Alerts: 전체 Pro 기능
+- Settings: 공통 화면, Pro status에서 CTA
+
+### A7: Cross-midnight Session 분할
+
+- completedSessionCount: 세션 시작일 귀속
+- totalFocusDuration: focusDuration(overlapping:)으로 각 일에 분할
+- sessionsOver30mCount: 세션 전체 duration 기준
