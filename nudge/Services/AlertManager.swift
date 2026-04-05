@@ -92,22 +92,22 @@ final class AlertManager: AlertManaging {
         let soundName: String
         var repeatCount = 1
         
-        if currentSpecies == "sexymask" {
+        if currentSpecies == "cowboy" {
             switch style {
             case .perimeterPulse:
-                soundName = "sexymask_step1"
+                soundName = "cowboy_step1"
             case .gentleNudge:
-                if NSSound(named: "sexymask_step2") != nil {
-                    soundName = "sexymask_step2"
+                if NSSound(named: "cowboy_step2") != nil {
+                    soundName = "cowboy_step2"
                 } else {
-                    soundName = "sexymask_step1"
+                    soundName = "cowboy_step1"
                     repeatCount = 2
                 }
             case .strongVisualNudge:
-                if NSSound(named: "sexymask_step3") != nil {
-                    soundName = "sexymask_step3"
+                if NSSound(named: "cowboy_step3") != nil {
+                    soundName = "cowboy_step3"
                 } else {
-                    soundName = "sexymask_step1"
+                    soundName = "cowboy_step1"
                     repeatCount = 3
                 }
             }
