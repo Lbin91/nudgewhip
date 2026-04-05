@@ -22,6 +22,7 @@ enum PetEmotion: String, Codable, CaseIterable, Sendable {
 
 @Model
 final class PetState {
+    var species: String
     var stageRawValue: String
     var emotionRawValue: String
     var experiencePoints: Int
@@ -44,6 +45,7 @@ final class PetState {
     
     /// 펫 상태 생성. 새싹 단계, 수면 감정으로 시작
     init(
+        species: String = "default",
         stage: PetGrowthStage = .sprout,
         emotion: PetEmotion = .sleep,
         experiencePoints: Int = 0,
@@ -52,6 +54,7 @@ final class PetState {
         lastFocusSessionEndedAt: Date? = nil,
         updatedAt: Date = .now
     ) {
+        self.species = species
         self.stageRawValue = stage.rawValue
         self.emotionRawValue = emotion.rawValue
         self.experiencePoints = experiencePoints

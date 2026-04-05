@@ -7,6 +7,7 @@ final class NudgeAppController {
     @MainActor static let shared = NudgeAppController()
     
     let menuBarViewModel: MenuBarViewModel
+    private let alertManager: AlertManager
     private let onboardingCoordinator: OnboardingCoordinator
     private let settingsCoordinator: SettingsCoordinator
     private var hasStarted = false
@@ -15,6 +16,7 @@ final class NudgeAppController {
     private init() {
         let permissionManager = PermissionManager()
         let alertManager = AlertManager()
+        self.alertManager = alertManager
         let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager)
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
         self.menuBarViewModel = menuBarViewModel
@@ -36,6 +38,9 @@ final class NudgeAppController {
             }
             if let whitelistApps = try? modelContext.fetch(FetchDescriptor<WhitelistApp>()) {
                 menuBarViewModel.apply(whitelistApps: whitelistApps)
+            }
+            if let petState = try? modelContext.fetch(FetchDescriptor<PetState>()).first {
+                alertManager.update(species: petState.species)
             }
             menuBarViewModel.startIfNeeded()
             menuBarViewModel.refreshPermission()
@@ -62,6 +67,11 @@ final class NudgeAppController {
         try? NudgeDataBootstrap.ensureDefaults(in: NudgeModelContainer.shared.mainContext)
         syncPersistedRuntimeState()
         
+        // 캐릭터 정보 업데이트
+        if let petState = try? NudgeModelContainer.shared.mainContext.fetch(FetchDescriptor<PetState>()).first {
+            alertManager.update(species: petState.species)
+        }
+        
         DispatchQueue.main.async { [weak self] in
             self?.startFlow()
             self?.countdownOverlayController?.showIfNeeded()
@@ -74,7 +84,9 @@ final class NudgeAppController {
             (try? context.fetch(FetchDescriptor<UserSettings>()).first) != nil
         }()
         
-        guard !hasExistingSettings else { return }
+        let forceReset = ProcessInfo.processInfo.environment["NUDGE_RESET_ON_LAUNCH"] == "1"
+        
+        guard forceReset || !hasExistingSettings else { return }
         OnboardingStorage.shared.reset()
     }
     

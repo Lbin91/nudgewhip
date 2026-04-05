@@ -6,3 +6,4 @@
 !nudge.xcodeproj/xcshareddata/xcschemes/
 !nudge.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 build/
+.sisyphus
