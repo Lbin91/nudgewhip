@@ -81,14 +81,6 @@ struct QuickControlsView: View {
             }
 
             HStack {
-                Text(localizedAppString("menu.dropdown.label.tts", defaultValue: "TTS"))
-                    .foregroundStyle(Color.nudgeTextSecondary)
-                Spacer()
-                Text(ttsStatusText)
-                    .foregroundStyle(Color.nudgeTextPrimary)
-            }
-
-            HStack {
                 Text(localizedAppString("menu.dropdown.label.schedule", defaultValue: "Schedule"))
                     .foregroundStyle(Color.nudgeTextSecondary)
                 Spacer()
