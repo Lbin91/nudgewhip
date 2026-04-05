@@ -26,7 +26,7 @@ xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeU
 
 **Hybrid SwiftUI + AppKit** approach for macOS menu bar app:
 
-- **SwiftUI** (`MenuBarExtra`): All UI — dropdown view, settings, pet animations, stats dashboard. Requires macOS 13.0+.
+- **SwiftUI** (`MenuBarExtra`): All UI — dropdown view, settings, pet animations, stats dashboard. Requires macOS 15.0+.
 - **AppKit** (`NSEvent`): Core idle detection logic — `addGlobalMonitorForEvents(matching:handler:)` hooks global mouse/keyboard events from background.
 - **SwiftData**: Local persistence for settings, focus sessions, pet state, daily stats.
 - **CloudKit** (planned): Serverless sync between macOS and iOS via `CKQuerySubscription` + APNs push. Private Database only.
