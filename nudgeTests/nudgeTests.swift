@@ -116,6 +116,28 @@ private final class TestAlertPresenter: AlertPresenting {
 }
 
 @MainActor
+private final class TrackingPanel: NSPanel {
+    private(set) var orderFrontCount = 0
+    private(set) var orderOutCount = 0
+    private(set) var closeCount = 0
+    
+    override func orderFrontRegardless() {
+        orderFrontCount += 1
+        super.orderFrontRegardless()
+    }
+    
+    override func orderOut(_ sender: Any?) {
+        orderOutCount += 1
+        super.orderOut(sender)
+    }
+    
+    override func close() {
+        closeCount += 1
+        super.close()
+    }
+}
+
+@MainActor
 private final class TestNotificationNudgeManager: NotificationNudgeManaging {
     private(set) var deliverCount = 0
     private(set) var clearCount = 0
@@ -362,13 +384,12 @@ struct nudgeTests {
         let originalDeadline = idleMonitor.idleDeadlineAt
         
         idleMonitor.setMenuPresentationActive(true)
-        eventMonitor.emitActivity()
+        idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(1), isAppActive: true)
         
         #expect(idleMonitor.lastInputAt == baseDate)
         #expect(idleMonitor.idleDeadlineAt == originalDeadline)
         
-        idleMonitor.setMenuPresentationActive(false)
-        eventMonitor.emitActivity()
+        idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(2), isAppActive: false)
         
         #expect(idleMonitor.lastInputAt != baseDate)
         #expect(idleMonitor.idleDeadlineAt != originalDeadline)
@@ -402,7 +423,7 @@ struct nudgeTests {
     @Test
     func systemEventMonitorIgnoresMenuBarTrackingEventsWithoutWindow() {
         #expect(
-            !SystemEventMonitor.shouldTreatEventAsActivity(
+            SystemEventMonitor.shouldTreatEventAsActivity(
                 eventType: .mouseMoved,
                 isAppActive: true,
                 hasActiveWindow: false,
@@ -435,6 +456,13 @@ struct nudgeTests {
         )
     }
     
+    @Test
+    func systemEventMonitorIncludesDraggedPointerEvents() {
+        #expect(SystemEventMonitor.monitoredEventTypes.contains(.leftMouseDragged))
+        #expect(SystemEventMonitor.monitoredEventTypes.contains(.rightMouseDragged))
+        #expect(SystemEventMonitor.monitoredEventTypes.contains(.otherMouseDragged))
+    }
+    
     @MainActor
     @Test
     func menuBarViewModelReflectsRuntimeIconAndCountdown() {
@@ -456,6 +484,23 @@ struct nudgeTests {
         idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
         #expect(viewModel.systemImageName == "exclamationmark.circle")
         #expect(viewModel.countdownText(now: baseDate.addingTimeInterval(300)) == nil)
+    }
+
+    @MainActor
+    @Test
+    func menuBarViewModelFormatsConfiguredIdleThresholdForDebugOverlay() {
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 180
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+
+        #expect(viewModel.configuredIdleThresholdText == "03:00")
+        #expect(viewModel.debugRuntimeStateText == "Accessibility required")
     }
     
     @MainActor
@@ -552,6 +597,34 @@ struct nudgeTests {
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
     }
+
+    @MainActor
+    @Test
+    func menuBarViewModelRefreshSnapshotAppliesPersistedIdleThresholdBeforeMonitoringStarts() throws {
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeDataBootstrap.ensureDefaults(in: context)
+
+        let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        settings.idleThresholdSeconds = 180
+        try context.save()
+
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider()
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor, modelContext: context)
+
+        viewModel.refreshMenuSnapshot(now: baseDate)
+        viewModel.startIfNeeded(at: baseDate)
+
+        #expect(viewModel.configuredIdleThresholdText == "03:00")
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(180))
+    }
     
     @MainActor
     @Test
@@ -592,6 +665,8 @@ struct nudgeTests {
         #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
+        #expect(viewModel.idleThresholdSecondsValue == 600)
+        #expect(viewModel.ttsEnabledValue == false)
     }
     
     @MainActor
@@ -914,6 +989,41 @@ struct nudgeTests {
         )
         
         #expect(notificationManager.deliverCount == 1)
+    }
+    
+    @MainActor
+    @Test
+    func perimeterPulsePresenterShowsAndHidesPanelsAcrossAllScreens() {
+        let frames: [CGRect] = [
+            CGRect(x: 0, y: 0, width: 1440, height: 900),
+            CGRect(x: 1440, y: 0, width: 1920, height: 1080)
+        ]
+        var createdPanels: [TrackingPanel] = []
+        let presenter = PerimeterPulsePresenter(
+            screenFramesProvider: { frames },
+            panelFactory: { frame in
+                let panel = TrackingPanel(
+                    contentRect: frame,
+                    styleMask: [.borderless, .nonactivatingPanel],
+                    backing: .buffered,
+                    defer: false
+                )
+                createdPanels.append(panel)
+                return panel
+            }
+        )
+        
+        presenter.show(style: .perimeterPulse)
+        #expect(createdPanels.count == 2)
+        #expect(createdPanels.allSatisfy { $0.orderFrontCount == 1 })
+        
+        presenter.show(style: .strongVisualNudge)
+        #expect(createdPanels.count == 2)
+        #expect(createdPanels.allSatisfy { $0.orderFrontCount == 2 })
+        
+        presenter.hide()
+        #expect(createdPanels.allSatisfy { $0.orderOutCount == 1 })
+        #expect(createdPanels.allSatisfy { $0.closeCount == 1 })
     }
     
     @MainActor
