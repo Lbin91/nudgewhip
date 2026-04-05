@@ -28,6 +28,9 @@ final class FocusSession {
     var lastAlertAt: Date?
     var endReasonRawValue: String?
     var createdAt: Date
+
+    /// alerting → recovery 구간 기록. SwiftData 자동 relationship
+    var alertingSegments: [AlertingSegment] = []
     
     /// 종료 사유 로우 밸류 ↔ enum 편의 변환
     var endReason: FocusSessionEndReason? {

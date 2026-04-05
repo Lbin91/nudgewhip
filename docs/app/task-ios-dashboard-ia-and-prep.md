@@ -190,7 +190,7 @@ Acceptance:
 
 사용 데이터:
 
-- `RemoteEscalation` history projection
+- `RemoteEscalationEvent` CloudKit records (data schema section 7.5 참조)
 
 필수 필드:
 

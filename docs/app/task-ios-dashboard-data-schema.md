@@ -128,6 +128,8 @@
   목적: 최신 runtime state sync
 - `DashboardDayProjection`
   목적: iOS dashboard read model
+- `RemoteEscalationEvent`
+  목적: iOS Alerts 탭용 원격 follow-up 이벤트 기록
 
 ### 7.2 `DashboardDayProjection` Identity
 
@@ -173,10 +175,41 @@
 - `remoteEscalationSentCount`: Int
 - `remoteEscalationRecoveredWithinWindowCount`: Int
 
-### 7.5 Completion Criteria
+### 7.5 `RemoteEscalationEvent` Spec
+
+- record type: `RemoteEscalationEvent`
+- identity key: `macDeviceID + occurredAt` (timestamp 기반 unique key)
+- database: private database
+- zone: `NudgeSync` custom zone 유지
+
+정의:
+
+- `occurredAt`: Date — escalation 이벤트 발생 시각 (alerting이 일정 시간 지속 후 remote push 발송 시점)
+- `macDeviceID`: String — 발생 Mac 식별자
+- `escalationStep`: Int — 발생 당시 escalation 단계 (1=idleDetected, 2=gentleNudge, 3=strongNudge)
+- `contentStateRawValue`: String — 발생 당시 content state (예: "StrongNudge")
+- `wasRecoveredWithinWindow`: Bool? — recovery window 내 복구 여부. nil이면 아직 복구되지 않았거나 판단 불가
+- `recoveredAt`: Date? — 실제 복구 시각. nil이면 미복구
+- `schemaVersion`: Int
+
+규칙:
+
+- `RemoteEscalationEvent`는 Mac이 생성하고 CloudKit에 업로드한다.
+- iOS는 이 record를 읽기만 한다 (consumer).
+- MVP에서 최근 30일치 보관. DashboardDayProjection의 retention(35일)과 독립적으로 관리.
+- Recovery window는 UserSettings 기반 값(예: 5분)으로, DashboardDayProjection에는 집계 결과(`remoteEscalationSentCount`, `remoteEscalationRecoveredWithinWindowCount`)만 저장하고 개별 이벤트는 이 record에서 조회한다.
+
+iOS Alerts 탭 매핑:
+
+- Alerts 탭 리스트는 `RemoteEscalationEvent`를 `occurredAt` 내림차순으로 표시한다.
+- 각 row에서 시각, escalation 단계 label, 복구 여부를 표시한다.
+- Free 사용자는 Alerts 탭 접근 불가 (전체가 Pro 기능).
+
+### 7.6 Completion Criteria
 
 - 엔지니어가 record schema를 바로 만들 수 있다.
-- `MacState`와 `DashboardDayProjection`가 섞이지 않는다.
+- `MacState`, `DashboardDayProjection`, `RemoteEscalationEvent`가 서로 섞이지 않는다.
+- Alerts 탭의 데이터 소스가 스키마 수준에서 정의되어 있다.
 
 ## 8. Retention and Roll-up
 
