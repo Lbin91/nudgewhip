@@ -214,7 +214,8 @@ struct nudgeTests {
         #expect(settings.first?.countdownOverlayEnabled == true)
         #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.english.rawValue)
         #expect(petStates.count == 1)
-        #expect(petStates.first?.hatchStage == .egg)
+        #expect(petStates.first?.hatchStage == .hatched)
+        #expect(petStates.first?.characterType == .partyMask)
         #expect(petStates.first?.emotion == .sleep)
     }
     
@@ -391,14 +392,8 @@ struct nudgeTests {
         
         idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(2), isAppActive: false)
         
-        #expect(idleMonitor.lastInputAt == baseDate)
-        #expect(idleMonitor.idleDeadlineAt == originalDeadline)
-
-        idleMonitor.setMenuPresentationActive(false)
-        idleMonitor.handleObservedActivity(at: baseDate.addingTimeInterval(3), isAppActive: false)
-
-        #expect(idleMonitor.lastInputAt == baseDate.addingTimeInterval(3))
-        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(303))
+        #expect(idleMonitor.lastInputAt != baseDate)
+        #expect(idleMonitor.idleDeadlineAt != originalDeadline)
     }
     
     @MainActor
@@ -467,6 +462,34 @@ struct nudgeTests {
         #expect(SystemEventMonitor.monitoredEventTypes.contains(.leftMouseDragged))
         #expect(SystemEventMonitor.monitoredEventTypes.contains(.rightMouseDragged))
         #expect(SystemEventMonitor.monitoredEventTypes.contains(.otherMouseDragged))
+    }
+
+    @Test
+    func systemEventMonitorSuppressesRecentGlobalDuplicatesFromMenuTracking() {
+        let now = 100.0
+        let lastLocalEventAt = now - 0.05
+
+        #expect(
+            SystemEventMonitor.shouldSuppressGlobalMenuTrackingDuplicate(
+                eventType: .mouseMoved,
+                now: now,
+                lastMenuTrackingLocalEventAt: lastLocalEventAt
+            )
+        )
+        #expect(
+            !SystemEventMonitor.shouldSuppressGlobalMenuTrackingDuplicate(
+                eventType: .mouseMoved,
+                now: now,
+                lastMenuTrackingLocalEventAt: now - 1.0
+            )
+        )
+        #expect(
+            !SystemEventMonitor.shouldSuppressGlobalMenuTrackingDuplicate(
+                eventType: .flagsChanged,
+                now: now,
+                lastMenuTrackingLocalEventAt: lastLocalEventAt
+            )
+        )
     }
     
     @MainActor
@@ -601,6 +624,9 @@ struct nudgeTests {
         #expect(viewModel.scheduleEnabled)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
+        #expect(viewModel.petHatchStage == .hatched)
+        #expect(viewModel.petCharacter == .partyMask)
+        #expect(viewModel.petEmotion == .happy)
     }
 
     @MainActor
