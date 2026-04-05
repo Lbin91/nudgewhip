@@ -60,7 +60,6 @@
 - `screenUnlocked`
 - `fastUserSwitchingStarted`
 - `fastUserSwitchingEnded`
-- `ttsFinished`
 - `cooldownExpired`
 - `monitorStartFailed`
 
@@ -123,7 +122,6 @@
 ### 6.5 From `alerting`
 
 - `userActivityDetected` -> `monitoring`
-- `ttsFinished` and no further escalation pending -> `monitoring`
 - `manualPauseEnabled` -> `pausedManual`
 - `whitelistMatched` -> `pausedWhitelist`
 - `sleepDetected`, `screenLocked`, `fastUserSwitchingStarted` -> `suspendedSleepOrLock`
@@ -144,7 +142,7 @@
 - `idleDeadlineTimer`: 마지막 입력 시각 + 사용자가 설정한 idle threshold에 맞춰 단일 deadline 예약
 - `alertEscalationTimer`: 1차 알림 후 추가 escalation을 위한 deadline 예약
 - `cooldownTimer`: 복귀 직후 일정 시간 재알림 방지
-- `ttsDebounceTimer`: TTS 연속 실행 방지
+- `notificationDebounceTimer`: 3차 시스템 알림 연속 발행 방지
 
 ### 7.2 Timer Rules
 
@@ -177,7 +175,7 @@
 
 - 1차 알림은 `perimeter pulse`만 사용한다.
 - 2차 알림은 더 강한 시각 피드백으로 제한한다.
-- TTS는 짧은 1문장만 허용한다.
+- 3차 시스템 알림은 짧은 1회성 문구만 허용한다.
 - 장기 미복귀 시에만 `RemoteEscalation` 후보를 CloudKit 레이어에 넘긴다.
 
 ## 9. Invariants
@@ -207,5 +205,5 @@
 ## 12. Implementation Notes
 
 - reducer는 순수 함수 형태를 우선한다.
-- side effect는 timer, UI, CloudKit, speech synthesis로 분리한다.
+- side effect는 timer, UI, CloudKit, system notification으로 분리한다.
 - 상태 이름은 UI 문구와 분리하고 코드 상 canonical enum으로 유지한다.

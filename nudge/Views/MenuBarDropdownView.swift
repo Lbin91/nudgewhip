@@ -18,7 +18,6 @@ struct MenuBarDropdownView: View {
             
             QuickControlsView(
                 menuBarViewModel: menuBarViewModel,
-                ttsStatusText: menuBarViewModel.ttsStatusText,
                 idleThresholdText: menuBarViewModel.idleThresholdText,
                 scheduleText: menuBarViewModel.scheduleText,
                 scheduleEnabled: scheduleEnabled,

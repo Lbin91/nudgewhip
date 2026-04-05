@@ -57,7 +57,7 @@
 - schedule 밖에서는:
   - idle deadline 취소
   - visual alert 중단
-  - notification/TTS 채널 중단
+  - notification 채널 중단
 - schedule 안으로 복귀 시:
   - baseline 재설정
   - idle countdown 다시 시작

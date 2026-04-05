@@ -173,8 +173,7 @@ struct nudgeTests {
             FocusSession(
                 startedAt: dayStart.addingTimeInterval(9 * 60 * 60),
                 endedAt: dayStart.addingTimeInterval((10 * 60 + 30) * 60),
-                alertCount: 2,
-                ttsCount: 1
+                alertCount: 2
             ),
             FocusSession(
                 startedAt: dayStart.addingTimeInterval(11 * 60 * 60),
@@ -194,7 +193,6 @@ struct nudgeTests {
         #expect(stats.dayStart == dayStart)
         #expect(stats.totalFocusDuration == 6_300)
         #expect(stats.alertCount == 3)
-        #expect(stats.ttsCount == 1)
         #expect(stats.longestFocusDuration == 5_400)
         #expect(stats.completedSessionCount == 2)
     }
@@ -564,7 +562,6 @@ struct nudgeTests {
         settings.scheduleEnabled = true
         settings.scheduleStartSecondsFromMidnight = 32_400
         settings.scheduleEndSecondsFromMidnight = 61_200
-        settings.ttsEnabled = false
         settings.petPresentationMode = .minimal
         
         let petState = try #require(try context.fetch(FetchDescriptor<PetState>()).first)
@@ -595,7 +592,6 @@ struct nudgeTests {
         viewModel.refreshMenuSnapshot(now: Date(timeIntervalSince1970: 1_775_091_600))
         
         #expect(viewModel.idleThresholdText.contains("10"))
-        #expect(viewModel.ttsStatusText == localizedAppString("menu.dropdown.value.disabled", defaultValue: "Disabled"))
         #expect(viewModel.scheduleEnabled)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
@@ -677,7 +673,6 @@ struct nudgeTests {
         )
         
         viewModel.updateIdleThreshold(600)
-        viewModel.updateTTS(false)
         viewModel.updateCountdownOverlayEnabled(false)
         viewModel.updateScheduleEnabled(true)
         viewModel.updateLaunchAtLogin(true)
@@ -685,14 +680,12 @@ struct nudgeTests {
 
         let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
         #expect(settings.idleThresholdSeconds == 600)
-        #expect(settings.ttsEnabled == false)
         #expect(settings.countdownOverlayEnabled == false)
         #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
         #expect(viewModel.countdownOverlayEnabledValue == false)
-        #expect(viewModel.ttsEnabledValue == false)
     }
     
     @MainActor
@@ -937,7 +930,7 @@ struct nudgeTests {
         alertManager.apply(
             settings: UserSettings(
                 alertsPerHourLimit: 2,
-                ttsPerHourLimit: 1
+                notificationNudgePerHourLimit: 1
             )
         )
         
@@ -1107,7 +1100,6 @@ struct nudgeTests {
         let draft = OnboardingDraft(
             idleThresholdSeconds: 600,
             launchAtLoginEnabled: true,
-            ttsEnabled: false,
             countdownOverlayEnabled: false,
             preferredLanguage: .korean,
             petPresentationMode: .minimal,
@@ -1155,7 +1147,6 @@ struct nudgeTests {
         #expect(viewModel.step == .basicSetup)
         
         viewModel.idleThresholdSeconds = 600
-        viewModel.ttsEnabled = false
         viewModel.countdownOverlayEnabled = false
         viewModel.preferredLanguage = .korean
         viewModel.launchAtLoginEnabled = true
@@ -1174,7 +1165,6 @@ struct nudgeTests {
         
         let settings = try container.mainContext.fetch(FetchDescriptor<UserSettings>())
         #expect(settings.first?.idleThresholdSeconds == 600)
-        #expect(settings.first?.ttsEnabled == false)
         #expect(settings.first?.countdownOverlayEnabled == false)
         #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.korean.rawValue)
         #expect(settings.first?.scheduleEnabled == true)

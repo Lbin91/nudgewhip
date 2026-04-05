@@ -21,7 +21,7 @@
 | `idle_notice` | 무입력 임계 도달 | 부드러운 재호출 |
 | `gentle_warning` | 1차 경고 | 짧은 주의 환기 |
 | `strong_warning` | 반복 무입력 | 더 명확한 복귀 요청 |
-| `tts_line` | 음성 알림 | 한 문장 음성 출력 |
+| `notification_line` | 시스템 알림 | 짧은 1회성 알림 문구 |
 | `recovery` | 입력 복귀 직후 | 즉시 긍정 피드백 |
 | `break_ack` | 휴식 모드 진입 | 휴식 승인 |
 | `break_suggestion` | 반복 오탐 감지 시 | 휴식 제안 안내 |
@@ -42,7 +42,7 @@
 |---|---|---|
 | `perimeterPulse` | `idle_notice` → `gentle_warning` | idle_notice first, escalate to gentle_warning if no return |
 | `strongVisualNudge` | `strong_warning` | stronger visual + copy |
-| `ttsNudge` | `tts_line` | single sentence, cancelable |
+| `notificationNudge` | `notification_line` | single sentence, cancelable |
 | `remoteEscalation` | `remote_escalation` | Pro only, iOS follow-up |
 | `breakSuggestion` | `break_suggestion` | repeated false-positive mitigation |
 
@@ -92,7 +92,7 @@
 - KR: `자리를 비운 지 꽤 됐습니다. 지금 돌아오는 것이 좋습니다.`
 - EN: `You have been away for a while. Now would be a good time to return.`
 
-### 4.5 tts_line
+### 4.5 notification_line
 
 - KR: `지금 다시 시작해 봅시다.`
 - EN: `Let's restart now.`
@@ -204,4 +204,4 @@
 
 - KR/EN 길이 차이로 인한 truncation 여부를 검증한다.
 - 동일 세션 내 반복 문구가 너무 빨리 재노출되지 않는지 검증한다.
-- TTS 문구는 1문장, 1초기억 가능 길이, 발화 후 즉시 cancel 가능해야 한다.
+- 시스템 알림 문구는 1문장, 빠르게 훑을 수 있는 길이, 복귀 시 즉시 정리 가능해야 한다.

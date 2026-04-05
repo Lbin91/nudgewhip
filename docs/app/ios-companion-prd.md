@@ -271,7 +271,6 @@
 - `totalFocusDuration`
 - `completedSessionCount`
 - `alertCount`
-- `ttsCount`
 - `longestFocusDuration`
 - `recoverySampleCount`
 - `recoveryDurationTotal`

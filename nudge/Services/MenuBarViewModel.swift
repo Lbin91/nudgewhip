@@ -15,7 +15,6 @@ final class MenuBarViewModel {
     private let modelContext: ModelContext
     private(set) var hasStarted = false
     private(set) var idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-    private(set) var ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     private(set) var petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     private(set) var scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
     private(set) var countdownOverlayEnabled = true
@@ -264,7 +263,6 @@ final class MenuBarViewModel {
     private func applyMenuSettingsSnapshot(_ settings: UserSettings?) {
         guard let settings else {
             idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-            ttsStatusText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
             petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
             scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
             countdownOverlayEnabled = true
@@ -273,9 +271,6 @@ final class MenuBarViewModel {
         }
         
         idleThresholdText = formattedDuration(TimeInterval(settings.idleThresholdSeconds))
-        ttsStatusText = settings.ttsEnabled
-            ? localizedAppString("menu.dropdown.value.enabled", defaultValue: "Enabled")
-            : localizedAppString("menu.dropdown.value.disabled", defaultValue: "Disabled")
         petPresentationText = settings.petPresentationMode == .sprout
             ? localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
             : localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")

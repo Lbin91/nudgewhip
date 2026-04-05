@@ -44,7 +44,6 @@ enum NudgeRuntimeEvent: Equatable, Sendable {
     case screenUnlocked
     case fastUserSwitchingStarted
     case fastUserSwitchingEnded
-    case ttsFinished
     case cooldownExpired
     case scheduleWindowEntered
     case scheduleWindowExited
@@ -136,12 +135,6 @@ enum RuntimeStateReducer {
             let wasAlerting = next.runtimeState == .alerting
             next.runtimeState = resolveBaseRuntimeState(from: next)
             next.contentState = wasAlerting ? .recovery : baseContentState(for: next.runtimeState)
-            next.alertEscalationStep = 0
-            
-        case .ttsFinished:
-            guard next.runtimeState == .alerting else { return next }
-            next.runtimeState = resolveBaseRuntimeState(from: next)
-            next.contentState = baseContentState(for: next.runtimeState)
             next.alertEscalationStep = 0
             
         case .scheduleWindowEntered:

@@ -83,13 +83,13 @@
 
 - Step 1: 임계시간 도달 시 `perimeter pulse` 1차 넛지
 - Step 2: 45~60초 추가 무입력 시 강한 시각 넛지
-- Step 3: 60~90초 추가 무입력 시 짧은 TTS 1회
+- Step 3: 60~90초 추가 무입력 시 3차 시스템 알림
 - Step 4: 장기 미복귀 시 iOS `RemoteEscalation` (Pro, best-effort)
 
 ### 6.3 Fatigue Guardrails
 
 - 시간당 최대 알림 횟수 제한
-- 시간당 TTS 최대 횟수 제한
+- 시간당 3차 알림 최대 횟수 제한
 - 복귀 직후 cooldown 적용
 - 동일 문구 연속 반복 금지 창 적용
 - 반복 오탐 시 민감도 조정 또는 짧은 숨 고르기 제안
@@ -104,7 +104,7 @@
 ### 7.1 Menu Bar IA
 
 - Top: 현재 상태 + 남은 시간/카운트다운
-- Middle: 빠른 제어 (임계시간, 휴식, TTS on/off)
+- Middle: 빠른 제어 (임계시간, 스케줄, 상단 오버레이)
 - Bottom: 펫 요약 + 오늘 요약 통계
 - 상세 설정/상세 통계/펫 상세는 별도 창으로 분리
 
@@ -184,7 +184,7 @@
 ### 10.1 Initial Language Support
 
 - 초기 지원 언어: 한국어(`ko`), 영어(`en`)
-- 범위: macOS 핵심 UI, iOS 핵심 UI, 권한 안내, 알림/TTS 핵심 문구, 업그레이드 문구, 웹 핵심 랜딩/프라이버시 카피
+- 범위: macOS 핵심 UI, iOS 핵심 UI, 권한 안내, 알림 핵심 문구, 업그레이드 문구, 웹 핵심 랜딩/프라이버시 카피
 - Locale behavior: 시스템 언어가 `ko/en`이면 해당 언어 표시, 미지원 언어는 영어 fallback
 
 ### 10.2 Localization System Contract
@@ -237,7 +237,7 @@
 
 ### 12.2 Testability Requirements
 
-- DI points: `Clock`, `EventMonitor`, `PermissionProvider`, `FrontmostAppProvider`, `SpeechSynthesizer`, `CloudKitClient`
+- DI points: `Clock`, `EventMonitor`, `PermissionProvider`, `FrontmostAppProvider`, `NotificationCenterClient`, `CloudKitClient`
 - 필수 시나리오: AX 허용/거부/재시도, sleep/wake, lock/unlock, whitelist 전환, 입력 폭주, 오디오 부재, 다중 모니터, 오프라인 복구, iOS 미실행/알림 비허용
 
 ## 13. Launch Web Presence
@@ -264,7 +264,7 @@
 
 ## 16. Open Questions
 
-- TTS 기본값을 on으로 둘지 opt-in으로 둘지
+- 3차 시스템 알림을 사용자 설정으로 노출할지 여부
 - `activate(ignoringOtherApps:)` 기반 강제 포커스 획득 허용 여부
 - 상세 통계와 펫 성장의 Free/Pro 경계 세분화
 - `Mac-only` 사용자용 Pro 가치 제안

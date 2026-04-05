@@ -21,9 +21,6 @@ final class OnboardingViewModel {
     var launchAtLoginEnabled: Bool {
         didSet { persistDraft() }
     }
-    var ttsEnabled: Bool {
-        didSet { persistDraft() }
-    }
     var countdownOverlayEnabled: Bool {
         didSet { persistDraft() }
     }
@@ -69,7 +66,6 @@ final class OnboardingViewModel {
         self.permissionState = permissionManager.accessibilityPermissionState
         self.idleThresholdSeconds = initialDraft.idleThresholdSeconds
         self.launchAtLoginEnabled = initialDraft.launchAtLoginEnabled
-        self.ttsEnabled = initialDraft.ttsEnabled
         self.countdownOverlayEnabled = initialDraft.countdownOverlayEnabled
         self.preferredLanguage = initialDraft.preferredLanguage
         self.petPresentationMode = initialDraft.petPresentationMode
@@ -203,7 +199,6 @@ final class OnboardingViewModel {
         
         if let settings = try context.fetch(FetchDescriptor<UserSettings>()).first {
             settings.idleThresholdSeconds = idleThresholdSeconds
-            settings.ttsEnabled = ttsEnabled
             settings.countdownOverlayEnabled = countdownOverlayEnabled
             settings.preferredLocaleIdentifier = preferredLanguage.rawValue
             settings.petPresentationMode = petPresentationMode
@@ -222,7 +217,6 @@ final class OnboardingViewModel {
             OnboardingDraft(
                 idleThresholdSeconds: idleThresholdSeconds,
                 launchAtLoginEnabled: launchAtLoginEnabled,
-                ttsEnabled: ttsEnabled,
                 countdownOverlayEnabled: countdownOverlayEnabled,
                 preferredLanguage: preferredLanguage,
                 petPresentationMode: petPresentationMode,
@@ -249,7 +243,6 @@ final class OnboardingViewModel {
         return OnboardingDraft(
             idleThresholdSeconds: settings?.idleThresholdSeconds ?? 300,
             launchAtLoginEnabled: storage.shouldPresentOnboarding ? true : launchAtLoginManager.isEnabled,
-            ttsEnabled: settings?.ttsEnabled ?? true,
             countdownOverlayEnabled: settings?.countdownOverlayEnabled ?? true,
             preferredLanguage: AppLanguage.resolve(settings?.preferredLocaleIdentifier),
             petPresentationMode: settings?.petPresentationMode ?? .sprout,

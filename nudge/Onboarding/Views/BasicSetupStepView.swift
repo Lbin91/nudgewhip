@@ -3,7 +3,6 @@ import SwiftUI
 struct BasicSetupStepView: View {
     @Binding var idleThresholdSeconds: Int
     @Binding var launchAtLoginEnabled: Bool
-    @Binding var ttsEnabled: Bool
     @Binding var countdownOverlayEnabled: Bool
     @Binding var preferredLanguage: AppLanguage
     
@@ -35,12 +34,10 @@ struct BasicSetupStepView: View {
             
             OnboardingSectionCard(
                 title: localizedAppString("onboarding.setup.section.behavior", defaultValue: "How NudgeWhip starts"),
-                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether NudgeWhip opens automatically and whether voice nudges stay on.")
+                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether NudgeWhip opens automatically and whether the top countdown overlay stays on.")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(localizedAppString("onboarding.setup.launch_at_login.label", defaultValue: "Launch at login"), isOn: $launchAtLoginEnabled)
-                        .toggleStyle(.checkbox)
-                    Toggle(localizedAppString("onboarding.setup.tts.label", defaultValue: "Use voice nudges"), isOn: $ttsEnabled)
                         .toggleStyle(.checkbox)
                     Toggle(localizedAppString("onboarding.setup.overlay.label", defaultValue: "Show top countdown overlay"), isOn: $countdownOverlayEnabled)
                         .toggleStyle(.checkbox)
@@ -64,10 +61,9 @@ struct BasicSetupStepView: View {
             
             NudgePreviewCard(
                 idleThresholdSeconds: $idleThresholdSeconds,
-                ttsEnabled: $ttsEnabled,
                 activePreviewStyle: $activePreviewStyle
-        )
-    }
+            )
+        }
         .overlay {
             if let style = activePreviewStyle {
                 NudgePreviewOverlay(style: style) {

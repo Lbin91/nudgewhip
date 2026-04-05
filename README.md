@@ -59,7 +59,7 @@ This public beta already includes a real working core loop:
 - global idle detection from keyboard and mouse activity
 - one-shot idle deadlines instead of noisy polling
 - local visual nudges
-- optional voice nudges
+- system notification escalation
 - runtime status and countdown in the dropdown
 - schedule controls
 - local daily summary stats

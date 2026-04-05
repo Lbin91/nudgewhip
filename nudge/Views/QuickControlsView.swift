@@ -1,5 +1,5 @@
 // QuickControlsView.swift
-// 유휴 임계값·TTS·펫 모드 설정 표시 및 액션 버튼.
+// 유휴 임계값·스케줄 설정 표시 및 액션 버튼.
 //
 // GroupBox로 설정 값을 보여주고, 권한 새로고침·타이머 리셋 버튼을 제공한다.
 // 접근성 권한이 없으면 타이머 리셋 버튼이 비활성화된다.
@@ -8,7 +8,6 @@ import SwiftUI
 
 struct QuickControlsView: View {
     let menuBarViewModel: MenuBarViewModel
-    let ttsStatusText: String
     let idleThresholdText: String
     let scheduleText: String
     var scheduleEnabled: Binding<Bool>
@@ -51,12 +50,6 @@ struct QuickControlsView: View {
                     Text(idleThresholdText)
                 } label: {
                     Text(localizedAppString("menu.dropdown.label.idle_threshold", defaultValue: "Idle threshold"))
-                }
-                
-                LabeledContent {
-                    Text(ttsStatusText)
-                } label: {
-                    Text(localizedAppString("menu.dropdown.label.tts", defaultValue: "TTS"))
                 }
                 
                 LabeledContent {

@@ -49,14 +49,6 @@ struct SettingsRootView: View {
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5 min"), value: 300)
                     thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10m", defaultValue: "10 min"), value: 600)
                 }
-                
-                Toggle(
-                    localizedAppString("settings.section.monitoring.tts", defaultValue: "Use voice nudges"),
-                    isOn: Binding(
-                        get: { viewModel.ttsEnabledValue },
-                        set: viewModel.updateTTS
-                    )
-                )
 
                 Toggle(
                     localizedAppString("settings.section.monitoring.overlay", defaultValue: "Show top countdown overlay"),

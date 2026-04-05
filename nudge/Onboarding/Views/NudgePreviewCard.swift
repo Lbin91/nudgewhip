@@ -3,7 +3,6 @@ import AppKit
 
 struct NudgePreviewCard: View {
     @Binding var idleThresholdSeconds: Int
-    @Binding var ttsEnabled: Bool
     @Binding var activePreviewStyle: AlertVisualStyle?
     
     var body: some View {
@@ -27,14 +26,7 @@ struct NudgePreviewCard: View {
                         Label(localizedAppString("onboarding.preview.sound.button", defaultValue: "Preview sound"), systemImage: "play.circle.fill")
                     }
                     .buttonStyle(.plain)
-                    .foregroundStyle(ttsEnabled ? .primary : .secondary)
-                    .disabled(!ttsEnabled || activePreviewStyle != nil)
-                    
-                    if !ttsEnabled {
-                        Text(localizedAppString("onboarding.preview.sound.disabled", defaultValue: "(Requires voice nudges to be ON)"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    .disabled(activePreviewStyle != nil)
                 }
                 
                 Divider()

@@ -4,7 +4,6 @@ struct CompletionReadyStepView: View {
     let idleThresholdText: String
     let scheduleText: String
     let launchAtLoginText: String
-    let ttsText: String
     let overlayText: String
     let languageText: String
     
@@ -23,7 +22,6 @@ struct CompletionReadyStepView: View {
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), idleThresholdText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.schedule", defaultValue: "Schedule"), scheduleText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), launchAtLoginText)
-                        summaryRow(localizedAppString("onboarding.completion.ready.summary.tts", defaultValue: "Voice nudges"), ttsText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.overlay", defaultValue: "Top overlay"), overlayText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.language", defaultValue: "Language"), languageText)
                     }

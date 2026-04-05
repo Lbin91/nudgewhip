@@ -151,14 +151,14 @@ App Launch
   - idle threshold
   - launch at login
 - Group B: guidance style
-  - TTS
+  - top overlay
   - visual mode
 - footer: continue CTA
 
 ### Required controls
 - Idle threshold segmented choices
 - Launch at login toggle
-- TTS toggle
+- Top overlay toggle
 - Visual mode segmented control
 
 ### Draft copy
@@ -173,8 +173,8 @@ App Launch
 | Idle option 3 | 10분 | 10 min |
 | Launch at login label | 로그인 시 자동 실행 | Launch at login |
 | Launch at login help | Mac을 켤 때 자동으로 시작합니다. | Start automatically when you sign in to your Mac. |
-| TTS label | 음성 알림 사용 | Use voice nudges |
-| TTS help | 필요할 때 짧은 음성 알림을 재생합니다. | Play short voice nudges when needed. |
+| Top overlay label | 상단 카운트다운 표시 | Show top countdown overlay |
+| Top overlay help | 모니터링 중 남은 시간을 화면 상단에 표시합니다. | Show the remaining countdown at the top of the screen while monitoring. |
 | Visual mode label | 기본 표시 방식 | Visual mode |
 | Visual option 1 | 새싹 | Sprout |
 | Visual option 2 | 미니멀 | Minimal |
@@ -205,7 +205,7 @@ App Launch
 | Body | 이제 메뉴바에서 상태와 카운트다운을 확인할 수 있습니다. | You can now check status and countdown from the menu bar. |
 | Summary label 1 | 무입력 기준 시간 | Idle threshold |
 | Summary label 2 | 로그인 시 자동 실행 | Launch at login |
-| Summary label 3 | 음성 알림 | Voice nudges |
+| Summary label 3 | 상단 오버레이 | Top overlay |
 | Summary label 4 | 표시 방식 | Visual mode |
 | CTA | 메뉴바에서 시작 | Continue to Menu Bar |
 

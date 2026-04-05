@@ -12,6 +12,7 @@ enum AlertVisualStyle: Equatable, Sendable {
 protocol AlertManaging: AnyObject {
     func handle(snapshot: RuntimeSnapshot)
     func apply(settings: UserSettings)
+    func update(species: String)
 }
 
 @MainActor
@@ -37,6 +38,7 @@ final class AlertManager: AlertManaging {
     private var thirdStageNotificationTimestamps: [Date] = []
     private var alertsPerHourLimit = 6
     private var thirdStagePerHourLimit = 2
+    private var currentSpecies: String = "default"
     
     init(
         presenter: AlertPresenting? = nil,
@@ -79,17 +81,55 @@ final class AlertManager: AlertManaging {
     
     func apply(settings: UserSettings) {
         alertsPerHourLimit = max(0, settings.alertsPerHourLimit)
-        thirdStagePerHourLimit = max(0, settings.ttsPerHourLimit)
+        thirdStagePerHourLimit = max(0, settings.notificationNudgePerHourLimit)
+    }
+
+    func update(species: String) {
+        self.currentSpecies = species
     }
 
     private func playSound(for style: AlertVisualStyle) {
         let soundName: String
-        switch style {
-        case .perimeterPulse: soundName = "Tink"
-        case .gentleNudge: soundName = "Hero"
-        case .strongVisualNudge: soundName = "Sosumi"
+        var repeatCount = 1
+        
+        if currentSpecies == "sexymask" {
+            switch style {
+            case .perimeterPulse:
+                soundName = "sexymask_step1"
+            case .gentleNudge:
+                if NSSound(named: "sexymask_step2") != nil {
+                    soundName = "sexymask_step2"
+                } else {
+                    soundName = "sexymask_step1"
+                    repeatCount = 2
+                }
+            case .strongVisualNudge:
+                if NSSound(named: "sexymask_step3") != nil {
+                    soundName = "sexymask_step3"
+                } else {
+                    soundName = "sexymask_step1"
+                    repeatCount = 3
+                }
+            }
+        } else {
+            switch style {
+            case .perimeterPulse: soundName = "Tink"
+            case .gentleNudge: soundName = "Hero"
+            case .strongVisualNudge: soundName = "Sosumi"
+            }
         }
-        NSSound(named: soundName)?.play()
+        
+        playRepeatedly(soundName: soundName, count: repeatCount)
+    }
+
+    private func playRepeatedly(soundName: String, count: Int) {
+        guard let sound = NSSound(named: soundName) else { return }
+        
+        for i in 0..<count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.4) {
+                sound.play()
+            }
+        }
     }
     
     private func visualStyle(for snapshot: RuntimeSnapshot) -> AlertVisualStyle? {

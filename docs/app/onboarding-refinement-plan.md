@@ -51,7 +51,7 @@
 ### 4.3 Basic Setup
 
 현재 이슈:
-- threshold / launch-at-login / TTS / visual mode가 많아 보일 수 있음
+- threshold / launch-at-login / overlay / visual mode가 많아 보일 수 있음
 
 보강안:
 - `Detection`, `Guidance` 두 그룹으로 시각 분리

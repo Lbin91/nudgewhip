@@ -84,7 +84,7 @@
 
 - 사용자가 `gentle / moderate / strong` 차이를 설명 없이 이해할 수 있다.
 - preview overlay는 demo라는 점이 명확해야 한다.
-- TTS off 상태에서는 sound preview gating이 명확하다.
+- sound preview는 별도 토글 없이 항상 예측 가능하게 동작한다.
 - completion summary는 스캔이 쉽고 줄바꿈이 안정적이다.
 
 ### 6.2 Onboarding QA Matrix
@@ -93,7 +93,7 @@
 
 - locale: `ko`, `en`
 - appearance: light, dark
-- TTS: on, off
+- Sound preview: available
 - style: gentle, moderate, strong
 - accessibility: reduced motion on/off
 - flow: completion ready, completion limited
@@ -101,7 +101,7 @@
 필수 시나리오:
 
 - [ ] 각 preview style visual distinction 확인
-- [ ] TTS off 시 sound preview 비활성 상태 확인
+- [ ] sound preview 중복 실행 방지 확인
 - [ ] KR/EN 문장 줄바꿈 확인
 - [ ] light/dark contrast 확인
 - [ ] reduced motion 대응 확인

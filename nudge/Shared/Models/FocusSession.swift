@@ -2,7 +2,7 @@
 // 개별 포커스 세션을 기록하는 SwiftData 모델.
 //
 // 세션 시작/종료 시각, 모니터링·휴식·화이트리스트 상태,
-// 알림·TTS·복구 횟수를 추적한다. 특정 시간 구간과의 겹침 계산도 지원한다.
+// 알림·복구 횟수를 추적한다. 특정 시간 구간과의 겹침 계산도 지원한다.
 
 import Foundation
 import SwiftData
@@ -23,7 +23,6 @@ final class FocusSession {
     var breakMode: Bool
     var whitelistedPause: Bool
     var alertCount: Int
-    var ttsCount: Int
     var recoveryCount: Int
     var lastAlertAt: Date?
     var endReasonRawValue: String?
@@ -62,7 +61,6 @@ final class FocusSession {
         breakMode: Bool = false,
         whitelistedPause: Bool = false,
         alertCount: Int = 0,
-        ttsCount: Int = 0,
         recoveryCount: Int = 0,
         lastAlertAt: Date? = nil,
         endReason: FocusSessionEndReason? = nil,
@@ -74,7 +72,6 @@ final class FocusSession {
         self.breakMode = breakMode
         self.whitelistedPause = whitelistedPause
         self.alertCount = alertCount
-        self.ttsCount = ttsCount
         self.recoveryCount = recoveryCount
         self.lastAlertAt = lastAlertAt
         self.endReasonRawValue = endReason?.rawValue

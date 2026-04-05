@@ -16,7 +16,6 @@ final class SettingsViewModel {
     private(set) var idleThresholdSecondsValue: Int
     private(set) var countdownOverlayEnabledValue: Bool
     private(set) var preferredLanguage: AppLanguage
-    private(set) var ttsEnabledValue: Bool
     private(set) var errorMessage: String?
     
     init(
@@ -38,7 +37,6 @@ final class SettingsViewModel {
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 300
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
-        self.ttsEnabledValue = currentSettings?.ttsEnabled ?? true
         AppLanguageStore.shared.refresh(from: currentSettings)
         menuBarViewModel.refreshMenuSnapshot()
     }
@@ -94,13 +92,6 @@ final class SettingsViewModel {
         idleThresholdSecondsValue = value
         guard let settings else { return }
         settings.idleThresholdSeconds = value
-        settings.updatedAt = .now
-        save(settings)
-    }
-    
-    func updateTTS(_ enabled: Bool) {
-        guard let settings else { return }
-        settings.ttsEnabled = enabled
         settings.updatedAt = .now
         save(settings)
     }
@@ -163,6 +154,5 @@ final class SettingsViewModel {
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
-        ttsEnabledValue = resolvedSettings?.ttsEnabled ?? ttsEnabledValue
     }
 }

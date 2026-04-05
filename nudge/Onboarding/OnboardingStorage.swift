@@ -22,7 +22,6 @@ final class OnboardingStorage: OnboardingStoring {
         static let resumeStep = "onboarding.resume_step"
         static let idleThreshold = "onboarding.draft.idle_threshold"
         static let launchAtLogin = "onboarding.draft.launch_at_login"
-        static let ttsEnabled = "onboarding.draft.tts_enabled"
         static let countdownOverlayEnabled = "onboarding.draft.countdown_overlay_enabled"
         static let preferredLanguage = "onboarding.draft.preferred_language"
         static let petMode = "onboarding.draft.pet_mode"
@@ -54,7 +53,6 @@ final class OnboardingStorage: OnboardingStoring {
         return OnboardingDraft(
             idleThresholdSeconds: defaults.integer(forKey: Keys.idleThreshold),
             launchAtLoginEnabled: defaults.bool(forKey: Keys.launchAtLogin),
-            ttsEnabled: defaults.bool(forKey: Keys.ttsEnabled),
             countdownOverlayEnabled: defaults.object(forKey: Keys.countdownOverlayEnabled) as? Bool ?? true,
             preferredLanguage: AppLanguage(rawValue: defaults.string(forKey: Keys.preferredLanguage) ?? "") ?? .english,
             petPresentationMode: PetPresentationMode(rawValue: defaults.string(forKey: Keys.petMode) ?? "") ?? .sprout,
@@ -68,7 +66,6 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.set(true, forKey: Keys.hasDraft)
         defaults.set(draft.idleThresholdSeconds, forKey: Keys.idleThreshold)
         defaults.set(draft.launchAtLoginEnabled, forKey: Keys.launchAtLogin)
-        defaults.set(draft.ttsEnabled, forKey: Keys.ttsEnabled)
         defaults.set(draft.countdownOverlayEnabled, forKey: Keys.countdownOverlayEnabled)
         defaults.set(draft.preferredLanguage.rawValue, forKey: Keys.preferredLanguage)
         defaults.set(draft.petPresentationMode.rawValue, forKey: Keys.petMode)
@@ -97,7 +94,6 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.removeObject(forKey: Keys.resumeStep)
         defaults.removeObject(forKey: Keys.idleThreshold)
         defaults.removeObject(forKey: Keys.launchAtLogin)
-        defaults.removeObject(forKey: Keys.ttsEnabled)
         defaults.removeObject(forKey: Keys.countdownOverlayEnabled)
         defaults.removeObject(forKey: Keys.preferredLanguage)
         defaults.removeObject(forKey: Keys.petMode)

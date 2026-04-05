@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Nudge (넛지)** — macOS menu bar utility that detects user inactivity (idle/offline distraction) and gently nudges them back to work via visual/audio alerts and a virtual pet system. Future iOS companion app for cross-device push notifications.
+**Nudge (넛지)** — macOS menu bar utility that detects user inactivity (idle/offline distraction) and gently nudges them back to work via visual alerts, notification follow-ups, and a virtual pet system. Future iOS companion app for cross-device push notifications.
 
 ## Build & Development Commands
 

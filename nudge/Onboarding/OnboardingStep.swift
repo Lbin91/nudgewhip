@@ -23,7 +23,6 @@ enum OnboardingStep: String, CaseIterable, Sendable {
 struct OnboardingDraft: Equatable, Sendable {
     var idleThresholdSeconds: Int
     var launchAtLoginEnabled: Bool
-    var ttsEnabled: Bool
     var countdownOverlayEnabled: Bool
     var preferredLanguage: AppLanguage
     var petPresentationMode: PetPresentationMode

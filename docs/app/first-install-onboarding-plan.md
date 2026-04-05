@@ -20,7 +20,7 @@
 - 메뉴바 앱이라 메인 창이 없어 진입 경로가 불명확하다.
 - Accessibility 권한이 필요한 이유를 사용자가 충분히 이해하기 전에 이탈할 수 있다.
 - 권한을 거부했을 때 “앱이 고장 난 것처럼” 느껴질 수 있다.
-- 최초 기본 설정(`idle threshold`, `TTS`, `visual mode`)이 정리되지 않아 기본 경험이 불안정하다.
+- 최초 기본 설정(`idle threshold`, `countdown overlay`, `visual mode`)이 정리되지 않아 기본 경험이 불안정하다.
 
 따라서 최초 설치 시점에는 별도 온보딩 흐름이 필요하다.
 
@@ -93,7 +93,7 @@ MVP는 **최대 4화면**으로 제한한다.
   - `3분`, `5분(추천)`, `10분`
 - 시작 시 로그인 자동 실행 (Launch on Login)
   - `켜기(추천)` / `끄기`
-- TTS
+- Countdown overlay
   - `켜기` / `끄기`
 - Visual mode
   - `sprout`
@@ -101,7 +101,7 @@ MVP는 **최대 4화면**으로 제한한다.
 
 설계 원칙:
 - 고급 옵션은 숨긴다.
-- 한 화면에서 제어 수가 많아질 경우 `Idle threshold + Launch on Login`을 1차 그룹, `TTS + Visual mode`를 2차 그룹으로 시각적으로 분리한다.
+- 한 화면에서 제어 수가 많아질 경우 `Idle threshold + Launch on Login`을 1차 그룹, `Countdown overlay + Visual mode`를 2차 그룹으로 시각적으로 분리한다.
 - 한 화면에서 “결정해야 하는 질문 수”는 4개를 넘기지 않는다.
 - 기본값은 즉시 usable 해야 한다.
 
@@ -113,7 +113,7 @@ MVP는 **최대 4화면**으로 제한한다.
 
 표시 내용:
 - `모니터링 준비 완료`
-- 선택한 threshold / TTS / visual mode 요약
+- 선택한 threshold / countdown overlay / visual mode 요약
 - Primary CTA: `메뉴바에서 시작`
 
 종료 상태:
@@ -137,7 +137,7 @@ MVP는 **최대 4화면**으로 제한한다.
 최초 설치에서 저장할 설정:
 
 - `UserSettings.idleThresholdSeconds`
-- `UserSettings.ttsEnabled`
+- `UserSettings.countdownOverlayEnabled`
 - `UserSettings.petPresentationMode`
 
 기기 로컬 플래그(`UserDefaults`)로 저장할 값:
@@ -224,7 +224,7 @@ MVP는 **최대 4화면**으로 제한한다.
 - 권한 허용/거부 어느 경우든 온보딩을 완료할 수 있다.
 - 권한 허용 시 monitoring 준비 상태로 진입한다.
 - 권한 거부 시 limited mode 안내와 복구 경로가 보인다.
-- `idle threshold`, `launch at login`, `TTS`, `visual mode`가 저장되고 다음 실행에 유지된다.
+- `idle threshold`, `launch at login`, `countdown overlay`, `visual mode`가 저장되고 다음 실행에 유지된다.
 - KR/EN 모두 문구가 disclosure 문서와 의미상 일치한다.
 - 다음 실행에서는 onboarding completed 플래그에 따라 반복 노출되지 않는다.
 - launch at login은 SwiftData가 아니라 device-local 설정 계층으로 저장된다.
@@ -238,7 +238,7 @@ MVP는 **최대 4화면**으로 제한한다.
 1. `UserDefaults` 기반 onboarding completion/version flag 추가
 2. 온보딩 전용 container 및 step state 추가
 3. Permission screen에 기존 `PermissionManager` 흐름 재사용
-4. Basic setup 화면에서 `UserSettings` 저장 연결 (`idle threshold`, `TTS`, `visual mode`)
+4. Basic setup 화면에서 `UserSettings` 저장 연결 (`idle threshold`, `countdown overlay`, `visual mode`)
 5. launch at login은 `SMAppService` + device-local flag로 별도 연결
 6. granted / denied completion 분기 추가
 7. 메뉴/설정에서 onboarding 재오픈 경로 추가 (예: 메뉴바 드롭다운 하단 "도움말" 섹션에 "초기 설정 다시" 메뉴 아이템)
@@ -283,5 +283,5 @@ Manual:
 - 최초 온보딩을 full-screen window로 띄울지, 작은 setup window로 띄울지
 - 완료 화면에서 “메뉴바에서 시작” CTA가 실제로 어떤 행동을 해야 하는지
 - onboarding을 다시 여는 진입점을 메뉴바에 둘지 설정 화면에 둘지
-- 최초 기본값을 `5분 / 자동실행 on / TTS on / sprout`로 확정할지 여부
+- 최초 기본값을 `5분 / 자동실행 on / overlay on / sprout`로 확정할지 여부
 - `나중에 설정`을 눌렀을 때 completion으로 볼지, reminder 배지를 남길지 여부

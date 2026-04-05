@@ -81,7 +81,7 @@ nudge/
 
 책임:
 - 현재 step view data 제공
-- idle threshold / TTS / visual mode draft state 보관
+- idle threshold / countdown overlay / visual mode draft state 보관
 - permission state 반영
 - launch at login toggle draft state 보관
 
@@ -128,7 +128,7 @@ enum OnboardingStep {
 
 - `selectedIdleThresholdSeconds`
 - `selectedLaunchAtLogin`
-- `selectedTTSEnabled`
+- `selectedCountdownOverlayEnabled`
 - `selectedVisualMode`
 - `currentPermissionState`
 
@@ -136,7 +136,7 @@ enum OnboardingStep {
 
 - SwiftData (`UserSettings`)
   - `idleThresholdSeconds`
-  - `ttsEnabled`
+  - `countdownOverlayEnabled`
   - `petPresentationMode`
 
 - device-local storage
@@ -232,7 +232,7 @@ enum OnboardingStep {
 
 용도:
 - launch at login
-- TTS
+- countdown overlay
 - visual mode helper text
 - idle threshold preset row
 
@@ -274,7 +274,7 @@ enum OnboardingStep {
 출력 액션:
 - threshold selection
 - launch at login toggle
-- TTS toggle
+- countdown overlay toggle
 - visual mode selection
 - continue
 

@@ -69,7 +69,6 @@
 - `totalFocusDuration`
 - `completedSessionCount`
 - `alertCount`
-- `ttsCount`
 - `longestFocusDuration`
 - `timeZoneIdentifier`
 
@@ -165,7 +164,6 @@
 - `totalFocusDuration`: Double or Int seconds
 - `completedSessionCount`: Int
 - `alertCount`: Int
-- `ttsCount`: Int
 - `longestFocusDuration`: Double or Int seconds
 - `recoverySampleCount`: Int
 - `recoveryDurationTotal`: Double or Int seconds
@@ -288,7 +286,7 @@ iOS Alerts 탭 매핑:
 - `longestFocusDuration`: 일 단위로 자른 세그먼트 기준이 아닌, 세션 전체 duration 기준으로 판단한다. 하루 경계에서 잘린 세션이 longest가 될 수 있다.
 - `sessionsOver30mCount`: 세션 전체 duration이 30분 초과인지로 판단한다. 하루 분할 여부와 무관하게 세션 시작일에 1건으로 계산한다.
 - `hourlyAlertCounts`: alert 발생 시각 기준으로 해당 시간 bin에 귀속한다. 세션 경계와 무관하다.
-- `alertCount`, `ttsCount`: 이벤트 발생 시각 기준으로 해당 일에 귀속한다.
+- `alertCount`: 이벤트 발생 시각 기준으로 해당 일에 귀속한다.
 
 완료 기준:
 

@@ -14,7 +14,7 @@
 - macOS 앱 UI
 - iOS companion UI
 - 시스템 권한 안내 문구
-- 알림 및 TTS 핵심 메시지
+- 알림 핵심 메시지
 - 결제/업그레이드 문구
 - 랜딩 페이지 핵심 카피 및 프라이버시 문구
 
@@ -82,7 +82,7 @@
 - KR/EN truncation critical issue: 0
 - KR/EN 핵심 화면 스크린샷 검수 완료
 - 앱/웹 용어집 불일치 치명 이슈: 0
-- TTS locale 매칭 확인 (ko/en)
+- 알림 문구 locale 매칭 확인 (ko/en)
 
 ## 11. 앱/웹 용어 일관성 원칙
 
@@ -99,4 +99,3 @@
 - `rg -n 'String\\(localized:' nudge`
 - 웹 i18n 키 점검:
 - `rg -n 'i18n|locale|translation' docs/web`
-

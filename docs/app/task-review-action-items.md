@@ -109,7 +109,6 @@ Phase 3 (코드, Phase 2 완료 후):
 | # | 항목 | 영역 |
 |---|------|------|
 | S1 | `sessionsOver30mCount`를 "Derivable Now"로 재분류 | Data Schema |
-| S2 | `ttsCount` Packaging Mapping 분류 추가 | Data Schema |
 | S3 | `localDayKey` timezone 변경 시나리오 정의 | Data Schema |
 | S4 | 24-bin chart 접근성 대응 방안 명시 | IA |
 | S5 | State matrix에 화면별 매핑 추가 | IA |

@@ -1,7 +1,7 @@
 // DailyStats.swift
 // 하루 단위 집계 통계를 나타내는 값 타입.
 //
-// 총 포커스 시간, 알림/TTS 횟수, 최장 연속 포커스, 완료 세션 수를 보관한다.
+// 총 포커스 시간, 알림 횟수, 최장 연속 포커스, 완료 세션 수를 보관한다.
 // FocusSession 배열과 기준 날짜로부터 derive()로 자동 계산한다.
 
 import Foundation
@@ -10,7 +10,6 @@ struct DailyStats: Equatable, Sendable {
     let dayStart: Date
     let totalFocusDuration: TimeInterval
     let alertCount: Int
-    let ttsCount: Int
     let longestFocusDuration: TimeInterval
     let completedSessionCount: Int
 
@@ -46,7 +45,6 @@ struct DailyStats: Equatable, Sendable {
             dayStart: dayInterval.start,
             totalFocusDuration: sessionsWithFocus.reduce(0) { $0 + $1.1 },
             alertCount: sessionsWithFocus.reduce(0) { $0 + $1.0.alertCount },
-            ttsCount: sessionsWithFocus.reduce(0) { $0 + $1.0.ttsCount },
             longestFocusDuration: sessionsWithFocus.map(\.1).max() ?? 0,
             completedSessionCount: sessionsWithFocus.count,
             recoverySampleCount: recoveryDurations.count,

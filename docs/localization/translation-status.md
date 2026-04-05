@@ -21,7 +21,7 @@
 
 - macOS app core UI
 - Accessibility onboarding and permission messaging
-- Idle alert copy and TTS short lines
+- Idle alert copy and notification copy
 - Upgrade / pricing copy
 - Privacy / trust copy
 - Launch web hero, FAQ, and privacy copy
@@ -42,7 +42,7 @@
 | Menu bar core UI | Required | Required | Includes state, timer, and quick actions |
 | Permission onboarding | Required | Required | Must explain why Accessibility is needed |
 | Idle alert copy | Required | Required | Includes gentle/strong nudge variants |
-| TTS short lines | Required | Required | Short, natural, and locale-aware |
+| Notification copy | Required | Required | Short, natural, and locale-aware |
 | Upgrade / Pro copy | Required | Required | Free/Pro terminology must match glossary |
 | Privacy disclosure | Required | Required | Must be identical in meaning across locales |
 | Launch web hero / FAQ | Required | Required | Same product position, localized phrasing |
@@ -72,7 +72,7 @@
 - Content copy still being finalized in separate docs
 - Layout may change when longer EN strings land in UI
 - Pro-only wording must not leak into Free UI
-- TTS lines may need last-mile brevity adjustments after implementation
+- Notification copy may need last-mile brevity adjustments after implementation
 
 ## 8. Next Steps
 다음 단계

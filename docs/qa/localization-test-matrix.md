@@ -17,7 +17,7 @@
 - KR/EN은 직역 일치가 아니라 의미 일치를 우선한다.
 - 앱과 웹은 동일한 개념에 동일 용어를 사용한다.
 - 화면 검증은 텍스트 길이, 줄바꿈, 버튼 폭, metadata 길이를 함께 본다.
-- TTS는 locale 매칭과 발화 길이를 별도 확인한다.
+- 3차 시스템 알림은 locale 매칭과 문구 길이를 별도 확인한다.
 
 ## 3. Matrix
 
@@ -28,11 +28,11 @@
 | Accessibility onboarding | KR | 권한 필요 사유를 보여주는 first-run 화면 | 손쉬운 사용 권한 이유, 수집하지 않는 데이터, 제한 모드 동작이 명확히 전달됨 | Required | 권한 거부율 증가, privacy confusion | `localization` + `macos-core` |
 | Accessibility onboarding | EN | first-run permission screen | Accessibility rationale and limited mode remain clear and consistent with app disclosure | Required | meaning drift between app and website copy | `localization` + `macos-core` |
 | Idle alert copy | KR | `idle_notice`, `gentle_warning`, `strong_warning` 노출 | 모든 단계가 과하게 위협적으로 보이지 않고, 동일 세션 내 반복 문구가 과도하지 않음 | Required | tone drift, repeated copy fatigue | `content-strategist` |
-| Idle alert copy | EN | same alert ladder in English | sentence length remains short enough for alert overlays and TTS previews | Required | truncation, overly literal translation | `localization` + `content-strategist` |
+| Idle alert copy | EN | same alert ladder in English | sentence length remains short enough for alert overlays and notification copy | Required | truncation, overly literal translation | `localization` + `content-strategist` |
 | Break suggestion | KR | 반복 오탐 감지 시 breakSuggestion 노출 | 휴식 제안 문구가 비난 톤 없이 표시되고, KR/EN 의미가 일치함 | Required | tone drift, missing copy | `content-strategist` + `localization` |
 | Break suggestion | EN | repeated false-positive triggers breakSuggestion | break suggestion copy is neutral, short, and meaning-matched with KR | Required | literal translation, truncation | `content-strategist` + `localization` |
-| TTS short lines | KR | alert 단계에서 TTS 문구 재생 | 한 문장만 발화되고, locale이 한국어일 때 한국어 음성이 사용됨 | Optional for screenshot; audio QA required | wrong voice locale, long utterance | `content-strategist` + `qa-integrator` |
-| TTS short lines | EN | alert 단계에서 TTS 문구 재생 | English TTS is selected and speech ends before user activity resumes | Optional for screenshot; audio QA required | locale mismatch, speech queue overlap | `content-strategist` + `qa-integrator` |
+| Notification copy | KR | alert 단계에서 3차 시스템 알림이 표시된다 | title/body가 한국어로 표시되고 짧은 문구가 잘리지 않는다 | Optional for screenshot; notification QA required | wrong locale, long body copy | `content-strategist` + `qa-integrator` |
+| Notification copy | EN | alert 단계에서 3차 시스템 알림이 표시된다 | English notification copy is selected and delivered content remains concise | Optional for screenshot; notification QA required | locale mismatch, duplicate delivery | `content-strategist` + `qa-integrator` |
 | Upgrade / Pro copy | KR | Free/Pro 비교, 업그레이드 CTA 표시 | Free/Pro 명칭이 용어집과 일치하고, Pro 가치가 Mac+iPhone 루프로 이해됨 | Required | Pro value blur, pricing confusion | `marketing-strategist` |
 | Upgrade / Pro copy | EN | Free/Pro comparison and upgrade CTA | terminology stays consistent with glossary and does not imply real-time guarantee | Required | unsupported sync promise | `marketing-strategist` |
 | Privacy disclosure | KR | onboarding/settings/privacy section 표시 | 키 입력 내용, 화면 캡처, 브라우징 기록 미수집 문구가 앱 고지와 일치함 | Required | trust regression, compliance mismatch | `localization` + `macos-core` |
@@ -50,7 +50,7 @@
 - Truncation: titles, CTA, permission text, and FAQ answers must fit within the target layout without mid-word clipping.
 - Fallback: missing locale must fall back to English, but placeholder text must never be visible.
 - Plural/variation: quantity-sensitive strings must use String Catalog variation or locale-safe wording.
-- TTS locale: spoken language must match the visible locale unless explicitly overridden by system settings.
+- Notification locale: visible notification copy must match the active app locale.
 - Metadata parity: App Store, launch website, and in-app privacy copy must match on meaning.
 - Permission/privacy wording consistency: Accessibility and data disclosure language must be identical in intent across all surfaces.
 
@@ -82,11 +82,11 @@
 - Verify repeated alert phrases rotate across approved variants.
 - Verify streak and summary text remain natural in both locales.
 
-### 5.5 TTS Locale
+### 5.5 Notification Locale
 
-- Verify KR alert path speaks Korean.
-- Verify EN alert path speaks English.
-- Verify speech queue cancels on input recovery.
+- Verify KR alert path shows Korean notification copy.
+- Verify EN alert path shows English notification copy.
+- Verify pending notifications are cleared on input recovery.
 
 ### 5.6 Metadata and Trust
 
@@ -100,7 +100,7 @@
 - User-facing hardcoded strings in launch scope: 0
 - Critical KR/EN truncation regressions: 0
 - Privacy wording mismatches: 0
-- TTS locale mismatches: 0
+- Notification locale mismatches: 0
 - App Store/web metadata drift: 0
 
 ## 7. Notes for Execution

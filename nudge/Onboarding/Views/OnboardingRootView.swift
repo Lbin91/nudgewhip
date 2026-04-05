@@ -116,7 +116,6 @@ struct OnboardingRootView: View {
             BasicSetupStepView(
                 idleThresholdSeconds: $viewModel.idleThresholdSeconds,
                 launchAtLoginEnabled: $viewModel.launchAtLoginEnabled,
-                ttsEnabled: $viewModel.ttsEnabled,
                 countdownOverlayEnabled: $viewModel.countdownOverlayEnabled,
                 preferredLanguage: $viewModel.preferredLanguage
             )
@@ -137,7 +136,6 @@ struct OnboardingRootView: View {
                 idleThresholdText: idleThresholdText,
                 scheduleText: scheduleText,
                 launchAtLoginText: toggleText(viewModel.launchAtLoginEnabled),
-                ttsText: toggleText(viewModel.ttsEnabled),
                 overlayText: toggleText(viewModel.countdownOverlayEnabled),
                 languageText: viewModel.preferredLanguage.displayName
             )

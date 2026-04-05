@@ -1,7 +1,7 @@
 // UserSettings.swift
 // 사용자 설정을 저장하는 SwiftData 모델.
 //
-// 유휴 임계값, 알림·TTS 설정, Pro 잠금 해제, 펫 표시 모드 등을 관리한다.
+// 유휴 임계값, 알림 설정, Pro 잠금 해제, 펫 표시 모드 등을 관리한다.
 // preferredLocaleIdentifier로 로컬라이즈 언어 설정도 보관한다.
 
 import Foundation
@@ -17,10 +17,8 @@ final class UserSettings {
     var idleThresholdSeconds: Int
     var gentleAlertLeadSeconds: Int
     var strongAlertLeadSeconds: Int
-    var ttsLeadSeconds: Int
     var alertsPerHourLimit: Int
-    var ttsPerHourLimit: Int
-    var ttsEnabled: Bool
+    var notificationNudgePerHourLimit: Int
     var breakSuggestionEnabled: Bool
     var proUnlocked: Bool
     var preferredLocaleIdentifier: String?
@@ -43,10 +41,8 @@ final class UserSettings {
         idleThresholdSeconds: Int = 300,
         gentleAlertLeadSeconds: Int = 30,
         strongAlertLeadSeconds: Int = 60,
-        ttsLeadSeconds: Int = 90,
         alertsPerHourLimit: Int = 6,
-        ttsPerHourLimit: Int = 2,
-        ttsEnabled: Bool = true,
+        notificationNudgePerHourLimit: Int = 2,
         breakSuggestionEnabled: Bool = true,
         proUnlocked: Bool = false,
         preferredLocaleIdentifier: String? = AppLanguage.english.rawValue,
@@ -61,10 +57,8 @@ final class UserSettings {
         self.idleThresholdSeconds = idleThresholdSeconds
         self.gentleAlertLeadSeconds = gentleAlertLeadSeconds
         self.strongAlertLeadSeconds = strongAlertLeadSeconds
-        self.ttsLeadSeconds = ttsLeadSeconds
         self.alertsPerHourLimit = alertsPerHourLimit
-        self.ttsPerHourLimit = ttsPerHourLimit
-        self.ttsEnabled = ttsEnabled
+        self.notificationNudgePerHourLimit = notificationNudgePerHourLimit
         self.breakSuggestionEnabled = breakSuggestionEnabled
         self.proUnlocked = proUnlocked
         self.preferredLocaleIdentifier = preferredLocaleIdentifier

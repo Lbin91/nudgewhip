@@ -35,12 +35,11 @@
 - [x] `nudge/Services/AlertManager.swift` 작성
 - [x] `perimeterPulse` 1차 시각 넛지 구현
 - [x] `strongVisualNudge` 2차 시각 넛지 구현
-- [x] system notification 기반 3차 임시 알림 구현 (`ttsNudge` 임시 대체)
-- [ ] `ttsNudge` 3차 알림 구현
-- [ ] TTS 큐 중첩 금지 구현
-- [ ] 복귀 시 TTS 즉시 cancel 구현
+- [x] system notification 기반 3차 알림 구현
+- [ ] 3차 시스템 알림 중복 발행 방지 구현
+- [ ] 복귀 시 pending notification 즉시 cancel 검증
 - [x] 시간당 최대 알림 횟수 제한 구현
-- [x] 시간당 TTS 최대 횟수 제한 구현
+- [x] 시간당 3차 알림 최대 횟수 제한 구현
 - [ ] 복귀 직후 cooldown 구현
 - [ ] 동일 문구 연속 반복 금지 창 구현
 - [ ] `RemoteEscalation` 비활성 유지 가드 구현
@@ -68,7 +67,7 @@
 
 ### E. Localization / Copy Runtime
 
-- [ ] TTS 핵심 문구 locale 매핑 구현
+- [ ] 3차 알림 핵심 문구 locale 매핑 구현
 - [ ] 온보딩 / 메뉴바 / 알림 신규 문자열의 `.xcstrings` 정리 및 stale key 정리
 
 ### F. Free Stats / Summary Completion
@@ -134,7 +133,6 @@
 - [x] `EventMonitor` injectable 구현 및 테스트 추가
 - [x] `PermissionProvider` injectable 구현 및 테스트 추가
 - [x] `FrontmostAppProvider` injectable 구현 및 테스트 추가
-- [ ] `SpeechSynthesizer` injectable 구현 및 테스트 추가
 - [ ] `CloudKitClient` injectable 구현 및 테스트 추가
 
 ### L. Behavior Tests
@@ -153,7 +151,7 @@
 - [ ] EN 메뉴바 핵심 화면 스크린샷 검증
 - [ ] KR/EN truncation 0 달성
 - [ ] App/웹 용어집 일치 검증
-- [ ] TTS locale mismatch 0 검증
+- [ ] 알림 문구 locale mismatch 0 검증
 - [ ] privacy wording mismatch 0 검증
 - [ ] App Store metadata drift 0 검증
 - [ ] user-facing hardcoded strings 0 검증

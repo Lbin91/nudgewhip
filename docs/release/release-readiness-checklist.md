@@ -57,7 +57,7 @@
 | Launch scope strings exist in `ko` and `en` | [ ] | [ ] | translation status review | missing launch-scope key is a blocker |
 | No user-facing hardcoded strings remain in launch scope | [ ] | [ ] | string audit | hardcoded copy is a blocker |
 | KR/EN screenshots reviewed for truncation | [ ] | [ ] | screenshot matrix | critical truncation is a blocker |
-| TTS lines exist in both supported locales | [ ] | [ ] | copy review | unsupported TTS locale is a blocker |
+| Notification copy exists in both supported locales | [ ] | [ ] | copy review | unsupported notification locale is a blocker |
 | App and web terminology match glossary | [ ] | [ ] | glossary check | terminology drift is a blocker |
 
 ### 3.5 Privacy
@@ -169,4 +169,3 @@
 - `data-architect`: 데이터 정합성 및 마이그레이션 안전성 확인
 - `content-strategist`: 알림 문구, 톤, break suggestion 카피 검증
 - `marketing-strategist`: 웹 카피, App Store 메타데이터, 가격 카피 검증
-

@@ -19,7 +19,7 @@
 - 알림은 입력 복귀를 최우선 종료 조건으로 가진다.
 - 알림 단계는 누적되어도 과도하게 반복되지 않아야 한다.
 - 시각 알림은 색상만으로 상태를 전달하지 않는다.
-- TTS는 보조 채널이며 기본 채널이 아니다.
+- 3차 시스템 알림은 보조 채널이며 기본 채널이 아니다.
 
 ## 3. Taxonomy
 
@@ -29,7 +29,7 @@
 |---|---|---|
 | `perimeterPulse` | 1차 시각 넛지 | 현재 디스플레이 테두리 |
 | `strongVisualNudge` | 2차 시각 넛지 | 더 강한 테두리/오버레이 |
-| `ttsNudge` | 짧은 음성 넛지 | 시스템 음성 합성 |
+| `notificationNudge` | 3차 시스템 알림 | 로컬 시스템 알림 |
 | `remoteEscalation` | Pro용 원격 에스컬레이션 | iOS companion notification |
 | `breakSuggestion` | 반복 오탐 완화 안내 | 메뉴바/설정 UI |
 
@@ -53,7 +53,7 @@
 - 권장 기본 간격은 다음과 같다.
 - 1차: idle threshold 도달 즉시 `perimeterPulse`
 - 2차: 추가 45~60초 무입력 시 `strongVisualNudge`
-- 3차: 추가 60~90초 무입력 시 `ttsNudge`
+- 3차: 추가 60~90초 무입력 시 `notificationNudge`
 - 4차: 장기 미복귀 시 `remoteEscalation`
 
 ### 4.3 Pause and Suppression
@@ -68,7 +68,7 @@
 
 ### 5.1 Escalation Order
 
-- `perimeterPulse` -> `strongVisualNudge` -> `ttsNudge` -> `remoteEscalation`
+- `perimeterPulse` -> `strongVisualNudge` -> `notificationNudge` -> `remoteEscalation`
 - `remoteEscalation`은 Pro에서만 활성화한다.
 - `grayscale`은 기본 단계가 아니며, 고강도 실험 옵션으로만 취급한다.
 
@@ -81,7 +81,7 @@
 ### 5.3 Fatigue Guardrails
 
 - 시간당 최대 알림 횟수를 제한한다.
-- 시간당 TTS 횟수를 별도로 제한한다.
+- 시간당 3차 알림 횟수를 별도로 제한한다.
 - 동일 문구 연속 반복 금지 창을 둔다.
 - 입력 복귀 직후 일정 시간은 재알림을 금지한다.
 - 반복 오탐이 발생하면 `breakSuggestion`을 노출한다.
@@ -91,7 +91,7 @@
 - 비난, 경고, 처벌 느낌의 단어를 피한다.
 - 짧고 관찰형 문장을 사용한다.
 - 문구는 행동 유도 중심이어야 한다.
-- TTS 문구는 1문장, 1회, 1톤으로 고정한다.
+- 3차 시스템 알림 문구는 짧은 1회성 문장으로 고정한다.
 
 ### 6.1 Good Examples
 
@@ -124,7 +124,7 @@
 
 - 구현은 알림 상태를 코드상 enum으로 고정하고, 단계별 카피 슬롯을 분리해야 한다.
 - 알림 종류는 UI와 로직이 섞이지 않도록 presentation layer와 trigger layer를 분리해야 한다.
-- TTS 호출은 큐 중첩을 금지하고, 입력 복귀 시 즉시 cancel 가능해야 한다.
+- 3차 시스템 알림은 중복 발행을 금지하고, 입력 복귀 시 즉시 정리 가능해야 한다.
 
 ## 10. Notification Type — Dialogue Slot Mapping
 
@@ -135,10 +135,10 @@
 |---|---|---|---|
 | `perimeterPulse` | `idle_notice` | cheer (mild) | `GentleNudge`에 해당하는 1차 시각 넛지 |
 | `strongVisualNudge` | `strong_warning` | concern (mild) + cheer | `StrongNudge`에 해당하는 2차 강화 넛지 |
-| `ttsNudge` | `tts_line` | cheer (active) | 음성 보조 채널 |
+| `notificationNudge` | `notification_line` | cheer (active) | 시스템 알림 보조 채널 |
 | `remoteEscalation` | `remote_escalation` | concern (mild) | iOS 원격 에스컬레이션 |
 | `breakSuggestion` | `break_suggestion` | sleep | 민감도 조정 또는 숨 고르기 제안 |
 | (복귀 감지 시) | `recovery_cheer` | happy (strong) | 복귀 축하 |
 
-- `recovery_cheer` 슬롯은 `dialogue-pool.md`의 `recovery` 슬롯에 대응하며, 복귀 감지 시 자동 발화한다.
+- `recovery_cheer` 슬롯은 `dialogue-pool.md`의 `recovery` 슬롯에 대응하며, 복귀 감지 시 자동으로 연결된다.
 - `gentle_warning`은 별도 1.5차 단계가 아니라 `perimeterPulse`의 richer surface variation으로만 사용한다.
