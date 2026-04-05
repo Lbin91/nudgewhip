@@ -34,19 +34,36 @@ final class PetState {
     var lastFocusSessionEndedAt: Date?
     var updatedAt: Date
     var hatchStage: PetHatchStage {
-        get { PetHatchStage(rawValue: hatchStageRawValue) ?? .egg }
+        get { PetHatchStage(rawValue: hatchStageRawValue) ?? .hatched }
         set { hatchStageRawValue = newValue.rawValue }
     }
     var characterType: PetCharacterType {
         get { PetCharacterType(rawValue: characterTypeRawValue) ?? .partyMask }
         set { characterTypeRawValue = newValue.rawValue }
     }
+
+    /// 다른 worktree에서 남은 species 기반 호출과의 호환 레이어
+    var species: String {
+        switch characterType {
+        case .partyMask:
+            return "cowboy"
+        case .rat:
+            return "rat"
+        case .ox:
+            return "ox"
+        case .tiger:
+            return "tiger"
+        case .rabbit:
+            return "rabbit"
+        }
+    }
+
     var emotion: PetEmotion {
         get { PetEmotion(rawValue: emotionRawValue) ?? .sleep }
         set { emotionRawValue = newValue.rawValue }
     }
     init(
-        hatchStage: PetHatchStage = .egg,
+        hatchStage: PetHatchStage = .hatched,
         characterType: PetCharacterType = .partyMask,
         emotion: PetEmotion = .sleep,
         experiencePoints: Int = 0,

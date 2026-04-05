@@ -4,6 +4,7 @@
 // UserSettings와 PetState의 기본 인스턴스를 생성해
 // 빈 SwiftData 저장소에 삽입한다.
 
+import Foundation
 import SwiftData
 
 enum NudgeDataBootstrap {
@@ -17,7 +18,13 @@ enum NudgeDataBootstrap {
         
         let petStates = try context.fetch(FetchDescriptor<PetState>())
         if petStates.isEmpty {
-            context.insert(PetState())
+            context.insert(PetState(hatchStage: .hatched, characterType: .partyMask))
+        } else {
+            for petState in petStates where petState.hatchStage == .egg {
+                petState.hatchStage = .hatched
+                petState.characterType = .partyMask
+                petState.updatedAt = .now
+            }
         }
         
         try context.save()
