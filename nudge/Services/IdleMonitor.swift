@@ -213,13 +213,27 @@ final class IdleMonitor {
     
     /// 화이트리스트 앱 매칭 상태 설정
     func setWhitelistMatched(_ matched: Bool, at date: Date = .now) {
+        // CRITICAL NON-REGRESSION:
+        // `MenuBarViewModel.refreshMenuSnapshot()` reapplies whitelist apps on every
+        // session/model refresh. If this path handles an unchanged `false -> false`
+        // state, it re-enters `beginSession()`, which fires `onSessionUpdated`,
+        // which immediately refreshes the menu snapshot again.
+        //
+        // That loop pegs CPU, floods SwiftData with redundant session churn, and can
+        // block MenuBarExtra from ever becoming visible at launch.
+        guard runtimeStateController.snapshot.whitelistMatched != matched else { return }
+
         runtimeStateController.handle(matched ? .whitelistMatched : .whitelistUnmatched, at: date)
         scheduleAlertSync()
         
         if matched {
             sessionTracker?.endSession(reason: .whitelistPause, at: date)
             cancelMonitoringDeadlines()
-        } else {
+        // Only resume the session when the resolved post-whitelist state is truly
+        // `monitoring`. Clearing a whitelist match while permission is denied,
+        // manual pause is active, schedule pause is active, or the app is suspended
+        // must stay quiescent.
+        } else if runtimeStateController.snapshot.runtimeState == .monitoring {
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
         }
