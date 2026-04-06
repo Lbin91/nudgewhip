@@ -19,9 +19,27 @@ struct ContentView: View {
             onOpenOnboarding: onOpenOnboarding,
             onQuit: onQuit
         )
-        .padding(16)
-        .frame(width: 320)
+        .padding(NudgeSpacing.s3)
+        .frame(width: NudgeLayout.popoverWidth)
+        .background(popoverSurface)
+        .clipShape(RoundedRectangle(cornerRadius: NudgeRadius.popover, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: NudgeRadius.popover, style: .continuous)
+                .stroke(Color.nudgeStrokeDefault, lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.08), radius: 18, y: 6)
         .trackMenuPresentation(using: menuBarViewModel)
+    }
+
+    private var popoverSurface: some View {
+        LinearGradient(
+            colors: [
+                Color.nudgeBgCanvas,
+                Color.nudgeBgSurfaceAlt.opacity(0.92)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }
 

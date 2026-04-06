@@ -1,9 +1,13 @@
 # Nudge Design System
 
 - Version: 0.1
-- Last Updated: 2026-04-02
+- Last Updated: 2026-04-06
 - Owner: `visual-designer`
 - Scope: product UI, menu bar surfaces, alerts, landing page visual direction
+
+## Related Surface Specs
+
+- [menu-bar-popover-redesign.md](./menu-bar-popover-redesign.md)
 
 ## 1. Design Direction
 

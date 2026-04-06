@@ -33,11 +33,11 @@ extension Color {
 
     static let nudgeTextPrimary = adaptive(light: "#141A21", dark: "#F5F7FA")
     static let nudgeTextSecondary = adaptive(light: "#596273", dark: "#A7B0BF")
-    static let nudgeTextMuted = adaptive(light: "#7B8596", dark: "#758095")
+    static let nudgeTextMuted = adaptive(light: "#5F6D82", dark: "#758095")
 
-    static let nudgeFocus = adaptive(light: "#1E8E7E", dark: "#47C4B0")
+    static let nudgeFocus = adaptive(light: "#167A6C", dark: "#47C4B0")
     static let nudgeRest = adaptive(light: "#5C7E52", dark: "#8CBB7E")
-    static let nudgeAlert = adaptive(light: "#E35D3D", dark: "#FF8A68")
+    static let nudgeAlert = adaptive(light: "#B84525", dark: "#FF8A68")
     static let nudgeAccent = adaptive(light: "#D8A23A", dark: "#F2C86A")
 
     static let nudgeStrokeDefault = adaptive(light: "#D7D0C6", dark: "#2A3440")

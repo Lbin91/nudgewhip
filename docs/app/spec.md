@@ -1,7 +1,7 @@
 # NudgeWhip Product & Technical Spec vNext
 
 - Version: vNext (draft-1)
-- Last Updated: 2026-04-02
+- Last Updated: 2026-04-06
 - Supersedes: 초기 PRD 초안
 
 ## 1. Product Definition
@@ -103,6 +103,7 @@
 
 ### 7.1 Menu Bar IA
 
+- Detailed redesign contract: [menu-bar-popover-redesign.md](../design/menu-bar-popover-redesign.md)
 - Top: 현재 상태 + 남은 시간/카운트다운
 - Middle: 빠른 제어 (임계시간, 스케줄, 상단 오버레이)
 - Bottom: 펫 요약 + 오늘 요약 통계
