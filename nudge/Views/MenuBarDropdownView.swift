@@ -120,14 +120,15 @@ struct MenuBarDropdownView: View {
                         .font(.subheadline.weight(.semibold))
                 }
             }
-            .frame(maxWidth: .infinity)
             .padding(.vertical, 11)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(
+                Color.nudgeBgSurfaceAlt,
+                in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous))
         }
         .buttonStyle(.plain)
-        .background(
-            Color.nudgeBgSurfaceAlt,
-            in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous)
-        )
         .foregroundStyle(Color.nudgeTextPrimary)
     }
 
@@ -148,12 +149,13 @@ struct MenuBarDropdownView: View {
 
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
             .padding(.horizontal, NudgeSpacing.s4)
             .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(tint, in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous))
         }
         .buttonStyle(.plain)
-        .background(tint, in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous))
         .foregroundStyle(foreground)
     }
 
@@ -192,6 +194,7 @@ struct MenuBarDropdownView: View {
             }
             .padding(.horizontal, NudgeSpacing.s4)
             .padding(.vertical, 13)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
