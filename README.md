@@ -19,11 +19,13 @@
 
 <p align="center">
   NudgeWhip is a privacy-first macOS menu bar app for serious desktop work.<br />
-  It catches the quiet moment when your hands stop moving, your attention slips, and your work starts to drift, then pulls you back before a short pause turns into a lost hour.
+  It detects the moment attention drifts, then helps you return before a short pause becomes a lost hour.
 </p>
 
 <p align="center">
   <a href="docs/release/v0.1.0.md"><strong>Release Notes</strong></a>
+  ·
+  <a href="docs/release/v0.1.0-rc-checklist.md"><strong>RC Checklist</strong></a>
   ·
   <a href="docs/privacy/accessibility-and-data-disclosure.md"><strong>Privacy</strong></a>
   ·
@@ -34,47 +36,62 @@
 
 ## Why NudgeWhip
 
-Most focus tools do one of two things:
+Most focus tools drift toward one of two extremes:
 
 - they politely whisper and get ignored
-- they turn into full-blown blockers and create friction
+- they escalate into blockers and create friction
 
 NudgeWhip sits in the middle.
 
-It is built as a crisp recovery tool for people who already spend their day inside demanding Mac workflows: developers, designers, writers, founders, researchers, and anyone whose job depends on getting back into flow fast.
-
-The idea is simple:
+It is an `attention recall tool`: a local intervention layer for people whose work already lives inside demanding Mac workflows. The core idea is simple:
 
 - drifting is normal
 - recovery is the moment that matters
 - the intervention should be immediate, clear, and local
 
-## What You Get In `v0.1.0`
+## Release Status
 
-This public beta already includes a real working core loop:
+`v0.1.0` is the first public beta for the macOS core loop.
 
-- menu bar app with no Dock icon
-- Accessibility permission onboarding
-- visible limited mode when permission is denied
+Current release lane:
+
+- `macOS-only`
+- `source-first GitHub release`
+- `Free core loop only`
+
+Not in scope for `v0.1.0`:
+
+- iPhone companion app
+- CloudKit sync
+- Pro packaging
+- richer exception handling and advanced whitelist workflows
+- expanded progression systems
+
+## What Ships In `v0.1.0`
+
+This beta already includes a real working loop:
+
+- menu bar app with `LSUIElement` behavior and no Dock icon
+- Accessibility permission onboarding with visible limited-mode fallback
 - global idle detection from keyboard and mouse activity
 - one-shot idle deadlines instead of noisy polling
 - local visual nudges
 - system notification escalation
 - runtime status and countdown in the dropdown
+- manual pause controls in the dropdown
 - schedule controls
 - local daily summary stats
-- settings window
-- launch at login
-- Korean and English strings
+- settings window and launch-at-login toggle
+- Korean and English localization
 
 ## Screenshot
 
 <p align="center">
-  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip macOS launch surface" width="1100" />
+  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip macOS menu bar surface" width="1100" />
 </p>
 
 <p align="center">
-  <em>Current beta launch surface captured from the UI test run.</em>
+  <em>Current menu bar release candidate surface.</em>
 </p>
 
 ## What Makes It Different
@@ -91,69 +108,59 @@ Accessibility permission is used only to detect global input activity. NudgeWhip
 
 This is not a punishment machine. It is an intervention layer designed to shorten the distance between distraction and return.
 
-## Current Product Scope
-
-### In the public beta
-
-- menu bar runtime status
-- Accessibility permission setup
-- local idle detection
-- local alert flow
-- schedule-based pause windows
-- daily stats
-- local settings
-
-### Planned next
-
-- iPhone companion flow
-- CloudKit sync
-- richer exception handling
-- more advanced whitelist and break behavior
-- expanded feedback systems
-
-Future scope is intentionally kept separate from the current beta promise.
-
-## Privacy Notes
+## Privacy At A Glance
 
 NudgeWhip draws a hard line:
 
-- it uses global input activity
-- it does not inspect content
+- it uses global input activity only
+- it does not inspect typed text or screen contents
+- it does not store raw input logs
 - it stores summary data locally
-- it avoids raw input logging
+- it keeps local app state in `SwiftData`
 
 Full disclosure: [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md)
 
-## Build From Source
+## Build And Verify
 
-Current install path is source-first.
+Requirements:
+
+- macOS `15.0+`
+- Xcode `17+`
+
+Build the app:
 
 ```bash
 xcodebuild build -scheme nudge -destination 'platform=macOS'
 ```
 
-Run the full suite:
+Run static analysis:
 
 ```bash
-xcodebuild test -scheme nudge -destination 'platform=macOS'
+xcodebuild analyze -scheme nudge -destination 'platform=macOS'
 ```
 
-Run only UI tests:
+Run unit and runtime tests:
+
+```bash
+xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeTests
+```
+
+Run UI tests:
 
 ```bash
 xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeUITests
 ```
 
-## Requirements
+Note:
 
-- macOS `15.0+`
-- Xcode `17+`
+- menu bar agent UI tests are more timing-sensitive than standard foreground app UI tests
+- release verification steps are tracked in [docs/release/v0.1.0-rc-checklist.md](docs/release/v0.1.0-rc-checklist.md)
 
 ## Technical Shape
 
 Core stack:
 
-- `SwiftUI` for menu bar and settings UI
+- `SwiftUI` for menu bar, onboarding, and settings UI
 - `AppKit` for global event monitoring and alert/panel coordination
 - `SwiftData` for local persistence
 
@@ -171,8 +178,15 @@ nudge/
 ├── nudge/                  # app source
 ├── nudgeTests/             # unit and runtime tests
 ├── nudgeUITests/           # UI tests
-└── docs/                   # product, architecture, privacy, and release notes
+└── docs/                   # product, architecture, privacy, QA, and release docs
 ```
+
+## Documentation Map
+
+- [docs/release/v0.1.0.md](docs/release/v0.1.0.md): public beta release notes
+- [docs/release/v0.1.0-rc-checklist.md](docs/release/v0.1.0-rc-checklist.md): release candidate execution checklist
+- [docs/release/release-readiness-checklist.md](docs/release/release-readiness-checklist.md): release gate matrix
+- [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md): permission and data disclosure
 
 ## Beta Reality
 
@@ -182,7 +196,7 @@ It is an active public-beta / portfolio-stage product:
 
 - the core loop is real
 - the app builds and runs
-- the design direction is intentional
+- the release process is documented
 - the surface area is still tightening
 
 ## License
