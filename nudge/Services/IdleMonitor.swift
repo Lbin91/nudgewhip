@@ -39,6 +39,7 @@ final class IdleMonitor {
     private var cooldownWorkItem: DispatchWorkItem?
     private var scheduleBoundaryWorkItem: DispatchWorkItem?
     private var manualPauseResumeWorkItem: DispatchWorkItem?
+    private var alertSyncWorkItem: DispatchWorkItem?
     
     /// IdleMonitor 생성. 권한·상태·이벤트 모니터 주입 가능 (기본값 제공)
     init(
@@ -508,9 +509,14 @@ final class IdleMonitor {
     
     /// alert side effects는 이벤트 핸들러에서 바로 무겁게 수행하지 않도록 비동기로 동기화
     private func scheduleAlertSync() {
-        let snapshot = runtimeStateController.snapshot
-        Task { @MainActor [alertManager] in
-            alertManager?.handle(snapshot: snapshot)
+        alertSyncWorkItem?.cancel()
+
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.alertManager?.handle(snapshot: self.runtimeStateController.snapshot)
         }
+
+        alertSyncWorkItem = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: workItem)
     }
 }

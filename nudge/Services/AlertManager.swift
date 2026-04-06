@@ -40,14 +40,17 @@ final class AlertSoundPlayer: AlertSoundPlaying {
     ]
     private var pendingWorkItems: [DispatchWorkItem] = []
     private var activeSounds: [ObjectIdentifier: NSSound] = [:]
+    private var generation = 0
 
     func play(named soundName: String, repeatCount: Int, interval: TimeInterval) {
+        generation += 1
+        let playGeneration = generation
         stopAll()
         guard repeatCount > 0 else { return }
 
         for index in 0..<repeatCount {
             let workItem = DispatchWorkItem { [weak self] in
-                self?.playNow(named: soundName)
+                self?.playNow(named: soundName, generation: playGeneration)
             }
             pendingWorkItems.append(workItem)
             DispatchQueue.main.asyncAfter(deadline: .now() + (interval * Double(index)), execute: workItem)
@@ -55,6 +58,7 @@ final class AlertSoundPlayer: AlertSoundPlaying {
     }
 
     func stopAll() {
+        generation += 1
         pendingWorkItems.forEach { $0.cancel() }
         pendingWorkItems.removeAll()
 
@@ -64,7 +68,8 @@ final class AlertSoundPlayer: AlertSoundPlaying {
         activeSounds.removeAll()
     }
 
-    private func playNow(named soundName: String) {
+    private func playNow(named soundName: String, generation: Int) {
+        guard generation == self.generation else { return }
         guard let sound = makeSound(named: soundName) else { return }
 
         let soundIdentifier = ObjectIdentifier(sound)
@@ -74,6 +79,7 @@ final class AlertSoundPlayer: AlertSoundPlaying {
         let cleanupDelay = max(sound.duration, customSoundDurationByName[soundName] ?? 0.5) + 0.1
         DispatchQueue.main.asyncAfter(deadline: .now() + cleanupDelay) { [weak self, weak sound] in
             guard let self, let sound else { return }
+            guard generation == self.generation else { return }
             self.activeSounds.removeValue(forKey: ObjectIdentifier(sound))
         }
     }

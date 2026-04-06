@@ -312,6 +312,20 @@ struct nudgeTests {
         snapshot = RuntimeStateReducer.reduce(snapshot, event: .cooldownExpired, at: baseDate.addingTimeInterval(661))
         #expect(snapshot.contentState == .focus)
     }
+
+    @MainActor
+    @Test
+    func runtimeStateControllerCapsTransitionLogGrowth() {
+        let controller = RuntimeStateController()
+
+        for index in 0..<1_200 {
+            controller.handle(.userActivityDetected, at: Date(timeIntervalSince1970: TimeInterval(index)))
+        }
+
+        #expect(controller.transitionLog.count == 700)
+        #expect(controller.transitionLog.first?.occurredAt == Date(timeIntervalSince1970: 500))
+        #expect(controller.transitionLog.last?.occurredAt == Date(timeIntervalSince1970: 1_199))
+    }
     
     @MainActor
     @Test
@@ -552,6 +566,34 @@ struct nudgeTests {
                 eventType: .flagsChanged,
                 now: now,
                 lastMenuTrackingLocalEventAt: lastLocalEventAt
+            )
+        )
+    }
+
+    @Test
+    func systemEventMonitorSkipsGlobalEventsWhenAppWindowIsActive() {
+        #expect(
+            !SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .keyDown,
+                isAppActive: true,
+                hasActiveWindow: true,
+                isLocalEvent: false
+            )
+        )
+        #expect(
+            SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .keyDown,
+                isAppActive: true,
+                hasActiveWindow: true,
+                isLocalEvent: true
+            )
+        )
+        #expect(
+            SystemEventMonitor.shouldTreatEventAsActivity(
+                eventType: .keyDown,
+                isAppActive: false,
+                hasActiveWindow: false,
+                isLocalEvent: false
             )
         )
     }

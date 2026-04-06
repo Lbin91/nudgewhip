@@ -115,6 +115,10 @@ final class SystemEventMonitor: EventMonitoring {
         if isLocalEvent && !hasActiveWindow {
             return false
         }
+
+        if !isLocalEvent && isAppActive && hasActiveWindow {
+            return false
+        }
         
         return true
     }

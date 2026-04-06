@@ -209,6 +209,9 @@ enum RuntimeStateReducer {
 @MainActor
 @Observable
 final class RuntimeStateController {
+    private static let transitionLogSoftLimit = 1_000
+    private static let transitionLogTrimCount = 500
+
     private(set) var snapshot: RuntimeSnapshot
     private(set) var transitionLog: [RuntimeTransitionLogEntry]
     
@@ -221,5 +224,8 @@ final class RuntimeStateController {
     func handle(_ event: NudgeRuntimeEvent, at date: Date = .now) {
         snapshot = RuntimeStateReducer.reduce(snapshot, event: event, at: date)
         transitionLog.append(RuntimeTransitionLogEntry(event: event, snapshot: snapshot, occurredAt: date))
+        if transitionLog.count > Self.transitionLogSoftLimit {
+            transitionLog.removeFirst(Self.transitionLogTrimCount)
+        }
     }
 }
