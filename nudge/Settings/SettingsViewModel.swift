@@ -15,6 +15,7 @@ final class SettingsViewModel {
     private(set) var launchAtLoginEnabled: Bool
     private(set) var idleThresholdSecondsValue: Int
     private(set) var countdownOverlayEnabledValue: Bool
+    private(set) var soundThemeValue: SoundTheme
     private(set) var preferredLanguage: AppLanguage
     private(set) var errorMessage: String?
     
@@ -36,6 +37,7 @@ final class SettingsViewModel {
         let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 300
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
+        self.soundThemeValue = currentSettings?.soundTheme ?? .normal
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
         AppLanguageStore.shared.refresh(from: currentSettings)
         menuBarViewModel.refreshMenuSnapshot()
@@ -102,6 +104,14 @@ final class SettingsViewModel {
         refreshSettingsSnapshot()
     }
 
+    func updateSoundTheme(_ theme: SoundTheme) {
+        soundThemeValue = theme
+        guard let settings else { return }
+        settings.soundTheme = theme
+        settings.updatedAt = .now
+        save(settings)
+    }
+
     func updatePreferredLanguage(_ language: AppLanguage) {
         preferredLanguage = language
         AppLanguageStore.shared.apply(preferredLocaleIdentifier: language.rawValue)
@@ -153,6 +163,7 @@ final class SettingsViewModel {
         let resolvedSettings = settings ?? self.settings
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
+        soundThemeValue = resolvedSettings?.soundTheme ?? soundThemeValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
     }
 }

@@ -81,7 +81,7 @@ final class MenuBarViewModel {
             return nil
         }
 
-        let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()) - 1)
+        let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()))
         if remaining < 60 {
             return "\(remaining)s"
         }
@@ -314,10 +314,13 @@ final class MenuBarViewModel {
         case .hatched:
             petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
         }
-        
         switch petState.characterType {
         case .partyMask:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Ringmaster")
+        case .cowboy:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.cowboy", defaultValue: "Cowboy")
+        case .devil:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.devil", defaultValue: "Little Devil")
         case .catwoman:
             petCharacterText = localizedAppString("menu.dropdown.value.pet_character.catwoman", defaultValue: "Catwoman")
         case .rat:

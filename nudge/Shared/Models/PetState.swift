@@ -12,6 +12,8 @@ enum PetHatchStage: String, Codable, CaseIterable, Sendable {
 
 enum PetCharacterType: String, Codable, CaseIterable, Sendable {
     case partyMask // Ringmaster
+    case cowboy
+    case devil
     case catwoman
     case rat
     case ox
@@ -52,6 +54,10 @@ final class PetState {
         switch characterType {
         case .partyMask:
             return "ringmaster"
+        case .cowboy:
+            return "cowboy"
+        case .devil:
+            return "devil"
         case .catwoman:
             return "catwoman"
         case .rat:

@@ -28,9 +28,9 @@ struct AnimatedASCIICharacterView: View {
 
     private func frameText(_ ascii: String) -> some View {
         Text(ascii)
-            .font(.monospaced(.body)())
+            .font(.monospaced(.caption)())
             .foregroundStyle(Color.nudgeTextPrimary)
-            .lineSpacing(2)
+            .lineSpacing(1)
             .accessibilityLabel("Pet character animation")
     }
 }

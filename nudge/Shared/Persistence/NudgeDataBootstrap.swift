@@ -18,11 +18,12 @@ enum NudgeDataBootstrap {
         
         let petStates = try context.fetch(FetchDescriptor<PetState>())
         if petStates.isEmpty {
-            context.insert(PetState(hatchStage: .hatched, characterType: .partyMask))
+            context.insert(PetState(hatchStage: .hatched, characterType: .devil))
         } else {
-            for petState in petStates where petState.hatchStage == .egg {
+            for petState in petStates {
+                // Ensure devil is the default for now
                 petState.hatchStage = .hatched
-                petState.characterType = .partyMask
+                petState.characterType = .devil
                 petState.updatedAt = .now
             }
         }

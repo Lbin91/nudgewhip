@@ -12,6 +12,11 @@ enum PetPresentationMode: String, Codable, CaseIterable, Sendable {
     case minimal
 }
 
+enum SoundTheme: String, Codable, CaseIterable, Sendable {
+    case normal
+    case whip
+}
+
 @Model
 final class UserSettings {
     var idleThresholdSeconds: Int
@@ -23,6 +28,7 @@ final class UserSettings {
     var proUnlocked: Bool
     var preferredLocaleIdentifier: String?
     var petPresentationRawValue: String
+    var soundThemeRawValue: String
     var countdownOverlayEnabled: Bool
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
@@ -34,6 +40,12 @@ final class UserSettings {
     var petPresentationMode: PetPresentationMode {
         get { PetPresentationMode(rawValue: petPresentationRawValue) ?? .sprout }
         set { petPresentationRawValue = newValue.rawValue }
+    }
+
+    /// 사운드 테마 설정 변환
+    var soundTheme: SoundTheme {
+        get { SoundTheme(rawValue: soundThemeRawValue) ?? .normal }
+        set { soundThemeRawValue = newValue.rawValue }
     }
     
     /// 모든 설정값의 기본값을 제공하는 이니셜라이저
@@ -47,6 +59,7 @@ final class UserSettings {
         proUnlocked: Bool = false,
         preferredLocaleIdentifier: String? = AppLanguage.english.rawValue,
         petPresentationMode: PetPresentationMode = .sprout,
+        soundTheme: SoundTheme = .normal,
         countdownOverlayEnabled: Bool = true,
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,
@@ -63,6 +76,7 @@ final class UserSettings {
         self.proUnlocked = proUnlocked
         self.preferredLocaleIdentifier = preferredLocaleIdentifier
         self.petPresentationRawValue = petPresentationMode.rawValue
+        self.soundThemeRawValue = soundTheme.rawValue
         self.countdownOverlayEnabled = countdownOverlayEnabled
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight

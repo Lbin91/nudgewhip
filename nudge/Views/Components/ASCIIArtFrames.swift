@@ -67,6 +67,10 @@ enum ASCIIArtFrames {
         switch character {
         case .partyMask:
             return ringmasterFrames(emotion: emotion)
+        case .cowboy:
+            return cowboyFrames(emotion: emotion)
+        case .devil:
+            return devilFrames(emotion: emotion)
         case .catwoman:
             return catwomanFrames(emotion: emotion)
         case .rat:
@@ -77,6 +81,68 @@ enum ASCIIArtFrames {
             return tigerFrames(emotion: emotion)
         case .rabbit:
             return rabbitFrames(emotion: emotion)
+        }
+    }
+
+    // MARK: - Devil (꼬마 악마 채찍꾼)
+
+    private static func devilFrames(emotion: PetEmotion) -> [String] {
+        switch emotion {
+        case .happy:
+            return [
+                "  \\^  ^/   \n ( ◕  ◕ )  \n  \\  ◡  / s \n  /|  |\\_//\n (_|  |_)   ",
+                "  \\^  ^/   \n ( ^  ^ )  \n  \\  ▿  / s \n  /|  |\\_//\n (_|  |_)   ",
+                "  \\^  ^/   \n ( >  < )  \n  \\  ⌣  / s \n  /|  |\\_//\n (_|  |_)   "
+            ]
+        case .cheer:
+            return [
+                "  \\^  ^/ ✧ \n ( ✪  ✪ )  \n  \\  ᗜ  / S \n  /|  |\\_//\n (_|  |_)   ",
+                "  \\^  ^/ ★ \n ( >  < )  \n  \\  ㅂ  / S \n  /|  |\\_//\n (_|  |_)   ",
+                "  \\^  ^/ ♪ \n ( ✪  ✪ ) !\n  \\  O  / S \n  /|  |\\_//\n (_|  |_)   "
+            ]
+        case .sleep:
+            return [
+                "  \\^  ^/   \n ( -  - )  \n  \\  ︶  / s \n  /|  |\\_//\n (_|  |_) zZ",
+                "  \\^  ^/   \n ( u  u )  \n  \\  -  / s \n  /|  |\\_//\n (_|  |_) Zz",
+                "  \\^  ^/   \n ( ◡  ◡ )  \n  \\  -  / s \n  /|  |\\_//\n (_|  |_) zZ"
+            ]
+        case .concern:
+            return [
+                "  \\^  ^/   \n ( •  • )  \n  \\  ㅁ  / S \n  /|  |\\_//\n (_|  |_) ??",
+                "  \\^  ^/   \n ( °  ° )  \n  \\  _  / S \n  /|  |\\_//\n (_|  |_) ..",
+                "  \\^  ^/   \n ( •  • )  \n  \\  o  / S \n  /|  |\\_//\n (_|  |_) !!"
+            ]
+        }
+    }
+
+    // MARK: - Cowboy (카우보이 보안관)
+
+    private static func cowboyFrames(emotion: PetEmotion) -> [String] {
+        switch emotion {
+        case .happy:
+            return [
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( ^  ^ ) \n  \\  ◡  /  ",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( ◕  ◕ ) \n  \\  ▽  /  ",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( ◠  ◠ ) \n  \\  ⌣  /  "
+            ]
+        case .cheer:
+            return [
+                "  _  _  _   ✧\n ( `\\/` ) \n(_\\_  _/_)\n ( ✪  ✪ ) \n  \\  ᗜ  /  ☆",
+                "  _  _  _   ★\n ( `\\/` ) \n(_\\_  _/_)\n ( >  < ) \n  \\  ㅂ  /  ✧",
+                "  _  _  _   ♪\n ( `\\/` ) \n(_\\_  _/_)\n ( ^  ^ ) !\n  \\  O  /   ★"
+            ]
+        case .sleep:
+            return [
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( -  - ) \n  \\  ︶  /   zZ",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( u  u ) \n  \\  -  /   Zz",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( ◡  ◡ ) \n  \\  -  /   zZ"
+            ]
+        case .concern:
+            return [
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( •  • ) \n  \\  ㅁ  /   ??",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( °  ° ) \n  \\  _  /   ...",
+                "  _  _  _  \n ( `\\/` ) \n(_\\_  _/_)\n ( •  • ) \n  \\  o  /   !!"
+            ]
         }
     }
 

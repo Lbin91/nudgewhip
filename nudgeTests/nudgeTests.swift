@@ -160,6 +160,26 @@ private final class TestAlertPresenter: AlertPresenting {
 }
 
 @MainActor
+private final class TestAlertSoundPlayer: AlertSoundPlaying {
+    struct PlayCall: Equatable {
+        let soundName: String
+        let repeatCount: Int
+        let interval: TimeInterval
+    }
+
+    private(set) var playCalls: [PlayCall] = []
+    private(set) var stopAllCount = 0
+
+    func play(named soundName: String, repeatCount: Int, interval: TimeInterval) {
+        playCalls.append(PlayCall(soundName: soundName, repeatCount: repeatCount, interval: interval))
+    }
+
+    func stopAll() {
+        stopAllCount += 1
+    }
+}
+
+@MainActor
 private final class TrackingPanel: NSPanel {
     private(set) var orderFrontCount = 0
     private(set) var orderOutCount = 0
@@ -1083,6 +1103,67 @@ struct nudgeTests {
             )
         )
         
+        #expect(notificationManager.deliverCount == 1)
+    }
+
+    @MainActor
+    @Test
+    func alertManagerUsesStableWhipRepeatPlanByVisualStage() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let soundPlayer = TestAlertSoundPlayer()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager,
+            soundPlayer: soundPlayer
+        )
+        alertManager.apply(settings: UserSettings(soundTheme: .whip))
+
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .idleDetected,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 1,
+                lastInputAt: nil
+            )
+        )
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .gentleNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 2,
+                lastInputAt: nil
+            )
+        )
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .strongNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 5,
+                lastInputAt: nil
+            )
+        )
+
+        #expect(soundPlayer.playCalls == [
+            .init(soundName: "cowboy_step1", repeatCount: 1, interval: 2.0),
+            .init(soundName: "cowboy_step1", repeatCount: 2, interval: 2.0),
+            .init(soundName: "cowboy_step1", repeatCount: 3, interval: 2.0)
+        ])
         #expect(notificationManager.deliverCount == 1)
     }
     

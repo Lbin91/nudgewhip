@@ -28,9 +28,84 @@ protocol NotificationNudgeManaging: AnyObject {
 }
 
 @MainActor
+protocol AlertSoundPlaying: AnyObject {
+    func play(named soundName: String, repeatCount: Int, interval: TimeInterval)
+    func stopAll()
+}
+
+@MainActor
+final class AlertSoundPlayer: AlertSoundPlaying {
+    private let customSoundDurationByName: [String: TimeInterval] = [
+        "cowboy_step1": 1.92
+    ]
+    private var pendingWorkItems: [DispatchWorkItem] = []
+    private var activeSounds: [ObjectIdentifier: NSSound] = [:]
+
+    func play(named soundName: String, repeatCount: Int, interval: TimeInterval) {
+        stopAll()
+        guard repeatCount > 0 else { return }
+
+        for index in 0..<repeatCount {
+            let workItem = DispatchWorkItem { [weak self] in
+                self?.playNow(named: soundName)
+            }
+            pendingWorkItems.append(workItem)
+            DispatchQueue.main.asyncAfter(deadline: .now() + (interval * Double(index)), execute: workItem)
+        }
+    }
+
+    func stopAll() {
+        pendingWorkItems.forEach { $0.cancel() }
+        pendingWorkItems.removeAll()
+
+        for sound in activeSounds.values {
+            sound.stop()
+        }
+        activeSounds.removeAll()
+    }
+
+    private func playNow(named soundName: String) {
+        guard let sound = makeSound(named: soundName) else { return }
+
+        let soundIdentifier = ObjectIdentifier(sound)
+        activeSounds[soundIdentifier] = sound
+        sound.play()
+
+        let cleanupDelay = max(sound.duration, customSoundDurationByName[soundName] ?? 0.5) + 0.1
+        DispatchQueue.main.asyncAfter(deadline: .now() + cleanupDelay) { [weak self, weak sound] in
+            guard let self, let sound else { return }
+            self.activeSounds.removeValue(forKey: ObjectIdentifier(sound))
+        }
+    }
+
+    private func makeSound(named soundName: String) -> NSSound? {
+        if let namedSound = NSSound(named: soundName)?.copy() as? NSSound {
+            return namedSound
+        }
+
+        if let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3") {
+            return NSSound(contentsOf: soundURL, byReference: false)
+        }
+
+        if let soundURL = Bundle.main.url(forResource: soundName, withExtension: "mp3", subdirectory: "Sounds") {
+            return NSSound(contentsOf: soundURL, byReference: false)
+        }
+
+        return nil
+    }
+}
+
+private struct AlertSoundPlan: Equatable {
+    let soundName: String
+    let repeatCount: Int
+    let repeatInterval: TimeInterval
+}
+
+@MainActor
 final class AlertManager: AlertManaging {
     private let presenter: AlertPresenting
     private let notificationNudgeManager: NotificationNudgeManaging
+    private let soundPlayer: AlertSoundPlaying
     private let nowProvider: @MainActor () -> Date
     private(set) var activeStyle: AlertVisualStyle?
     private var lastDeliveredNotificationStep = 0
@@ -39,14 +114,17 @@ final class AlertManager: AlertManaging {
     private var alertsPerHourLimit = 6
     private var thirdStagePerHourLimit = 2
     private var currentSpecies: String = "default"
+    private var currentSoundTheme: SoundTheme = .normal
     
     init(
         presenter: AlertPresenting? = nil,
         notificationNudgeManager: NotificationNudgeManaging? = nil,
+        soundPlayer: AlertSoundPlaying? = nil,
         nowProvider: @escaping @MainActor () -> Date = { .now }
     ) {
         self.presenter = presenter ?? PerimeterPulsePresenter()
         self.notificationNudgeManager = notificationNudgeManager ?? NotificationNudgeManager()
+        self.soundPlayer = soundPlayer ?? AlertSoundPlayer()
         self.nowProvider = nowProvider
     }
     
@@ -57,14 +135,20 @@ final class AlertManager: AlertManaging {
         guard let nextStyle = visualStyle(for: snapshot) else {
             guard activeStyle != nil else { return }
             presenter.hide()
+            soundPlayer.stopAll()
             notificationNudgeManager.clearPendingNudges()
             activeStyle = nil
             lastDeliveredNotificationStep = 0
             return
         }
         
-        if activeStyle != nextStyle, canPresentVisualAlert {
-            playSound(for: nextStyle)
+        if activeStyle != nextStyle && canPresentVisualAlert {
+            let soundPlan = Self.soundPlan(for: nextStyle, theme: currentSoundTheme)
+            soundPlayer.play(
+                named: soundPlan.soundName,
+                repeatCount: soundPlan.repeatCount,
+                interval: soundPlan.repeatInterval
+            )
             presenter.show(style: nextStyle)
             activeStyle = nextStyle
             visualAlertTimestamps.append(now)
@@ -82,54 +166,42 @@ final class AlertManager: AlertManaging {
     func apply(settings: UserSettings) {
         alertsPerHourLimit = max(0, settings.alertsPerHourLimit)
         thirdStagePerHourLimit = max(0, settings.notificationNudgePerHourLimit)
+        currentSoundTheme = settings.soundTheme
     }
 
     func update(species: String) {
         self.currentSpecies = species
     }
 
-    private func playSound(for style: AlertVisualStyle) {
-        let soundName: String
-        var repeatCount = 1
-        
-        if currentSpecies == "cowboy" {
+    private static func soundPlan(for style: AlertVisualStyle, theme: SoundTheme) -> AlertSoundPlan {
+        if theme == .whip {
+            let repeatCount: Int
             switch style {
             case .perimeterPulse:
-                soundName = "cowboy_step1"
+                repeatCount = 1
             case .gentleNudge:
-                if NSSound(named: "cowboy_step2") != nil {
-                    soundName = "cowboy_step2"
-                } else {
-                    soundName = "cowboy_step1"
-                    repeatCount = 2
-                }
+                repeatCount = 2
             case .strongVisualNudge:
-                if NSSound(named: "cowboy_step3") != nil {
-                    soundName = "cowboy_step3"
-                } else {
-                    soundName = "cowboy_step1"
-                    repeatCount = 3
-                }
+                repeatCount = 3
             }
-        } else {
-            switch style {
-            case .perimeterPulse: soundName = "Tink"
-            case .gentleNudge: soundName = "Hero"
-            case .strongVisualNudge: soundName = "Sosumi"
-            }
-        }
-        
-        playRepeatedly(soundName: soundName, count: repeatCount)
-    }
 
-    private func playRepeatedly(soundName: String, count: Int) {
-        guard let sound = NSSound(named: soundName) else { return }
-        
-        for i in 0..<count {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.4) {
-                sound.play()
-            }
+            // `cowboy_step1.mp3` is about 1.92s long. Keep the repeats slightly
+            // past the clip duration so the lash pattern reads as deliberate
+            // repeated cracks instead of a blurred overlap.
+            return AlertSoundPlan(soundName: "cowboy_step1", repeatCount: repeatCount, repeatInterval: 2.0)
         }
+
+        let soundName: String
+        switch style {
+        case .perimeterPulse:
+            soundName = "Tink"
+        case .gentleNudge:
+            soundName = "Hero"
+        case .strongVisualNudge:
+            soundName = "Sosumi"
+        }
+
+        return AlertSoundPlan(soundName: soundName, repeatCount: 1, repeatInterval: 0)
     }
     
     private func visualStyle(for snapshot: RuntimeSnapshot) -> AlertVisualStyle? {
@@ -245,7 +317,6 @@ final class PerimeterPulsePresenter: AlertPresenting {
         
         let staleKeys = Set(panelsByFrameKey.keys).subtracting(nextPanelsByFrameKey.keys)
         for staleKey in staleKeys {
-            panelsByFrameKey[staleKey]?.orderOut(nil)
             panelsByFrameKey[staleKey]?.close()
         }
         
@@ -254,7 +325,6 @@ final class PerimeterPulsePresenter: AlertPresenting {
     
     func hide() {
         for panel in panelsByFrameKey.values {
-            panel.orderOut(nil)
             panel.close()
         }
         panelsByFrameKey.removeAll()

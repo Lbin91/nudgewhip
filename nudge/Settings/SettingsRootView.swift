@@ -58,11 +58,30 @@ struct SettingsRootView: View {
                         .foregroundStyle(Color.nudgeTextPrimary)
                     
                     HStack(spacing: NudgeSpacing.s2) {
-                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "10s"), value: 10)
+                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "1m"), value: 60)
                         thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.3m", defaultValue: "3m"), value: 180)
                         thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5m"), value: 300)
                         thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10m", defaultValue: "10m"), value: 600)
                     }
+                }
+
+                Divider()
+                    .overlay(Color.nudgeStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.sound_theme", defaultValue: "Sound theme"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgeTextPrimary)
+
+                    Picker("", selection: Binding(
+                        get: { viewModel.soundThemeValue },
+                        set: viewModel.updateSoundTheme
+                    )) {
+                        Text(localizedAppString("settings.section.monitoring.sound_theme.normal", defaultValue: "Normal")).tag(SoundTheme.normal)
+                        Text(localizedAppString("settings.section.monitoring.sound_theme.whip", defaultValue: "Whip!")).tag(SoundTheme.whip)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
                 }
 
                 Divider()
@@ -234,14 +253,15 @@ struct SettingsRootView: View {
         } label: {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, minHeight: 36)
                 .padding(.vertical, 8)
+                .background(
+                    isSelected ? Color.nudgeFocus : Color.nudgeBgSurfaceAlt,
+                    in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous))
         }
         .buttonStyle(.plain)
-        .background(
-            isSelected ? Color.nudgeFocus : Color.nudgeBgSurfaceAlt,
-            in: RoundedRectangle(cornerRadius: NudgeRadius.button, style: .continuous)
-        )
         .foregroundStyle(isSelected ? .white : Color.nudgeTextPrimary)
     }
 

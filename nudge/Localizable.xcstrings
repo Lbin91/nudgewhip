@@ -3451,19 +3451,19 @@
       }
     },
     "settings.section.monitoring.idle_threshold.10s" : {
-      "comment" : "10-second idle threshold option for testing.",
+      "comment" : "1-minute idle threshold option.",
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "10 sec"
+            "value" : "1 min"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "10초"
+            "value" : "1분"
           }
         }
       }

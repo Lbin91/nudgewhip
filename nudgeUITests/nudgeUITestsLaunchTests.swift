@@ -7,9 +7,10 @@
 
 import XCTest
 import AppKit
+import Darwin
 
 final class nudgeUITestsLaunchTests: XCTestCase {
-    private let bundleIdentifier = "com.bongjinlee.nudge"
+    private let bundleIdentifier = "com.bongjinlee.nudgewhip"
     private let terminationTimeout: TimeInterval = 5
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
@@ -40,25 +41,59 @@ final class nudgeUITestsLaunchTests: XCTestCase {
     }
     
     private func terminateRunningAppIfNeeded() throws {
-        let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
-        
-        for app in runningApps where !app.isTerminated {
-            if !app.terminate() {
-                _ = app.forceTerminate()
+        func runningApps() -> [NSRunningApplication] {
+            NSRunningApplication
+                .runningApplications(withBundleIdentifier: bundleIdentifier)
+                .filter { !$0.isTerminated }
+        }
+
+        for app in runningApps() {
+            _ = app.terminate()
+        }
+
+        let gracefulDeadline = Date().addingTimeInterval(terminationTimeout / 2)
+        while Date() < gracefulDeadline, !runningApps().isEmpty {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+
+        for app in runningApps() {
+            _ = app.forceTerminate()
+            kill(pid_t(app.processIdentifier), SIGKILL)
+            if let parentProcessIdentifier = parentProcessIdentifier(of: pid_t(app.processIdentifier)) {
+                kill(parentProcessIdentifier, SIGKILL)
             }
         }
-        
-        let deadline = Date().addingTimeInterval(terminationTimeout)
-        while Date() < deadline {
-            let stillRunning = NSRunningApplication
-                .runningApplications(withBundleIdentifier: bundleIdentifier)
-                .contains(where: { !$0.isTerminated })
-            if !stillRunning {
+
+        let forcedDeadline = Date().addingTimeInterval(terminationTimeout / 2)
+        while Date() < forcedDeadline {
+            if runningApps().isEmpty {
                 return
             }
             RunLoop.current.run(until: Date().addingTimeInterval(0.1))
         }
-        
+
         throw XCTSkip("Could not fully terminate \(bundleIdentifier) before the next UI test launch.")
+    }
+
+    private func parentProcessIdentifier(of processIdentifier: pid_t) -> pid_t? {
+        let process = Process()
+        let outputPipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/bin/ps")
+        process.arguments = ["-o", "ppid=", "-p", "\(processIdentifier)"]
+        process.standardOutput = outputPipe
+
+        do {
+            try process.run()
+        } catch {
+            return nil
+        }
+
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else { return nil }
+
+        let data = outputPipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let parent = Int32(output), parent > 1 else { return nil }
+        return parent
     }
 }

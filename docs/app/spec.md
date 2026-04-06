@@ -141,7 +141,7 @@
 
 ### 8.2 MVP Models
 
-- `UserSettings`
+- `UserSettings` (idleThreshold, scheduleEnabled, soundTheme: .normal | .whip)
 - `WhitelistApp`
 - `FocusSession`
 - `DailyStats`
