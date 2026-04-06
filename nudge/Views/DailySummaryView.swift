@@ -68,11 +68,7 @@ struct DailySummaryView: View {
     }
 
     private func formattedDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: max(duration, 0))
+        return localizedDurationString(duration)
             ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     }
 }

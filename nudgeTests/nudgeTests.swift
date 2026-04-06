@@ -114,6 +114,36 @@ private final class TestFrontmostAppProvider: FrontmostAppProviding {
 }
 
 @MainActor
+private final class TestSessionTracker: SessionTracking {
+    private(set) var isTracking = false
+    private(set) var beginSessionCount = 0
+    private(set) var endSessionCount = 0
+    private(set) var alertStartedCount = 0
+    private(set) var recoveryCount = 0
+
+    func beginSession(at date: Date) {
+        beginSessionCount += 1
+        isTracking = true
+    }
+
+    func endSession(reason: FocusSessionEndReason, at date: Date) {
+        guard isTracking else { return }
+        endSessionCount += 1
+        isTracking = false
+    }
+
+    func recordAlertStarted(at date: Date) {
+        alertStartedCount += 1
+    }
+
+    func recordAlertEscalation(step: Int, at date: Date) {}
+
+    func recordRecovery(at date: Date) {
+        recoveryCount += 1
+    }
+}
+
+@MainActor
 private final class TestAlertPresenter: AlertPresenting {
     private(set) var showCount = 0
     private(set) var hideCount = 0
@@ -1131,6 +1161,36 @@ struct nudgeTests {
         #expect(runtimeController.snapshot.runtimeState == .monitoring)
         #expect(!runtimeController.snapshot.whitelistMatched)
         #expect(idleMonitor.idleDeadlineAt != nil)
+    }
+
+    @MainActor
+    @Test
+    func idleMonitorDoesNotStartSessionFromUnchangedUnmatchedWhitelistState() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let permissionManager = PermissionManager(accessibilityPermissionState: .denied)
+        let runtimeController = RuntimeStateController()
+        let sessionTracker = TestSessionTracker()
+        let frontmostAppProvider = TestFrontmostAppProvider()
+        frontmostAppProvider.currentBundleIdentifier = "com.apple.finder"
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            runtimeStateController: runtimeController,
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: frontmostAppProvider,
+            sessionTracker: sessionTracker
+        )
+
+        idleMonitor.applyWhitelistApps([], at: baseDate)
+        #expect(sessionTracker.beginSessionCount == 0)
+        #expect(runtimeController.snapshot.runtimeState == .limitedNoAX)
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate.addingTimeInterval(1))
+        #expect(sessionTracker.beginSessionCount == 1)
+
+        idleMonitor.applyWhitelistApps([], at: baseDate.addingTimeInterval(2))
+        #expect(sessionTracker.beginSessionCount == 1)
+        #expect(runtimeController.snapshot.runtimeState == .monitoring)
     }
     
     @MainActor
