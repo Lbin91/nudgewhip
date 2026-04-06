@@ -81,9 +81,6 @@ enum ASCIIArtFrames {
     }
 
     // MARK: Ringmaster (서커스 단장)
-...
-        }
-    }
 
     // MARK: Catwoman (캣우먼)
 

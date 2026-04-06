@@ -81,7 +81,7 @@ final class MenuBarViewModel {
             return nil
         }
 
-        let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()))
+        let remaining = max(0, Int(deadline.timeIntervalSince(now).rounded()) - 1)
         if remaining < 60 {
             return "\(remaining)s"
         }
@@ -318,6 +318,8 @@ final class MenuBarViewModel {
         switch petState.characterType {
         case .partyMask:
             petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
+        case .catwoman:
+            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.catwoman", defaultValue: "Catwoman")
         case .rat:
             petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rat", defaultValue: "Rat")
         case .ox:
@@ -341,23 +343,12 @@ final class MenuBarViewModel {
     }
     
     private func formattedDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        var calendar = Calendar.current
-        calendar.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
-        formatter.calendar = calendar
-        formatter.allowedUnits = duration >= 3600 ? [.hour, .minute] : [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: max(duration, 0))
+        return localizedDurationString(duration)
             ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
     }
     
     private func formattedClock(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
-        formatter.timeStyle = .short
-        formatter.dateStyle = .none
-        return formatter.string(from: date)
+        localizedClockString(date)
     }
     
     private func dateFromSeconds(_ seconds: Int) -> Date {
