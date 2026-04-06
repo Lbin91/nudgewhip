@@ -35,6 +35,20 @@ private final class TestEventMonitor: EventMonitoring {
     }
 }
 
+@Test
+func localizedDurationStringUsesSelectedAppLanguage() {
+    let originalLocaleIdentifier = AppLanguageStore.shared.preferredLocaleIdentifier
+    defer {
+        AppLanguageStore.shared.apply(preferredLocaleIdentifier: originalLocaleIdentifier)
+    }
+
+    AppLanguageStore.shared.apply(preferredLocaleIdentifier: AppLanguage.english.rawValue)
+    #expect(localizedDurationString(3_661) == "1h 1m")
+
+    AppLanguageStore.shared.apply(preferredLocaleIdentifier: AppLanguage.korean.rawValue)
+    #expect(localizedDurationString(3_661) == "1시간 1분")
+}
+
 @MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool

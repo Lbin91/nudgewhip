@@ -246,14 +246,7 @@ struct OnboardingRootView: View {
     }
     
     private var idleThresholdText: String {
-        let formatter = DateComponentsFormatter()
-        var calendar = Calendar.current
-        calendar.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
-        formatter.calendar = calendar
-        formatter.allowedUnits = viewModel.idleThresholdSeconds >= 3600 ? [.hour, .minute] : [.minute, .second]
-        formatter.unitsStyle = .abbreviated
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: TimeInterval(viewModel.idleThresholdSeconds))
+        return localizedDurationString(TimeInterval(viewModel.idleThresholdSeconds))
             ?? "\(viewModel.idleThresholdSeconds)s"
     }
     
@@ -282,11 +275,7 @@ struct OnboardingRootView: View {
     }
     
     private func formattedClock(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: AppLanguageStore.shared.preferredLocaleIdentifier)
-        formatter.timeStyle = .short
-        formatter.dateStyle = .none
-        return formatter.string(from: date)
+        localizedClockString(date)
     }
 }
 
