@@ -11,18 +11,21 @@ enum PetHatchStage: String, Codable, CaseIterable, Sendable {
 }
 
 enum PetCharacterType: String, Codable, CaseIterable, Sendable {
-    case partyMask
+    case partyMask // Ringmaster
+    case catwoman
     case rat
     case ox
     case tiger
     case rabbit
 }
+
 enum PetEmotion: String, Codable, CaseIterable, Sendable {
     case happy
     case cheer
     case sleep
     case concern
 }
+
 @Model
 final class PetState {
     var hatchStageRawValue: String
@@ -33,10 +36,12 @@ final class PetState {
     var dailyStreak: Int
     var lastFocusSessionEndedAt: Date?
     var updatedAt: Date
+
     var hatchStage: PetHatchStage {
         get { PetHatchStage(rawValue: hatchStageRawValue) ?? .hatched }
         set { hatchStageRawValue = newValue.rawValue }
     }
+
     var characterType: PetCharacterType {
         get { PetCharacterType(rawValue: characterTypeRawValue) ?? .partyMask }
         set { characterTypeRawValue = newValue.rawValue }
@@ -46,7 +51,9 @@ final class PetState {
     var species: String {
         switch characterType {
         case .partyMask:
-            return "cowboy"
+            return "ringmaster"
+        case .catwoman:
+            return "catwoman"
         case .rat:
             return "rat"
         case .ox:
