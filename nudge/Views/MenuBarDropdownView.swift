@@ -28,32 +28,30 @@ struct MenuBarDropdownView: View {
         VStack(alignment: .leading, spacing: NudgeSpacing.s3) {
             sectionEyebrow(localizedAppString("menu.action.pause", defaultValue: "Pause NudgeWhip"))
 
-            if menuBarViewModel.isManualPauseActive {
-                primaryActionButton(
-                    title: localizedAppString("menu.action.pause.resume", defaultValue: "Resume NudgeWhip"),
-                    systemImage: "play.fill",
-                    tint: .nudgeFocus,
-                    action: { menuBarViewModel.resumeFromManualPause() }
-                )
-            } else {
-                primaryActionButton(
-                    title: localizedAppString("menu.action.pause.until_resumed", defaultValue: "Until resumed"),
-                    systemImage: "pause.fill",
-                    tint: .nudgeAlert,
-                    action: { menuBarViewModel.pauseUntilResumed() }
-                )
-
-                HStack(spacing: NudgeSpacing.s2) {
+            HStack(spacing: NudgeSpacing.s2) {
+                if menuBarViewModel.isManualPauseActive {
+                    primaryActionButton(
+                        title: localizedAppString("menu.action.pause.resume", defaultValue: "Resume NudgeWhip"),
+                        systemImage: "play.fill",
+                        tint: .nudgeFocus,
+                        action: { menuBarViewModel.resumeFromManualPause() }
+                    )
+                } else {
                     compactPauseButton(
-                        title: localizedAppString("menu.action.pause.10m", defaultValue: "10 min"),
+                        title: "",
+                        systemImage: "pause.fill",
+                        action: { menuBarViewModel.pauseUntilResumed() }
+                    )
+                    compactPauseButton(
+                        title: "10m",
                         action: { menuBarViewModel.pauseForMinutes(10) }
                     )
                     compactPauseButton(
-                        title: localizedAppString("menu.action.pause.30m", defaultValue: "30 min"),
+                        title: "30m",
                         action: { menuBarViewModel.pauseForMinutes(30) }
                     )
                     compactPauseButton(
-                        title: localizedAppString("menu.action.pause.60m", defaultValue: "60 min"),
+                        title: "60m",
                         action: { menuBarViewModel.pauseForMinutes(60) }
                     )
                 }
@@ -106,12 +104,24 @@ struct MenuBarDropdownView: View {
         }
     }
 
-    private func compactPauseButton(title: String, action: @escaping () -> Void) -> some View {
+    private func compactPauseButton(
+        title: String,
+        systemImage: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 11)
+            HStack(spacing: NudgeSpacing.s1) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .font(.subheadline.weight(.bold))
+                }
+                if !title.isEmpty {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 11)
         }
         .buttonStyle(.plain)
         .background(
