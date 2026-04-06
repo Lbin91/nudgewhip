@@ -17,8 +17,12 @@ final class NudgeAppController {
         let permissionManager = PermissionManager()
         let alertManager = AlertManager()
         self.alertManager = alertManager
-        let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager)
+        let sessionTracker = SessionTracker()
+        let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager, sessionTracker: sessionTracker)
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+        sessionTracker.onSessionUpdated = { [weak menuBarViewModel] in
+            menuBarViewModel?.refreshMenuSnapshot()
+        }
         self.menuBarViewModel = menuBarViewModel
         let modelContext = NudgeModelContainer.shared.mainContext
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {

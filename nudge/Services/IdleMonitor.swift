@@ -25,6 +25,7 @@ final class IdleMonitor {
     let lifecycleMonitor: any SystemLifecycleMonitoring
     let frontmostAppProvider: any FrontmostAppProviding
     let alertManager: (any AlertManaging)?
+    let sessionTracker: (any SessionTracking)?
     private(set) var idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
@@ -47,6 +48,7 @@ final class IdleMonitor {
         lifecycleMonitor: (any SystemLifecycleMonitoring)? = nil,
         frontmostAppProvider: (any FrontmostAppProviding)? = nil,
         alertManager: (any AlertManaging)? = nil,
+        sessionTracker: (any SessionTracking)? = nil,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
         cooldownDuration: TimeInterval = 60,
@@ -60,6 +62,7 @@ final class IdleMonitor {
         self.lifecycleMonitor = lifecycleMonitor ?? SystemLifecycleMonitor()
         self.frontmostAppProvider = frontmostAppProvider ?? FrontmostAppProvider()
         self.alertManager = alertManager
+        self.sessionTracker = sessionTracker
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
@@ -120,6 +123,7 @@ final class IdleMonitor {
             startLifecycleMonitoringIfNeeded()
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
+            sessionTracker?.beginSession(at: date)
         } else {
             stopEventMonitoring()
             stopLifecycleMonitoring()
@@ -139,6 +143,7 @@ final class IdleMonitor {
             startLifecycleMonitoringIfNeeded()
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
+            sessionTracker?.beginSession(at: date)
         } else {
             stopEventMonitoring()
             stopLifecycleMonitoring()
@@ -154,6 +159,11 @@ final class IdleMonitor {
         lastInputAt = date
         runtimeStateController.handle(.userActivityDetected, at: date)
         scheduleAlertSync()
+        
+        if wasAlerting {
+            sessionTracker?.recordRecovery(at: date)
+        }
+        
         scheduleIdleDeadline(from: date)
         cancelAlertEscalationDeadline()
         
@@ -185,6 +195,7 @@ final class IdleMonitor {
         runtimeStateController.handle(enabled ? .manualPauseEnabled : .manualPauseDisabled, at: date)
         
         if enabled {
+            sessionTracker?.endSession(reason: .manualPause, at: date)
             manualPauseUntil = pauseUntil
             scheduleManualPauseResumeIfNeeded(from: date)
             cancelMonitoringDeadlines()
@@ -194,6 +205,7 @@ final class IdleMonitor {
             lastInputAt = date
             checkSchedule(at: date)
             scheduleIdleDeadline(from: date)
+            sessionTracker?.beginSession(at: date)
         }
         
         scheduleAlertSync()
@@ -205,9 +217,11 @@ final class IdleMonitor {
         scheduleAlertSync()
         
         if matched {
+            sessionTracker?.endSession(reason: .whitelistPause, at: date)
             cancelMonitoringDeadlines()
         } else {
             scheduleIdleDeadline(from: lastInputAt ?? date)
+            sessionTracker?.beginSession(at: date)
         }
     }
     
@@ -218,11 +232,13 @@ final class IdleMonitor {
         
         switch event {
         case .sleepDetected, .screenLocked, .fastUserSwitchingStarted:
+            sessionTracker?.endSession(reason: .suspended, at: date)
             cancelMonitoringDeadlines()
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
             lastInputAt = date
             checkSchedule(at: date)
             scheduleIdleDeadline(from: date)
+            sessionTracker?.beginSession(at: date)
         default:
             break
         }
@@ -233,6 +249,7 @@ final class IdleMonitor {
         guard let idleDeadlineAt, date >= idleDeadlineAt else { return }
         runtimeStateController.handle(.idleDeadlineReached, at: date)
         scheduleAlertSync()
+        sessionTracker?.recordAlertStarted(at: date)
         self.idleDeadlineAt = nil
         idleDeadlineWorkItem?.cancel()
         idleDeadlineWorkItem = nil
@@ -244,6 +261,7 @@ final class IdleMonitor {
         guard let alertEscalationDeadlineAt, date >= alertEscalationDeadlineAt else { return }
         runtimeStateController.handle(.alertEscalationDeadlineReached, at: date)
         scheduleAlertSync()
+        sessionTracker?.recordAlertEscalation(step: runtimeStateController.snapshot.alertEscalationStep, at: date)
         self.alertEscalationDeadlineAt = nil
         alertEscalationWorkItem?.cancel()
         alertEscalationWorkItem = nil
@@ -274,6 +292,7 @@ final class IdleMonitor {
                 lastInputAt = date
                 scheduleAlertSync()
                 scheduleIdleDeadline(from: date)
+                sessionTracker?.beginSession(at: date)
             }
             scheduleBoundaryWorkItem?.cancel()
             scheduleBoundaryWorkItem = nil
@@ -299,9 +318,11 @@ final class IdleMonitor {
             lastInputAt = date
             scheduleAlertSync()
             scheduleIdleDeadline(from: date)
+            sessionTracker?.beginSession(at: date)
         } else if !inWindow && !snapshot.schedulePaused {
             runtimeStateController.handle(.scheduleWindowEntered, at: date)
             scheduleAlertSync()
+            sessionTracker?.endSession(reason: .completed, at: date)
             cancelMonitoringDeadlines()
         }
         
