@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip launch screen" width="1200" />
+  <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip launch screen" width="1200" />
 </p>
 
 <p align="center">
@@ -87,7 +87,7 @@ This beta already includes a real working loop:
 ## Screenshot
 
 <p align="center">
-  <img src="docs/assets/readme/nudge-launch-screen.png" alt="NudgeWhip macOS menu bar surface" width="1100" />
+  <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip macOS menu bar surface" width="1100" />
 </p>
 
 <p align="center">
@@ -130,25 +130,25 @@ Requirements:
 Build the app:
 
 ```bash
-xcodebuild build -scheme nudge -destination 'platform=macOS'
+xcodebuild build -scheme nudgewhip -destination 'platform=macOS'
 ```
 
 Run static analysis:
 
 ```bash
-xcodebuild analyze -scheme nudge -destination 'platform=macOS'
+xcodebuild analyze -scheme nudgewhip -destination 'platform=macOS'
 ```
 
 Run unit and runtime tests:
 
 ```bash
-xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeTests
+xcodebuild test -scheme nudgewhip -destination 'platform=macOS' -only-testing:nudgewhipTests
 ```
 
 Run UI tests:
 
 ```bash
-xcodebuild test -scheme nudge -destination 'platform=macOS' -only-testing:nudgeUITests
+xcodebuild test -scheme nudgewhip -destination 'platform=macOS' -only-testing:nudgewhipUITests
 ```
 
 Note:
@@ -174,10 +174,10 @@ At a high level:
 ## Repository Layout
 
 ```text
-nudge/
-├── nudge/                  # app source
-├── nudgeTests/             # unit and runtime tests
-├── nudgeUITests/           # UI tests
+nudgewhip/
+├── nudgewhip/              # app source
+├── nudgewhipTests/             # unit and runtime tests
+├── nudgewhipUITests/           # UI tests
 └── docs/                   # product, architecture, privacy, QA, and release docs
 ```
 

@@ -1,0 +1,357 @@
+import AppKit
+import SwiftUI
+
+struct SettingsRootView: View {
+    @Bindable var viewModel: SettingsViewModel
+    
+    init(viewModel: SettingsViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.nudgewhipBgCanvas.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s5) {
+                    VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                        Text(localizedAppString("settings.header.title", defaultValue: "Settings"))
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundStyle(Color.nudgewhipTextPrimary)
+                        
+                        Text(localizedAppString("settings.header.subtitle", defaultValue: "Adjust monitoring, schedule, alerts, and accessibility outside of onboarding."))
+                            .font(.subheadline)
+                            .foregroundStyle(Color.nudgewhipTextSecondary)
+                    }
+                    .padding(.horizontal, NudgeWhipSpacing.s1)
+                    
+                    VStack(spacing: NudgeWhipSpacing.s4) {
+                        monitoringSection
+                        scheduleSection
+                        accessibilitySection
+                        appSection
+                    }
+                    
+                    if let errorMessage = viewModel.errorMessage {
+                        Text(errorMessage)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Color.nudgewhipAlert)
+                            .padding(.horizontal, NudgeWhipSpacing.s2)
+                    }
+                }
+                .padding(NudgeWhipSpacing.s5)
+                .frame(maxWidth: 800, alignment: .leading)
+            }
+        }
+        .frame(minWidth: 620, minHeight: 600)
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            viewModel.refreshPermission()
+        }
+    }
+    
+    private var monitoringSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.monitoring", defaultValue: "Monitoring"), systemImage: "timer") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.idle_threshold", defaultValue: "Idle threshold"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+                    
+                    HStack(spacing: NudgeWhipSpacing.s2) {
+                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10s", defaultValue: "1m"), value: 60)
+                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.3m", defaultValue: "3m"), value: 180)
+                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.5m", defaultValue: "5m"), value: 300)
+                        thresholdButton(title: localizedAppString("settings.section.monitoring.idle_threshold.10m", defaultValue: "10m"), value: 600)
+                    }
+                }
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.sound_theme", defaultValue: "Sound theme"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Picker("", selection: Binding(
+                        get: { viewModel.soundThemeValue },
+                        set: viewModel.updateSoundTheme
+                    )) {
+                        Text(localizedAppString("settings.section.monitoring.sound_theme.whip", defaultValue: "Whip!")).tag(SoundTheme.whip)
+                        Text(localizedAppString("settings.section.monitoring.sound_theme.normal", defaultValue: "Light")).tag(SoundTheme.normal)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                Toggle(isOn: Binding(
+                    get: { viewModel.countdownOverlayEnabledValue },
+                    set: viewModel.updateCountdownOverlayEnabled
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.monitoring.overlay", defaultValue: "Show top countdown overlay"))
+                            .font(.subheadline.weight(.medium))
+                        Text(localizedAppString("settings.section.monitoring.overlay.desc", defaultValue: "Visual countdown when idle threshold is reached."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+                }
+                .toggleStyle(.checkbox)
+            }
+        }
+    }
+    
+    private var scheduleSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.schedule", defaultValue: "Schedule"), systemImage: "calendar.badge.clock") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                Toggle(isOn: Binding(
+                    get: { viewModel.scheduleEnabledValue },
+                    set: viewModel.updateScheduleEnabled
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.schedule.enabled", defaultValue: "Enable focus hours"))
+                            .font(.subheadline.weight(.medium))
+                        Text(localizedAppString("settings.section.schedule.enabled.desc", defaultValue: "Only monitor activity during specific times."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+                }
+                .toggleStyle(.checkbox)
+                
+                if viewModel.scheduleEnabledValue {
+                    HStack(spacing: NudgeWhipSpacing.s4) {
+                        VStack(alignment: .leading, spacing: NudgeWhipSpacing.s1) {
+                            Text(localizedAppString("settings.section.schedule.start", defaultValue: "Start time"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.nudgewhipTextMuted)
+                            
+                            DatePicker(
+                                "",
+                                selection: Binding(
+                                    get: { viewModel.scheduleStartTimeValue },
+                                    set: viewModel.updateScheduleStartTime
+                                ),
+                                displayedComponents: .hourAndMinute
+                            )
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                        }
+                        
+                        VStack(alignment: .leading, spacing: NudgeWhipSpacing.s1) {
+                            Text(localizedAppString("settings.section.schedule.end", defaultValue: "End time"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.nudgewhipTextMuted)
+                            
+                            DatePicker(
+                                "",
+                                selection: Binding(
+                                    get: { viewModel.scheduleEndTimeValue },
+                                    set: viewModel.updateScheduleEndTime
+                                ),
+                                displayedComponents: .hourAndMinute
+                            )
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(NudgeWhipSpacing.s3)
+                    .background(Color.nudgewhipBgSurfaceAlt.opacity(0.5), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
+                }
+            }
+        }
+    }
+    
+    private var accessibilitySection: some View {
+        SettingsSection(title: localizedAppString("settings.section.accessibility", defaultValue: "Accessibility"), systemImage: "hand.raised.fill") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                HStack(spacing: NudgeWhipSpacing.s3) {
+                    Image(systemName: permissionStatusIcon)
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(permissionStatusColor)
+                        .frame(width: 32, height: 32)
+                        .background(permissionStatusColor.opacity(0.12), in: Circle())
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(permissionStatusText)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(permissionStatusColor)
+                        
+                        Text(localizedAppString("settings.section.accessibility.body", defaultValue: "Required for global idle detection."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(localizedAppString("settings.section.accessibility.refresh", defaultValue: "Check again")) {
+                        viewModel.refreshPermission()
+                    }
+                    .buttonStyle(.link)
+                    .font(.caption.weight(.semibold))
+                }
+                .padding(NudgeWhipSpacing.s3)
+                .background(Color.nudgewhipBgSurfaceAlt.opacity(0.4), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
+                
+                HStack(spacing: NudgeWhipSpacing.s3) {
+                    primaryButton(localizedAppString("settings.section.accessibility.request", defaultValue: "Request access"), action: viewModel.requestAccessibilityPermission)
+                    
+                    secondaryButton(localizedAppString("settings.section.accessibility.open", defaultValue: "Open System Settings"), action: { _ = viewModel.openAccessibilitySettings() })
+                }
+            }
+        }
+    }
+    
+    private var appSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.app", defaultValue: "App"), systemImage: "macwindow") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.app.language", defaultValue: "Language"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Picker("", selection: Binding(
+                        get: { viewModel.preferredLanguage },
+                        set: viewModel.updatePreferredLanguage
+                    )) {
+                        ForEach(AppLanguage.allCases, id: \.rawValue) { language in
+                            Text(language.displayName).tag(language)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                Toggle(isOn: Binding(
+                    get: { viewModel.launchAtLoginEnabled },
+                    set: viewModel.updateLaunchAtLogin
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.app.launch_at_login", defaultValue: "Launch at login"))
+                            .font(.subheadline.weight(.medium))
+                        Text(localizedAppString("settings.section.app.launch_at_login.desc", defaultValue: "Automatically start NudgeWhip when you log in."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+                }
+                .toggleStyle(.checkbox)
+            }
+        }
+    }
+    
+    private func thresholdButton(title: String, value: Int) -> some View {
+        let isSelected = viewModel.idleThresholdSecondsValue == value
+        return Button {
+            viewModel.updateIdleThreshold(value)
+        } label: {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 36)
+                .padding(.vertical, 8)
+                .background(
+                    isSelected ? Color.nudgewhipFocus : Color.nudgewhipBgSurfaceAlt,
+                    in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button, style: .continuous)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: NudgeWhipRadius.button, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(isSelected ? .white : Color.nudgewhipTextPrimary)
+    }
+
+    private func primaryButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, NudgeWhipSpacing.s4)
+                .padding(.vertical, 10)
+                .background(Color.nudgewhipFocus, in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func secondaryButton(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.nudgewhipTextPrimary)
+                .padding(.horizontal, NudgeWhipSpacing.s4)
+                .padding(.vertical, 10)
+                .background(Color.nudgewhipBgSurfaceAlt, in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
+                .overlay(
+                    RoundedRectangle(cornerRadius: NudgeWhipRadius.button)
+                        .stroke(Color.nudgewhipStrokeDefault, lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private var permissionStatusText: String {
+        switch viewModel.permissionState {
+        case .unknown:
+            return localizedAppString("settings.section.accessibility.status.unknown", defaultValue: "Not checked")
+        case .granted:
+            return localizedAppString("settings.section.accessibility.status.granted", defaultValue: "Permission granted")
+        case .denied:
+            return localizedAppString("settings.section.accessibility.status.denied", defaultValue: "Permission needed")
+        }
+    }
+    
+    private var permissionStatusIcon: String {
+        switch viewModel.permissionState {
+        case .unknown:
+            return "questionmark.circle.fill"
+        case .granted:
+            return "checkmark.seal.fill"
+        case .denied:
+            return "exclamationmark.triangle.fill"
+        }
+    }
+    
+    private var permissionStatusColor: Color {
+        switch viewModel.permissionState {
+        case .unknown:
+            return Color.nudgewhipTextMuted
+        case .granted:
+            return Color.nudgewhipFocus
+        case .denied:
+            return Color.nudgewhipAlert
+        }
+    }
+}
+
+private struct SettingsSection<Content: View>: View {
+    let title: String
+    let systemImage: String
+    @ViewBuilder let content: Content
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+            HStack(spacing: NudgeWhipSpacing.s2) {
+                Image(systemName: systemImage)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.nudgewhipTextSecondary)
+                
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(Color.nudgewhipTextPrimary)
+            }
+            
+            content
+        }
+        .padding(NudgeWhipSpacing.s5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.nudgewhipBgSurface, in: RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous)
+                .stroke(Color.nudgewhipStrokeDefault.opacity(0.8), lineWidth: 1)
+        )
+    }
+}

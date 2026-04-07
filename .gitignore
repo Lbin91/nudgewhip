@@ -3,11 +3,14 @@
 *.xcuserstate
 .omx
 *.xcscheme
-!nudge.xcodeproj/xcshareddata/xcschemes/
-!nudge.xcodeproj/xcshareddata/xcschemes/*.xcscheme
+!nudgewhip.xcodeproj/xcshareddata/xcschemes/
+!nudgewhip.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 build/
 .sisyphus
 docs/
 .claude/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
 TODO.md
 xcuserdata/
