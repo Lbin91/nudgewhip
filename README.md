@@ -1,4 +1,6 @@
-![NudgeWhip launch screen](docs/assets/readme/nudgewhip-launch-screen.png)
+<p align="center">
+  <img src="docs/assets/readme/whip-devil-mark.png" alt="NudgeWhip whip devil mark" width="180" />
+</p>
 
 <p align="center">
   <a href="LICENSE">
@@ -15,12 +17,12 @@
 <h1 align="center">NudgeWhip</h1>
 
 <p align="center">
-  <strong>Sharper than a reminder. Lighter than a blocker.</strong>
+  <strong>A sharp little devil for drifting attention.</strong>
 </p>
 
 <p align="center">
-  NudgeWhip is a privacy-first macOS menu bar app for serious desktop work.<br />
-  It detects the moment attention drifts, then helps you return before a short pause becomes a lost hour.
+  NudgeWhip is a privacy-first macOS menu bar companion for serious desktop work.<br />
+  It catches the moment attention slips, then snaps you back before a short drift becomes a lost hour.
 </p>
 
 <p align="center">
@@ -85,12 +87,12 @@ This beta already includes a real working loop:
 - settings window and launch-at-login toggle
 - Korean and English localization
 
-## Screenshot
+## In The Menu Bar
 
 ![NudgeWhip macOS menu bar surface](docs/assets/readme/nudgewhip-launch-screen.png)
 
 <p align="center">
-  <em>Current menu bar release candidate surface.</em>
+  <em>The little devil lives in the menu bar and steps in when attention starts to slide.</em>
 </p>
 
 ## What Makes It Different
