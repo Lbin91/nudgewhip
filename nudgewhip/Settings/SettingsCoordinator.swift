@@ -8,6 +8,7 @@ final class SettingsCoordinator: NSObject, NSWindowDelegate {
     private let menuBarViewModel: MenuBarViewModel
     private let permissionManager: PermissionManager
     private let launchAtLoginManager: LaunchAtLoginManaging
+    private let appUpdater: any AppUpdating
     private let onOpenOnboarding: () -> Void
     
     private var settingsWindow: NSWindow?
@@ -17,12 +18,14 @@ final class SettingsCoordinator: NSObject, NSWindowDelegate {
         menuBarViewModel: MenuBarViewModel,
         permissionManager: PermissionManager,
         launchAtLoginManager: LaunchAtLoginManaging,
+        appUpdater: any AppUpdating,
         onOpenOnboarding: @escaping () -> Void
     ) {
         self.modelContainer = modelContainer
         self.menuBarViewModel = menuBarViewModel
         self.permissionManager = permissionManager
         self.launchAtLoginManager = launchAtLoginManager
+        self.appUpdater = appUpdater
         self.onOpenOnboarding = onOpenOnboarding
     }
     
@@ -38,6 +41,7 @@ final class SettingsCoordinator: NSObject, NSWindowDelegate {
             menuBarViewModel: menuBarViewModel,
             permissionManager: permissionManager,
             launchAtLoginManager: launchAtLoginManager,
+            appUpdater: appUpdater,
             onOpenOnboarding: onOpenOnboarding
         )
         let rootView = SettingsRootView(viewModel: viewModel)

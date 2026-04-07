@@ -242,6 +242,53 @@ struct SettingsRootView: View {
                     }
                 }
                 .toggleStyle(.checkbox)
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s3) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.app.updates", defaultValue: "Updates"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                        Text(localizedAppString("settings.section.app.updates.desc", defaultValue: "Check for new versions distributed through Sparkle."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+
+                    HStack(spacing: NudgeWhipSpacing.s3) {
+                        secondaryButton(localizedAppString("settings.section.app.updates.check", defaultValue: "Check for Updates…"), action: viewModel.checkForUpdates)
+                            .disabled(!viewModel.canCheckForUpdates)
+                            .opacity(viewModel.canCheckForUpdates ? 1 : 0.55)
+                    }
+
+                    if !viewModel.isAppUpdaterConfigured {
+                        Text(localizedAppString("settings.section.app.updates.setup_hint", defaultValue: "This build does not have a Sparkle feed configured yet. Add SUFeedURL and SUPublicEDKey to enable update checks."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+                }
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s3) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.app.github", defaultValue: "GitHub"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                        Text(localizedAppString("settings.section.app.github.desc", defaultValue: "Open the creator profile or the project repository on GitHub."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+
+                    HStack(spacing: NudgeWhipSpacing.s3) {
+                        secondaryButton(localizedAppString("settings.section.app.github.profile", defaultValue: "@Lbin91"), action: { _ = viewModel.openGitHubProfile() })
+                        secondaryButton(localizedAppString("settings.section.app.github.repo", defaultValue: "Project repo"), action: { _ = viewModel.openGitHubRepository() })
+                    }
+                }
             }
         }
     }

@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "bell_1x1_black-2.png",
+      "filename" : "whip_icon-2.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
     {
-      "filename" : "bell_1x1_black.png",
+      "filename" : "whip_icon.png",
       "idiom" : "mac",
       "scale" : "2x"
     }

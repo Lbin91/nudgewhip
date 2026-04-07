@@ -73,12 +73,11 @@ struct StatusSummaryView: View {
 
     private var petAnchor: some View {
         VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
-            AnimatedASCIICharacterView(
-                hatchStage: menuBarViewModel.petHatchStage,
-                character: menuBarViewModel.petCharacter,
-                emotion: menuBarViewModel.petEmotion,
-                animate: false
-            )
+            Image("whip_devil")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 84, height: 84)
+                .accessibilityLabel("Whip devil character")
 
             Text(menuBarViewModel.petCharacterText)
                 .font(.caption.weight(.semibold))

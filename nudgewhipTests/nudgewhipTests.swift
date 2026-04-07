@@ -231,6 +231,39 @@ private final class TestOnboardingOpener {
     }
 }
 
+@MainActor
+private final class TestExternalURLOpener {
+    private(set) var openedURLs: [URL] = []
+    var returnValue = true
+
+    func open(_ url: URL) -> Bool {
+        openedURLs.append(url)
+        return returnValue
+    }
+}
+
+@MainActor
+private final class TestAppUpdater: AppUpdating {
+    private(set) var canCheckForUpdates: Bool
+    private(set) var isConfigured: Bool
+    private(set) var checkForUpdatesCallCount = 0
+    var onCanCheckForUpdatesChanged: (@MainActor (Bool) -> Void)?
+
+    init(canCheckForUpdates: Bool = false, isConfigured: Bool = false) {
+        self.canCheckForUpdates = canCheckForUpdates
+        self.isConfigured = isConfigured
+    }
+
+    func checkForUpdates() {
+        checkForUpdatesCallCount += 1
+    }
+
+    func setCanCheckForUpdates(_ canCheckForUpdates: Bool) {
+        self.canCheckForUpdates = canCheckForUpdates
+        onCanCheckForUpdatesChanged?(canCheckForUpdates)
+    }
+}
+
 @Suite(.serialized)
 struct nudgewhipTests {
 
@@ -831,11 +864,13 @@ struct nudgewhipTests {
         )
         let opener = TestOnboardingOpener()
         let launchAtLoginManager = TestLaunchAtLoginManager()
+        let appUpdater = TestAppUpdater()
         let viewModel = SettingsViewModel(
             modelContext: context,
             menuBarViewModel: menuBarViewModel,
             permissionManager: PermissionManager(accessibilityPermissionState: .granted),
             launchAtLoginManager: launchAtLoginManager,
+            appUpdater: appUpdater,
             onOpenOnboarding: opener.open
         )
         
@@ -853,6 +888,111 @@ struct nudgewhipTests {
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
         #expect(viewModel.countdownOverlayEnabledValue == false)
+    }
+
+    @MainActor
+    @Test
+    func settingsViewModelOpensGitHubProfileAndRepositoryLinks() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+        let menuBarViewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        let opener = TestOnboardingOpener()
+        let externalURLOpener = TestExternalURLOpener()
+        let appUpdater = TestAppUpdater()
+        let viewModel = SettingsViewModel(
+            modelContext: context,
+            menuBarViewModel: menuBarViewModel,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: TestLaunchAtLoginManager(),
+            appUpdater: appUpdater,
+            onOpenOnboarding: opener.open,
+            openExternalURL: externalURLOpener.open
+        )
+
+        #expect(viewModel.openGitHubProfile())
+        #expect(viewModel.openGitHubRepository())
+        #expect(externalURLOpener.openedURLs == [
+            URL(string: "https://github.com/Lbin91")!,
+            URL(string: "https://github.com/Lbin91/nudgewhip")!
+        ])
+    }
+
+    @MainActor
+    @Test
+    func settingsViewModelTriggersSparkleUpdateCheckWhenConfigured() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+        let menuBarViewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        let appUpdater = TestAppUpdater(canCheckForUpdates: true, isConfigured: true)
+        let viewModel = SettingsViewModel(
+            modelContext: context,
+            menuBarViewModel: menuBarViewModel,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: TestLaunchAtLoginManager(),
+            appUpdater: appUpdater,
+            onOpenOnboarding: {}
+        )
+
+        viewModel.checkForUpdates()
+
+        #expect(appUpdater.checkForUpdatesCallCount == 1)
+        #expect(viewModel.canCheckForUpdates)
+        #expect(viewModel.errorMessage == nil)
+    }
+
+    @MainActor
+    @Test
+    func settingsViewModelReportsWhenSparkleIsNotConfigured() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+        let menuBarViewModel = MenuBarViewModel(
+            idleMonitor: IdleMonitor(
+                permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+                runtimeStateController: RuntimeStateController(),
+                eventMonitor: TestEventMonitor(),
+                lifecycleMonitor: TestSystemLifecycleMonitor(),
+                frontmostAppProvider: TestFrontmostAppProvider()
+            ),
+            modelContext: context
+        )
+        let appUpdater = TestAppUpdater(canCheckForUpdates: false, isConfigured: false)
+        let viewModel = SettingsViewModel(
+            modelContext: context,
+            menuBarViewModel: menuBarViewModel,
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            launchAtLoginManager: TestLaunchAtLoginManager(),
+            appUpdater: appUpdater,
+            onOpenOnboarding: {}
+        )
+
+        viewModel.checkForUpdates()
+
+        #expect(appUpdater.checkForUpdatesCallCount == 0)
+        #expect(viewModel.errorMessage?.contains("Sparkle") == true)
     }
     
     @MainActor

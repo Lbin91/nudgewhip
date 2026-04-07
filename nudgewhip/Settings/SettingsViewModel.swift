@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import SwiftData
@@ -5,11 +6,16 @@ import SwiftData
 @MainActor
 @Observable
 final class SettingsViewModel {
+    private static let githubProfileURL = URL(string: "https://github.com/Lbin91")!
+    private static let githubRepositoryURL = URL(string: "https://github.com/Lbin91/nudgewhip")!
+
     private let modelContext: ModelContext
     private let menuBarViewModel: MenuBarViewModel
     private let permissionManager: PermissionManager
     private let launchAtLoginManager: LaunchAtLoginManaging
+    private let appUpdater: any AppUpdating
     private let onOpenOnboarding: () -> Void
+    private let openExternalURL: (URL) -> Bool
     
     private(set) var permissionState: AccessibilityPermissionState
     private(set) var launchAtLoginEnabled: Bool
@@ -17,6 +23,7 @@ final class SettingsViewModel {
     private(set) var countdownOverlayEnabledValue: Bool
     private(set) var soundThemeValue: SoundTheme
     private(set) var preferredLanguage: AppLanguage
+    private(set) var canCheckForUpdates: Bool
     private(set) var errorMessage: String?
     
     init(
@@ -24,13 +31,17 @@ final class SettingsViewModel {
         menuBarViewModel: MenuBarViewModel,
         permissionManager: PermissionManager,
         launchAtLoginManager: LaunchAtLoginManaging,
-        onOpenOnboarding: @escaping () -> Void
+        appUpdater: any AppUpdating,
+        onOpenOnboarding: @escaping () -> Void,
+        openExternalURL: @escaping (URL) -> Bool = { NSWorkspace.shared.open($0) }
     ) {
         self.modelContext = modelContext
         self.menuBarViewModel = menuBarViewModel
         self.permissionManager = permissionManager
         self.launchAtLoginManager = launchAtLoginManager
+        self.appUpdater = appUpdater
         self.onOpenOnboarding = onOpenOnboarding
+        self.openExternalURL = openExternalURL
         self.permissionState = permissionManager.accessibilityPermissionState
         self.launchAtLoginEnabled = launchAtLoginManager.isEnabled
         try? NudgeWhipDataBootstrap.ensureDefaults(in: modelContext)
@@ -39,8 +50,13 @@ final class SettingsViewModel {
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
         self.soundThemeValue = currentSettings?.soundTheme ?? .whip
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
+        self.canCheckForUpdates = appUpdater.canCheckForUpdates
         AppLanguageStore.shared.refresh(from: currentSettings)
         menuBarViewModel.refreshMenuSnapshot()
+
+        self.appUpdater.onCanCheckForUpdatesChanged = { [weak self] canCheck in
+            self?.canCheckForUpdates = canCheck
+        }
     }
     
     var settings: UserSettings? {
@@ -61,6 +77,10 @@ final class SettingsViewModel {
     
     var scheduleEndTimeValue: Date {
         menuBarViewModel.scheduleEndTime
+    }
+
+    var isAppUpdaterConfigured: Bool {
+        appUpdater.isConfigured
     }
     
     func refreshPermission() {
@@ -85,9 +105,32 @@ final class SettingsViewModel {
     func openOnboarding() {
         onOpenOnboarding()
     }
+
+    @discardableResult
+    func openGitHubProfile() -> Bool {
+        openExternalLink(Self.githubProfileURL)
+    }
+
+    @discardableResult
+    func openGitHubRepository() -> Bool {
+        openExternalLink(Self.githubRepositoryURL)
+    }
     
     func resetIdleTimer() {
         menuBarViewModel.resetIdleTimer()
+    }
+
+    func checkForUpdates() {
+        guard appUpdater.isConfigured else {
+            errorMessage = localizedAppString(
+                "settings.section.app.updates.not_configured",
+                defaultValue: "Sparkle is not configured yet. Set SUFeedURL and SUPublicEDKey for this build first."
+            )
+            return
+        }
+
+        appUpdater.checkForUpdates()
+        errorMessage = nil
     }
     
     func updateIdleThreshold(_ value: Int) {
@@ -165,5 +208,14 @@ final class SettingsViewModel {
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
         soundThemeValue = resolvedSettings?.soundTheme ?? soundThemeValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
+    }
+
+    @discardableResult
+    private func openExternalLink(_ url: URL) -> Bool {
+        let opened = openExternalURL(url)
+        errorMessage = opened
+            ? nil
+            : localizedAppString("settings.section.app.github.error", defaultValue: "Could not open the GitHub link.")
+        return opened
     }
 }

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D5AFDB94E40CEF5DC59E9868 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 42DE9DF62C54BE043D18A6BE /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E8D43A522F7E559F00C95F50 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -32,16 +36,22 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E8D43A442F7E559D00C95F50 /* nudgewhip */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = nudgewhip;
 			sourceTree = "<group>";
 		};
 		E8D43A542F7E559F00C95F50 /* nudgewhipTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = nudgewhipTests;
 			sourceTree = "<group>";
 		};
 		E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = nudgewhipUITests;
 			sourceTree = "<group>";
 		};
@@ -52,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5AFDB94E40CEF5DC59E9868 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +123,7 @@
 			);
 			name = NudgeWhip;
 			packageProductDependencies = (
+				42DE9DF62C54BE043D18A6BE /* Sparkle */,
 			);
 			productName = NudgeWhip;
 			productReference = E8D43A422F7E559D00C95F50 /* NudgeWhip.app */;
@@ -134,8 +146,6 @@
 				E8D43A542F7E559F00C95F50 /* nudgewhipTests */,
 			);
 			name = nudgewhipTests;
-			packageProductDependencies = (
-			);
 			productName = nudgewhipTests;
 			productReference = E8D43A512F7E559F00C95F50 /* nudgewhipTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,8 +167,6 @@
 				E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */,
 			);
 			name = nudgewhipUITests;
-			packageProductDependencies = (
-			);
 			productName = nudgewhipUITests;
 			productReference = E8D43A5B2F7E559F00C95F50 /* nudgewhipUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -195,6 +203,9 @@
 			);
 			mainGroup = E8D43A392F7E559D00C95F50;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AB04770D17A798FA22AC3102 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E8D43A432F7E559D00C95F50 /* Products */;
 			projectDirPath = "";
@@ -408,6 +419,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NudgeWhip;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUFeedURL = "$(SPARKLE_APPCAST_URL)";
+				INFOPLIST_KEY_SUPublicEDKey = "$(SPARKLE_PUBLIC_ED_KEY)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -418,6 +431,8 @@
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
+				SPARKLE_APPCAST_URL = "";
+				SPARKLE_PUBLIC_ED_KEY = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -444,6 +459,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NudgeWhip;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_SUFeedURL = "$(SPARKLE_APPCAST_URL)";
+				INFOPLIST_KEY_SUPublicEDKey = "$(SPARKLE_PUBLIC_ED_KEY)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -454,6 +471,8 @@
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
+				SPARKLE_APPCAST_URL = "";
+				SPARKLE_PUBLIC_ED_KEY = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -583,6 +602,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AB04770D17A798FA22AC3102 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		42DE9DF62C54BE043D18A6BE /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB04770D17A798FA22AC3102 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E8D43A3A2F7E559D00C95F50 /* Project object */;
 }

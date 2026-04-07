@@ -7,6 +7,7 @@ final class NudgeWhipAppController {
     @MainActor static let shared = NudgeWhipAppController()
     
     let menuBarViewModel: MenuBarViewModel
+    let appUpdater: AppUpdater
     private let alertManager: AlertManager
     private let onboardingCoordinator: OnboardingCoordinator
     private let settingsCoordinator: SettingsCoordinator
@@ -15,6 +16,8 @@ final class NudgeWhipAppController {
     
     private init() {
         let permissionManager = PermissionManager()
+        let appUpdater = AppUpdater()
+        self.appUpdater = appUpdater
         let alertManager = AlertManager()
         self.alertManager = alertManager
         let sessionTracker = SessionTracker()
@@ -55,7 +58,8 @@ final class NudgeWhipAppController {
             modelContainer: NudgeWhipModelContainer.shared,
             menuBarViewModel: menuBarViewModel,
             permissionManager: permissionManager,
-            launchAtLoginManager: LaunchAtLoginManager()
+            launchAtLoginManager: LaunchAtLoginManager(),
+            appUpdater: appUpdater
         ) {
             DispatchQueue.main.async {
                 onboardingCoordinator.present(startAtWelcome: true)
