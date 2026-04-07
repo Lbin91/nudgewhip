@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		E8D43A422F7E559D00C95F50 /* nudge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nudge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8D43A422F7E559D00C95F50 /* NudgeWhip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NudgeWhip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D43A512F7E559F00C95F50 /* nudgeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D43A5B2F7E559F00C95F50 /* nudgeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,7 +85,7 @@
 		E8D43A432F7E559D00C95F50 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8D43A422F7E559D00C95F50 /* nudge.app */,
+				E8D43A422F7E559D00C95F50 /* NudgeWhip.app */,
 				E8D43A512F7E559F00C95F50 /* nudgeTests.xctest */,
 				E8D43A5B2F7E559F00C95F50 /* nudgeUITests.xctest */,
 			);
@@ -113,8 +113,8 @@
 			name = nudge;
 			packageProductDependencies = (
 			);
-			productName = nudge;
-			productReference = E8D43A422F7E559D00C95F50 /* nudge.app */;
+			productName = NudgeWhip;
+			productReference = E8D43A422F7E559D00C95F50 /* NudgeWhip.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E8D43A502F7E559F00C95F50 /* nudgeTests */ = {
@@ -413,7 +413,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = nudge;
+				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -448,7 +449,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = nudge;
+				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -476,7 +478,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nudge.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/nudge";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NudgeWhip.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NudgeWhip";
 			};
 			name = Debug;
 		};
@@ -497,7 +499,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nudge.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/nudge";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NudgeWhip.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/NudgeWhip";
 			};
 			name = Release;
 		};

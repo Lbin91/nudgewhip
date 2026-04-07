@@ -7,3 +7,7 @@
 !nudge.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 build/
 .sisyphus
+docs/
+.claude/
+TODO.md
+xcuserdata/
