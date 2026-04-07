@@ -4,6 +4,7 @@ import AppKit
 struct NudgePreviewCard: View {
     @Binding var idleThresholdSeconds: Int
     @Binding var activePreviewStyle: AlertVisualStyle?
+    @State private var previewSoundPlayer = AlertSoundPlayer()
     
     var body: some View {
         OnboardingSectionCard(
@@ -11,22 +12,28 @@ struct NudgePreviewCard: View {
             subtitle: nil
         ) {
             VStack(alignment: .leading, spacing: 16) {
-                // Modes
+                // Visual modes
                 HStack(spacing: 8) {
                     previewButton(style: .perimeterPulse, title: localizedAppString("onboarding.preview.gentle.button", defaultValue: "Gentle\n(Step 1)"))
                     previewButton(style: .gentleNudge, title: localizedAppString("onboarding.preview.moderate.button", defaultValue: "Moderate\n(Step 2)"))
                     previewButton(style: .strongVisualNudge, title: localizedAppString("onboarding.preview.strong.button", defaultValue: "Strong\n(Step 3)"))
                 }
                 
-                // Sound button
-                HStack {
-                    Button {
-                        playPreviewSound(style: .perimeterPulse)
-                    } label: {
-                        Label(localizedAppString("onboarding.preview.sound.button", defaultValue: "Preview sound"), systemImage: "play.circle.fill")
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(localizedAppString("onboarding.preview.sound.title", defaultValue: "Compare sound themes"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+
+                    HStack(spacing: 8) {
+                        previewSoundButton(
+                            title: localizedAppString("onboarding.preview.sound.whip.button", defaultValue: "Preview Whip!"),
+                            theme: .whip
+                        )
+                        previewSoundButton(
+                            title: localizedAppString("onboarding.preview.sound.normal.button", defaultValue: "Preview Light"),
+                            theme: .normal
+                        )
                     }
-                    .buttonStyle(.plain)
-                    .disabled(activePreviewStyle != nil)
                 }
                 
                 Divider()
@@ -51,6 +58,9 @@ struct NudgePreviewCard: View {
                     }
                 }
             }
+        }
+        .onDisappear {
+            previewSoundPlayer.stopAll()
         }
     }
     
@@ -114,16 +124,39 @@ struct NudgePreviewCard: View {
     
     private func startPreview(_ style: AlertVisualStyle) {
         activePreviewStyle = style
-        playPreviewSound(style: style)
+    }
+
+    private func previewSoundButton(title: String, theme: SoundTheme) -> some View {
+        Button {
+            playPreviewSound(theme: theme)
+        } label: {
+            Label(title, systemImage: "play.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 36)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(
+                    Color.nudgeBgSurfaceAlt,
+                    in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(activePreviewStyle != nil)
     }
     
-    private func playPreviewSound(style: AlertVisualStyle) {
-        let soundName: String
-        switch style {
-        case .perimeterPulse: soundName = "Tink"
-        case .gentleNudge: soundName = "Hero"
-        case .strongVisualNudge: soundName = "Sosumi"
-        }
-        NSSound(named: soundName)?.play()
+    private func playPreviewSound(theme: SoundTheme) {
+        previewSoundPlayer.stopAll()
+        let runtimePlan = alertSoundPlan(for: .strongVisualNudge, theme: theme)
+        let previewPlan = AlertSoundPlan(
+            soundName: runtimePlan.soundName,
+            repeatCount: 1,
+            repeatInterval: 0
+        )
+        previewSoundPlayer.play(
+            named: previewPlan.soundName,
+            repeatCount: previewPlan.repeatCount,
+            interval: previewPlan.repeatInterval
+        )
     }
 }

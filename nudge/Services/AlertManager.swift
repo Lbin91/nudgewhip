@@ -43,9 +43,9 @@ final class AlertSoundPlayer: AlertSoundPlaying {
     private var generation = 0
 
     func play(named soundName: String, repeatCount: Int, interval: TimeInterval) {
+        cancelAllPlayback(advanceGeneration: false)
         generation += 1
         let playGeneration = generation
-        stopAll()
         guard repeatCount > 0 else { return }
 
         for index in 0..<repeatCount {
@@ -58,7 +58,13 @@ final class AlertSoundPlayer: AlertSoundPlaying {
     }
 
     func stopAll() {
-        generation += 1
+        cancelAllPlayback(advanceGeneration: true)
+    }
+
+    private func cancelAllPlayback(advanceGeneration: Bool) {
+        if advanceGeneration {
+            generation += 1
+        }
         pendingWorkItems.forEach { $0.cancel() }
         pendingWorkItems.removeAll()
 
@@ -101,10 +107,38 @@ final class AlertSoundPlayer: AlertSoundPlaying {
     }
 }
 
-private struct AlertSoundPlan: Equatable {
+struct AlertSoundPlan: Equatable, Sendable {
     let soundName: String
     let repeatCount: Int
     let repeatInterval: TimeInterval
+}
+
+func alertSoundPlan(for style: AlertVisualStyle, theme: SoundTheme) -> AlertSoundPlan {
+    if theme == .whip {
+        let repeatCount: Int
+        switch style {
+        case .perimeterPulse:
+            repeatCount = 1
+        case .gentleNudge:
+            repeatCount = 2
+        case .strongVisualNudge:
+            repeatCount = 3
+        }
+
+        return AlertSoundPlan(soundName: "cowboy_step1", repeatCount: repeatCount, repeatInterval: 2.0)
+    }
+
+    let soundName: String
+    switch style {
+    case .perimeterPulse:
+        soundName = "Tink"
+    case .gentleNudge:
+        soundName = "Hero"
+    case .strongVisualNudge:
+        soundName = "Sosumi"
+    }
+
+    return AlertSoundPlan(soundName: soundName, repeatCount: 1, repeatInterval: 0)
 }
 
 @MainActor
@@ -120,7 +154,7 @@ final class AlertManager: AlertManaging {
     private var alertsPerHourLimit = 6
     private var thirdStagePerHourLimit = 2
     private var currentSpecies: String = "default"
-    private var currentSoundTheme: SoundTheme = .normal
+    private var currentSoundTheme: SoundTheme = .whip
     
     init(
         presenter: AlertPresenting? = nil,
@@ -149,7 +183,7 @@ final class AlertManager: AlertManaging {
         }
         
         if activeStyle != nextStyle && canPresentVisualAlert {
-            let soundPlan = Self.soundPlan(for: nextStyle, theme: currentSoundTheme)
+            let soundPlan = alertSoundPlan(for: nextStyle, theme: currentSoundTheme)
             soundPlayer.play(
                 named: soundPlan.soundName,
                 repeatCount: soundPlan.repeatCount,
@@ -179,37 +213,6 @@ final class AlertManager: AlertManaging {
         self.currentSpecies = species
     }
 
-    private static func soundPlan(for style: AlertVisualStyle, theme: SoundTheme) -> AlertSoundPlan {
-        if theme == .whip {
-            let repeatCount: Int
-            switch style {
-            case .perimeterPulse:
-                repeatCount = 1
-            case .gentleNudge:
-                repeatCount = 2
-            case .strongVisualNudge:
-                repeatCount = 3
-            }
-
-            // `cowboy_step1.mp3` is about 1.92s long. Keep the repeats slightly
-            // past the clip duration so the lash pattern reads as deliberate
-            // repeated cracks instead of a blurred overlap.
-            return AlertSoundPlan(soundName: "cowboy_step1", repeatCount: repeatCount, repeatInterval: 2.0)
-        }
-
-        let soundName: String
-        switch style {
-        case .perimeterPulse:
-            soundName = "Tink"
-        case .gentleNudge:
-            soundName = "Hero"
-        case .strongVisualNudge:
-            soundName = "Sosumi"
-        }
-
-        return AlertSoundPlan(soundName: soundName, repeatCount: 1, repeatInterval: 0)
-    }
-    
     private func visualStyle(for snapshot: RuntimeSnapshot) -> AlertVisualStyle? {
         guard snapshot.runtimeState == .alerting else { return nil }
         

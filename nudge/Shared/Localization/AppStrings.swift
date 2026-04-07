@@ -11,9 +11,14 @@ enum AppLanguage: String, CaseIterable, Codable, Sendable {
     case english = "en"
     case korean = "ko"
 
-    static func resolve(_ identifier: String?) -> AppLanguage {
-        guard let identifier else { return .english }
-        let normalized = identifier.lowercased()
+    static func resolve(
+        _ identifier: String?,
+        preferredLanguages: [String] = Locale.preferredLanguages
+    ) -> AppLanguage {
+        let resolvedIdentifier = identifier ?? preferredLanguages.first
+        guard let resolvedIdentifier else { return .english }
+
+        let normalized = resolvedIdentifier.lowercased()
         if normalized.hasPrefix("ko") {
             return .korean
         }
@@ -34,7 +39,7 @@ enum AppLanguage: String, CaseIterable, Codable, Sendable {
 final class AppLanguageStore {
     static let shared = AppLanguageStore()
 
-    private(set) var preferredLocaleIdentifier = AppLanguage.english.rawValue
+    private(set) var preferredLocaleIdentifier = AppLanguage.resolve(nil).rawValue
 
     func apply(preferredLocaleIdentifier: String?) {
         self.preferredLocaleIdentifier = AppLanguage.resolve(preferredLocaleIdentifier).rawValue

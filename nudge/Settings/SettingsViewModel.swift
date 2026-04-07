@@ -35,9 +35,9 @@ final class SettingsViewModel {
         self.launchAtLoginEnabled = launchAtLoginManager.isEnabled
         try? NudgeDataBootstrap.ensureDefaults(in: modelContext)
         let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
-        self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 300
+        self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 180
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
-        self.soundThemeValue = currentSettings?.soundTheme ?? .normal
+        self.soundThemeValue = currentSettings?.soundTheme ?? .whip
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
         AppLanguageStore.shared.refresh(from: currentSettings)
         menuBarViewModel.refreshMenuSnapshot()

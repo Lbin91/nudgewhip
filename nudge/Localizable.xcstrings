@@ -2032,6 +2032,111 @@
         }
       }
     },
+    "onboarding.preview.sound.normal.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview Light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트 사운드 듣기"
+          }
+        }
+      }
+    },
+    "onboarding.preview.sound.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compare sound themes"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 테마 비교"
+          }
+        }
+      }
+    },
+    "onboarding.preview.sound.whip.button" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview Whip!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whip! 사운드 듣기"
+          }
+        }
+      }
+    },
+    "settings.section.monitoring.sound_theme" : {
+      "comment" : "Label for sound theme picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound theme"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 테마"
+          }
+        }
+      }
+    },
+    "settings.section.monitoring.sound_theme.normal" : {
+      "comment" : "Light sound theme option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트"
+          }
+        }
+      }
+    },
+    "settings.section.monitoring.sound_theme.whip" : {
+      "comment" : "Whip sound theme option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whip!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whip!"
+          }
+        }
+      }
+    },
     "onboarding.preview.strong.button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2451,13 +2556,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "5 min (Recommended)"
+            "value" : "5 min"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "5분(추천)"
+            "value" : "5분"
           }
         }
       }

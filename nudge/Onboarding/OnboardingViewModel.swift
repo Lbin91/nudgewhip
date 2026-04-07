@@ -241,7 +241,7 @@ final class OnboardingViewModel {
         let settings = try? context.fetch(FetchDescriptor<UserSettings>()).first
         
         return OnboardingDraft(
-            idleThresholdSeconds: settings?.idleThresholdSeconds ?? 300,
+            idleThresholdSeconds: 180,
             launchAtLoginEnabled: storage.shouldPresentOnboarding ? true : launchAtLoginManager.isEnabled,
             countdownOverlayEnabled: settings?.countdownOverlayEnabled ?? true,
             preferredLanguage: AppLanguage.resolve(settings?.preferredLocaleIdentifier),

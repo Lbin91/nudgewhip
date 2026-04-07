@@ -49,6 +49,13 @@ func localizedDurationStringUsesSelectedAppLanguage() {
     #expect(localizedDurationString(3_661) == "1시간 1분")
 }
 
+@Test
+func appLanguageFallsBackToSupportedSystemLanguage() {
+    #expect(AppLanguage.resolve(nil, preferredLanguages: ["ko-KR"]) == .korean)
+    #expect(AppLanguage.resolve(nil, preferredLanguages: ["en-US"]) == .english)
+    #expect(AppLanguage.resolve(nil, preferredLanguages: ["ja-JP"]) == .english)
+}
+
 @MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool
@@ -276,7 +283,8 @@ struct nudgeTests {
         #expect(settings.count == 1)
         #expect(settings.first?.petPresentationMode == .sprout)
         #expect(settings.first?.countdownOverlayEnabled == true)
-        #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.english.rawValue)
+        #expect(settings.first?.soundTheme == .whip)
+        #expect(settings.first?.preferredLocaleIdentifier == nil)
         #expect(petStates.count == 1)
         #expect(petStates.first?.hatchStage == .hatched)
         #expect(petStates.first?.characterType == .partyMask)

@@ -44,22 +44,22 @@ final class UserSettings {
 
     /// 사운드 테마 설정 변환
     var soundTheme: SoundTheme {
-        get { SoundTheme(rawValue: soundThemeRawValue) ?? .normal }
+        get { SoundTheme(rawValue: soundThemeRawValue) ?? .whip }
         set { soundThemeRawValue = newValue.rawValue }
     }
     
     /// 모든 설정값의 기본값을 제공하는 이니셜라이저
     init(
-        idleThresholdSeconds: Int = 300,
+        idleThresholdSeconds: Int = 180,
         gentleAlertLeadSeconds: Int = 30,
         strongAlertLeadSeconds: Int = 60,
         alertsPerHourLimit: Int = 6,
         notificationNudgePerHourLimit: Int = 2,
         breakSuggestionEnabled: Bool = true,
         proUnlocked: Bool = false,
-        preferredLocaleIdentifier: String? = AppLanguage.english.rawValue,
+        preferredLocaleIdentifier: String? = nil,
         petPresentationMode: PetPresentationMode = .sprout,
-        soundTheme: SoundTheme = .normal,
+        soundTheme: SoundTheme = .whip,
         countdownOverlayEnabled: Bool = true,
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,

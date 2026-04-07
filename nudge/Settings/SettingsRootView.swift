@@ -77,8 +77,8 @@ struct SettingsRootView: View {
                         get: { viewModel.soundThemeValue },
                         set: viewModel.updateSoundTheme
                     )) {
-                        Text(localizedAppString("settings.section.monitoring.sound_theme.normal", defaultValue: "Normal")).tag(SoundTheme.normal)
                         Text(localizedAppString("settings.section.monitoring.sound_theme.whip", defaultValue: "Whip!")).tag(SoundTheme.whip)
+                        Text(localizedAppString("settings.section.monitoring.sound_theme.normal", defaultValue: "Light")).tag(SoundTheme.normal)
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()

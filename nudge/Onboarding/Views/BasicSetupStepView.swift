@@ -17,14 +17,14 @@ struct BasicSetupStepView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                         thresholdButton(
-                            title: localizedAppString("onboarding.setup.idle_threshold.10s", defaultValue: "10 sec (Test)"),
-                            subtitle: localizedAppString("onboarding.setup.idle_threshold.10s.subtitle", defaultValue: "For testing"),
-                            value: 10
+                            title: localizedAppString("onboarding.setup.idle_threshold.1m", defaultValue: "1 min"),
+                            subtitle: nil,
+                            value: 60
                         )
-                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min"), subtitle: nil, value: 180)
+                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min (Recommended)"), subtitle: localizedAppString("onboarding.setup.idle_threshold.3m.subtitle", defaultValue: "Recommended"), value: 180)
                         thresholdButton(
-                            title: localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min (Recommended)"),
-                            subtitle: localizedAppString("onboarding.setup.idle_threshold.5m.subtitle", defaultValue: "Recommended"),
+                            title: localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min"),
+                            subtitle: nil,
                             value: 300
                         )
                         thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.10m", defaultValue: "10 min"), subtitle: nil, value: 600)
