@@ -12,7 +12,7 @@ struct OnboardingHeroView: View {
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(accentColor)
                 .frame(width: 38, height: 38)
-                .background(accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
