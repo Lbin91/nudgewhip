@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip launch screen" width="1200" />
-</p>
+![NudgeWhip launch screen](docs/assets/readme/nudgewhip-launch-screen.png)
 
 <p align="center">
   <a href="docs/release/v0.1.0.md">
@@ -86,9 +84,7 @@ This beta already includes a real working loop:
 
 ## Screenshot
 
-<p align="center">
-  <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip macOS menu bar surface" width="1100" />
-</p>
+![NudgeWhip macOS menu bar surface](docs/assets/readme/nudgewhip-launch-screen.png)
 
 <p align="center">
   <em>Current menu bar release candidate surface.</em>
