@@ -1,6 +1,9 @@
 ![NudgeWhip launch screen](docs/assets/readme/nudgewhip-launch-screen.png)
 
 <p align="center">
+  <a href="LICENSE">
+    <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-3DA639?style=for-the-badge&logo=license">
+  </a>
   <a href="docs/release/v0.1.0.md">
     <img alt="v0.1.0 Public Beta" src="https://img.shields.io/badge/release-v0.1.0%20public%20beta-E35D3D?style=for-the-badge">
   </a>
@@ -197,4 +200,4 @@ It is an active public-beta / portfolio-stage product:
 
 ## License
 
-License selection is not finalized yet for the public release branch.
+This project is licensed under the [MIT License](LICENSE).
