@@ -29,9 +29,9 @@
   ·
   <a href="docs/privacy/accessibility-and-data-disclosure.md"><strong>Privacy</strong></a>
   ·
-  <a href="https://github.com/Lbin91/nudge/issues"><strong>Issues</strong></a>
+  <a href="https://github.com/Lbin91/nudgewhip/issues"><strong>Issues</strong></a>
   ·
-  <a href="https://github.com/Lbin91/nudge/releases"><strong>Releases</strong></a>
+  <a href="https://github.com/Lbin91/nudgewhip/releases"><strong>Releases</strong></a>
 </p>
 
 ## Why NudgeWhip
