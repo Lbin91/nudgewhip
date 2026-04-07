@@ -89,7 +89,10 @@ This beta already includes a real working loop:
 
 ## In The Menu Bar
 
-![NudgeWhip macOS menu bar surface](docs/assets/readme/nudgewhip-launch-screen.png)
+<p align="center">
+  <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip onboarding surface" width="400" />
+  <img src="docs/assets/readme/nudgewhip-menubar.png" alt="NudgeWhip menu bar dropdown" width="400" />
+</p>
 
 <p align="center">
   <em>The little devil lives in the menu bar and steps in when attention starts to slide.</em>
