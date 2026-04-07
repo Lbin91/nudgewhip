@@ -21,7 +21,7 @@ struct BasicSetupStepView: View {
                             subtitle: nil,
                             value: 60
                         )
-                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min (Recommended)"), subtitle: localizedAppString("onboarding.setup.idle_threshold.3m.subtitle", defaultValue: "Recommended"), value: 180)
+                        thresholdButton(title: localizedAppString("onboarding.setup.idle_threshold.3m", defaultValue: "3 min"), subtitle: localizedAppString("onboarding.setup.idle_threshold.3m.subtitle", defaultValue: "Recommended"), value: 180)
                         thresholdButton(
                             title: localizedAppString("onboarding.setup.idle_threshold.5m", defaultValue: "5 min"),
                             subtitle: nil,

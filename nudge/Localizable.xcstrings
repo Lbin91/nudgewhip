@@ -94,7 +94,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩"
+            "value" : "NudgeWhip"
           }
         }
       }
@@ -152,60 +152,6 @@
         }
       }
     },
-    "menu.action.pause.10m" : {
-      "comment" : "Manual pause duration option for ten minutes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 min"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10분"
-          }
-        }
-      }
-    },
-    "menu.action.pause.30m" : {
-      "comment" : "Manual pause duration option for thirty minutes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 min"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30분"
-          }
-        }
-      }
-    },
-    "menu.action.pause.60m" : {
-      "comment" : "Manual pause duration option for sixty minutes.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "60 min"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "60분"
-          }
-        }
-      }
-    },
     "menu.action.pause.resume" : {
       "comment" : "Menu action shown while manual pause is active. Tapping it resumes monitoring immediately.",
       "extractionState" : "manual",
@@ -220,24 +166,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "일시 정지 해제"
-          }
-        }
-      }
-    },
-    "menu.action.pause.until_resumed" : {
-      "comment" : "Manual pause option that keeps pause active until the user resumes it.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Until resumed"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "켤 때까지"
           }
         }
       }
@@ -274,24 +202,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "오늘"
-          }
-        }
-      }
-    },
-    "menu.dropdown.group.workspace" : {
-      "comment" : "Group title for workspace metadata in the dropdown.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workspace"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "작업 환경"
           }
         }
       }
@@ -364,60 +274,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "무입력 기준 시간"
-          }
-        }
-      }
-    },
-    "menu.dropdown.label.pet_emotion" : {
-      "comment" : "Label for the current pet emotion.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet emotion"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 감정"
-          }
-        }
-      }
-    },
-    "menu.dropdown.label.pet_mode" : {
-      "comment" : "Label for the current pet presentation mode.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet mode"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 모드"
-          }
-        }
-      }
-    },
-    "menu.dropdown.label.pet_stage" : {
-      "comment" : "Label for the current pet growth stage.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet stage"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 단계"
           }
         }
       }
@@ -508,60 +364,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "시작"
-          }
-        }
-      }
-    },
-    "menu.dropdown.subtitle.bootstrap" : {
-      "comment" : "Subtitle describing the current bootstrap status of the menu bar app.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Localized menu bar bootstrap"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "로컬라이즈된 메뉴바 기초 구조"
-          }
-        }
-      }
-    },
-    "menu.dropdown.value.disabled" : {
-      "comment" : "Value shown when a toggle is disabled.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Disabled"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "끔"
-          }
-        }
-      }
-    },
-    "menu.dropdown.value.enabled" : {
-      "comment" : "Value shown when a toggle is enabled.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enabled"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "켬"
           }
         }
       }
@@ -676,60 +478,6 @@
     },
     "menu.dropdown.value.pet_mode.sprout" : {
       "comment" : "Localized value for the sprout pet presentation mode.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprout"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새싹"
-          }
-        }
-      }
-    },
-    "menu.dropdown.value.pet_stage.buddy" : {
-      "comment" : "Localized value for the buddy pet growth stage.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buddy"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "버디"
-          }
-        }
-      }
-    },
-    "menu.dropdown.value.pet_stage.guide" : {
-      "comment" : "Localized value for the guide pet growth stage.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guide"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "가이드"
-          }
-        }
-      }
-    },
-    "menu.dropdown.value.pet_stage.sprout" : {
-      "comment" : "Localized value for the sprout pet growth stage.",
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
@@ -1266,7 +1014,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩 설정"
+            "value" : "NudgeWhip 설정"
           }
         }
       }
@@ -1643,24 +1391,6 @@
         }
       }
     },
-    "onboarding.completion.ready.summary.visual_mode" : {
-      "comment" : "Summary label for visual mode on the ready completion step.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visual mode"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "표시 방식"
-          }
-        }
-      }
-    },
     "onboarding.completion.ready.title" : {
       "comment" : "Main title for the ready completion step.",
       "extractionState" : "stale",
@@ -1745,7 +1475,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩은 전역 입력 활동을 감지해 무입력 상태를 파악하고, 로컬 넛지를 표시하기 위해서만 이 권한을 사용합니다."
+            "value" : "NudgeWhip은 전역 입력 활동을 감지해 무입력 상태를 파악하고, 로컬 넛지를 표시하기 위해서만 이 권한을 사용합니다."
           }
         }
       }
@@ -1942,7 +1672,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "백그라운드 입력 감지를 허용하면 넛지휩이 무입력 상태를 감지할 수 있어요."
+            "value" : "백그라운드 입력 감지를 허용하면 NudgeWhip이 무입력 상태를 감지할 수 있어요."
           }
         }
       }
@@ -2015,23 +1745,6 @@
         }
       }
     },
-    "onboarding.preview.sound.button" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preview sound"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사운드 미리 듣기"
-          }
-        }
-      }
-    },
     "onboarding.preview.sound.normal.button" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2079,60 +1792,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Whip! 사운드 듣기"
-          }
-        }
-      }
-    },
-    "settings.section.monitoring.sound_theme" : {
-      "comment" : "Label for sound theme picker.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sound theme"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "사운드 테마"
-          }
-        }
-      }
-    },
-    "settings.section.monitoring.sound_theme.normal" : {
-      "comment" : "Light sound theme option.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Light"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "라이트"
-          }
-        }
-      }
-    },
-    "settings.section.monitoring.sound_theme.whip" : {
-      "comment" : "Whip sound theme option.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Whip!"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Whip!"
           }
         }
       }
@@ -2455,7 +2114,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩이 실제로 모니터링하고 알려줄 시간을 정해주세요."
+            "value" : "NudgeWhip이 실제로 모니터링하고 알려줄 시간을 정해주세요."
           }
         }
       }
@@ -2531,6 +2190,24 @@
         }
       }
     },
+    "onboarding.setup.idle_threshold.1m" : {
+      "comment" : "Idle threshold option for one minute during onboarding.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 min"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1분"
+          }
+        }
+      }
+    },
     "onboarding.setup.idle_threshold.3m" : {
       "comment" : "Idle threshold option for three minutes during onboarding.",
       "extractionState" : "stale",
@@ -2545,6 +2222,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "3분"
+          }
+        }
+      }
+    },
+    "onboarding.setup.idle_threshold.3m.subtitle" : {
+      "comment" : "Subtitle for the 3-minute recommended idle threshold option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommended"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "추천"
           }
         }
       }
@@ -2567,24 +2262,6 @@
         }
       }
     },
-    "onboarding.setup.idle_threshold.5m.subtitle" : {
-      "comment" : "Subtitle for the 5-minute recommended idle threshold option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recommended"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기본 추천"
-          }
-        }
-      }
-    },
     "onboarding.setup.idle_threshold.10m" : {
       "comment" : "Idle threshold option for ten minutes during onboarding.",
       "extractionState" : "stale",
@@ -2599,42 +2276,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "10분"
-          }
-        }
-      }
-    },
-    "onboarding.setup.idle_threshold.10s" : {
-      "comment" : "Idle threshold option for ten seconds during onboarding for testing.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 sec (Test)"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10초(테스트)"
-          }
-        }
-      }
-    },
-    "onboarding.setup.idle_threshold.10s.subtitle" : {
-      "comment" : "Subtitle for the 10-second test idle threshold option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "For testing"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "테스트용"
           }
         }
       }
@@ -2757,7 +2398,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩 자동 실행과 상단 카운트다운 오버레이 표시 여부를 선택합니다."
+            "value" : "NudgeWhip 자동 실행과 상단 카운트다운 오버레이 표시 여부를 선택합니다."
           }
         }
       }
@@ -2776,114 +2417,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "첫 세션에 사용할 기본값을 선택해 주세요."
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.label" : {
-      "comment" : "Label for the visual mode picker during onboarding.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visual mode"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "기본 표시 방식"
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.minimal" : {
-      "comment" : "Visual mode option for minimal during onboarding.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimal"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미니멀"
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.minimal.subtitle" : {
-      "comment" : "Subtitle for the minimal visual mode option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quieter"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "더 조용하게"
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.sprout" : {
-      "comment" : "Visual mode option for sprout during onboarding.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprout"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새싹"
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.sprout.subtitle" : {
-      "comment" : "Subtitle for the sprout visual mode option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "With a character"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "캐릭터와 함께"
-          }
-        }
-      }
-    },
-    "onboarding.setup.visual_mode.subtitle" : {
-      "comment" : "Subtitle for the visual mode picker during onboarding.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pick the presentation style that feels the least distracting."
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "가장 방해가 되지 않는 표시 방식을 선택하세요."
           }
         }
       }
@@ -2973,7 +2506,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩 시작하기"
+            "value" : "NudgeWhip 시작하기"
           }
         }
       }
@@ -3108,18 +2641,14 @@
 
     },
     "preview.badge" : {
-      "extractionState" : "manual",
+      "comment" : "The text for the badge that appears at the top-right corner of the preview overlay, indicating that it is a preview.",
+      "extractionState" : "extracted_with_value",
+      "isCommentAutoGenerated" : true,
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "new",
             "value" : "Preview"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미리보기"
           }
         }
       }
@@ -3357,114 +2886,6 @@
         }
       }
     },
-    "settings.section.app.open_onboarding" : {
-      "comment" : "Button to reopen the onboarding flow.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open setup guide"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "초기 설정 다시 보기"
-          }
-        }
-      }
-    },
-    "settings.section.app.reset_idle_timer" : {
-      "comment" : "Button to reset the idle timer.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset idle timer"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "타이머 재설정"
-          }
-        }
-      }
-    },
-    "settings.section.appearance" : {
-      "comment" : "Section title for appearance settings.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appearance"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "외관"
-          }
-        }
-      }
-    },
-    "settings.section.appearance.pet_mode" : {
-      "comment" : "Label for the pet presentation mode picker.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pet mode"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "펫 모드"
-          }
-        }
-      }
-    },
-    "settings.section.appearance.pet_mode.minimal" : {
-      "comment" : "Minimal pet presentation mode option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minimal"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "미니멀"
-          }
-        }
-      }
-    },
-    "settings.section.appearance.pet_mode.sprout" : {
-      "comment" : "Sprout pet presentation mode option.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprout"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "새싹"
-          }
-        }
-      }
-    },
     "settings.section.monitoring" : {
       "comment" : "Section title for monitoring settings.",
       "extractionState" : "stale",
@@ -3590,6 +3011,60 @@
         }
       }
     },
+    "settings.section.monitoring.sound_theme" : {
+      "comment" : "Label for sound theme picker.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sound theme"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "사운드 테마"
+          }
+        }
+      }
+    },
+    "settings.section.monitoring.sound_theme.normal" : {
+      "comment" : "Light sound theme option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "라이트"
+          }
+        }
+      }
+    },
+    "settings.section.monitoring.sound_theme.whip" : {
+      "comment" : "Whip sound theme option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whip!"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Whip!"
+          }
+        }
+      }
+    },
     "settings.section.schedule" : {
       "comment" : "Section title for schedule settings.",
       "extractionState" : "stale",
@@ -3674,7 +3149,7 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "넛지휩 설정"
+            "value" : "NudgeWhip 설정"
           }
         }
       }

@@ -14,6 +14,14 @@ enum NudgeDataBootstrap {
         let settings = try context.fetch(FetchDescriptor<UserSettings>())
         if settings.isEmpty {
             context.insert(UserSettings())
+        } else {
+            for setting in settings where !setting.languageDefaultMigrationCompleted {
+                if setting.preferredLocaleIdentifier == AppLanguage.english.rawValue {
+                    setting.preferredLocaleIdentifier = nil
+                }
+                setting.languageDefaultMigrationCompleted = true
+                setting.updatedAt = .now
+            }
         }
         
         let petStates = try context.fetch(FetchDescriptor<PetState>())

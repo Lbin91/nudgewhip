@@ -285,10 +285,31 @@ struct nudgeTests {
         #expect(settings.first?.countdownOverlayEnabled == true)
         #expect(settings.first?.soundTheme == .whip)
         #expect(settings.first?.preferredLocaleIdentifier == nil)
+        #expect(settings.first?.languageDefaultMigrationCompleted == true)
         #expect(petStates.count == 1)
         #expect(petStates.first?.hatchStage == .hatched)
         #expect(petStates.first?.characterType == .partyMask)
         #expect(petStates.first?.emotion == .sleep)
+    }
+
+    @MainActor
+    @Test
+    func bootstrapMigratesLegacyEnglishDefaultLanguageToSystemFollowing() throws {
+        let container = try NudgeModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let legacySettings = UserSettings(
+            preferredLocaleIdentifier: AppLanguage.english.rawValue,
+            languageDefaultMigrationCompleted: false
+        )
+        context.insert(legacySettings)
+        try context.save()
+
+        try NudgeDataBootstrap.ensureDefaults(in: context)
+
+        let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        #expect(settings.preferredLocaleIdentifier == nil)
+        #expect(settings.languageDefaultMigrationCompleted)
     }
     
     @Test
