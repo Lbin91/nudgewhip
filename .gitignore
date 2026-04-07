@@ -7,7 +7,22 @@
 !nudgewhip.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 build/
 .sisyphus
-docs/
+# Track only product-facing docs and README assets under docs/.
+docs/*
+!docs/app/
+!docs/app/**
+!docs/architecture/
+!docs/architecture/**
+!docs/assets/
+docs/assets/*
+!docs/assets/readme/
+!docs/assets/readme/**
+!docs/privacy/
+!docs/privacy/**
+!docs/qa/
+!docs/qa/**
+!docs/release/
+!docs/release/**
 .claude/
 AGENTS.md
 CLAUDE.md
