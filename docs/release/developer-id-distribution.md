@@ -2,6 +2,10 @@
 
 This repository targets public distribution outside the Mac App Store.
 
+> Local release automation is intentionally not committed to the public repository.
+> The steps below describe the required flow, but the exact archive/export/notarize
+> scripts are maintained locally.
+
 ## Prerequisites
 
 - `Developer ID Application` certificate installed in the local keychain
@@ -22,48 +26,28 @@ xcrun notarytool store-credentials nudgewhip-notary \
 
 ## Build a public DMG
 
-```bash
-scripts/build_release_dmg.sh
-```
+Required flow:
 
-This archives the app, exports a Developer ID signed `.app`, and creates a DMG in:
-
-```bash
-dist/sparkle/
-```
+1. Archive the app for generic macOS distribution
+2. Export a `Developer ID Application` signed `.app`
+3. Package the exported app into a DMG for public distribution
+4. Place the final DMG in a release artifacts directory such as `dist/sparkle/`
 
 ## Notarize and staple
 
-```bash
-scripts/build_release_dmg.sh --notarize
-```
+Required flow:
 
-Or notarize an existing DMG directly:
-
-```bash
-scripts/notarize_dmg.sh dist/sparkle/<your-dmg>
-```
+1. Submit the DMG to Apple using `xcrun notarytool submit --wait`
+2. Staple the approved ticket with `xcrun stapler staple`
+3. Validate the stapled DMG with `xcrun stapler validate`
 
 ## Generate Sparkle appcast
 
 After placing notarized DMG or ZIP archives in `dist/sparkle/`:
 
-```bash
-SPARKLE_RELEASE_TAG=v0.1.0 scripts/generate_sparkle_appcast.sh dist/sparkle
-```
-
-This updates:
-
-```bash
-docs/release/appcast.xml
-```
-
-If you do not use GitHub Releases, you can instead provide a full download prefix:
-
-```bash
-SPARKLE_DOWNLOAD_URL_PREFIX=https://example.com/downloads/v0.1.0 \
-scripts/generate_sparkle_appcast.sh dist/sparkle
-```
+1. Run Sparkle's `generate_appcast` tool locally
+2. Point the generated enclosure URLs at your public download location
+3. Publish the resulting `docs/release/appcast.xml`
 
 ## Current feed URL
 

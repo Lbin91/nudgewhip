@@ -8,6 +8,7 @@
 build/
 .build/
 dist/
+scripts/
 .sisyphus
 # Track only product-facing docs and README assets under docs/.
 docs/*
