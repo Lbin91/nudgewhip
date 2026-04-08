@@ -1,11 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"
-     xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"
-     xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <channel>
-    <title>NudgeWhip Appcast</title>
-    <link>https://github.com/Lbin91/nudgewhip/releases</link>
-    <description>Appcast for NudgeWhip macOS releases distributed via Sparkle.</description>
-    <language>en</language>
-  </channel>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+    <channel>
+        <title>NudgeWhip Appcast</title>
+        <link>https://github.com/Lbin91/nudgewhip/releases</link>
+        <description>Appcast for NudgeWhip macOS releases distributed via Sparkle.</description>
+        <language>en</language>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Wed, 08 Apr 2026 11:47:37 +0900</pubDate>
+            <link>https://github.com/Lbin91/nudgewhip/releases</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/Lbin91/nudgewhip/releases/download/v0.1.0/NudgeWhip-0.1.0-1.dmg" length="4327388" type="application/octet-stream"/>
+        </item>
+    </channel>
 </rss>

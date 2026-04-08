@@ -87,10 +87,15 @@ This beta already includes a real working loop:
 - settings window and launch-at-login toggle
 - Korean and English localization
 
-## In The Menu Bar
+## Onboarding
 
 <p align="center">
   <img src="docs/assets/readme/nudgewhip-launch-screen.png" alt="NudgeWhip onboarding surface" width="400" />
+</p>
+
+## In The Menu Bar
+
+<p align="center">
   <img src="docs/assets/readme/nudgewhip-menubar.png" alt="NudgeWhip menu bar dropdown" width="400" />
 </p>
 

@@ -36,22 +36,16 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E8D43A442F7E559D00C95F50 /* nudgewhip */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = nudgewhip;
 			sourceTree = "<group>";
 		};
 		E8D43A542F7E559F00C95F50 /* nudgewhipTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = nudgewhipTests;
 			sourceTree = "<group>";
 		};
 		E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = nudgewhipUITests;
 			sourceTree = "<group>";
 		};
@@ -426,7 +420,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhip;
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;
@@ -466,7 +460,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhip;
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;

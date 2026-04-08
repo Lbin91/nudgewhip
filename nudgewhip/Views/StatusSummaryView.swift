@@ -66,13 +66,14 @@ struct StatusSummaryView: View {
             Text(statusDetail)
                 .font(.caption)
                 .foregroundStyle(Color.nudgewhipTextSecondary)
-                .lineLimit(3)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var petAnchor: some View {
-        VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+        VStack(alignment: .center, spacing: NudgeWhipSpacing.s2) {
             Image("whip_devil")
                 .resizable()
                 .scaledToFit()

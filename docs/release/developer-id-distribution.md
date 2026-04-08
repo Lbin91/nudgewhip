@@ -49,13 +49,20 @@ scripts/notarize_dmg.sh dist/sparkle/<your-dmg>
 After placing notarized DMG or ZIP archives in `dist/sparkle/`:
 
 ```bash
-scripts/generate_sparkle_appcast.sh dist/sparkle
+SPARKLE_RELEASE_TAG=v0.1.0 scripts/generate_sparkle_appcast.sh dist/sparkle
 ```
 
 This updates:
 
 ```bash
 docs/release/appcast.xml
+```
+
+If you do not use GitHub Releases, you can instead provide a full download prefix:
+
+```bash
+SPARKLE_DOWNLOAD_URL_PREFIX=https://example.com/downloads/v0.1.0 \
+scripts/generate_sparkle_appcast.sh dist/sparkle
 ```
 
 ## Current feed URL

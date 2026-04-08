@@ -2886,6 +2886,193 @@
         }
       }
     },
+    "settings.section.app.launch_at_login.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically start NudgeWhip when you log in."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "로그인하면 NudgeWhip을 자동으로 실행합니다."
+          }
+        }
+      }
+    },
+    "settings.section.app.github" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        }
+      }
+    },
+    "settings.section.app.github.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the creator profile or the project repository on GitHub."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제작자 프로필이나 프로젝트 저장소를 GitHub에서 엽니다."
+          }
+        }
+      }
+    },
+    "settings.section.app.github.error" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not open the GitHub link."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub 링크를 열 수 없습니다."
+          }
+        }
+      }
+    },
+    "settings.section.app.github.profile" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "@Lbin91"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "@Lbin91"
+          }
+        }
+      }
+    },
+    "settings.section.app.github.repo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Project repo"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "프로젝트 저장소"
+          }
+        }
+      }
+    },
+    "settings.section.app.updates" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트"
+          }
+        }
+      }
+    },
+    "settings.section.app.updates.check" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for Updates…"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "업데이트 확인…"
+          }
+        }
+      }
+    },
+    "settings.section.app.updates.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check for new versions distributed through Sparkle."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sparkle로 배포되는 새 버전을 확인합니다."
+          }
+        }
+      }
+    },
+    "settings.section.app.updates.not_configured" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sparkle is not configured yet. Set SUFeedURL and SUPublicEDKey for this build first."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 Sparkle이 설정되지 않았습니다. 먼저 이 빌드에 SUFeedURL과 SUPublicEDKey를 설정해 주세요."
+          }
+        }
+      }
+    },
+    "settings.section.app.updates.setup_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This build does not have a Sparkle feed configured yet. Add SUFeedURL and SUPublicEDKey to enable update checks."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 빌드에는 아직 Sparkle 피드가 설정되지 않았습니다. 업데이트 확인을 활성화하려면 SUFeedURL과 SUPublicEDKey를 추가해 주세요."
+          }
+        }
+      }
+    },
     "settings.section.monitoring" : {
       "comment" : "Section title for monitoring settings.",
       "extractionState" : "stale",
@@ -3011,6 +3198,23 @@
         }
       }
     },
+    "settings.section.monitoring.overlay.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visual countdown when idle threshold is reached."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "무입력 기준 시간에 도달하면 시각 카운트다운을 표시합니다."
+          }
+        }
+      }
+    },
     "settings.section.monitoring.sound_theme" : {
       "comment" : "Label for sound theme picker.",
       "extractionState" : "manual",
@@ -3097,6 +3301,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "시간대 사용"
+          }
+        }
+      }
+    },
+    "settings.section.schedule.enabled.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only monitor activity during specific times."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지정한 시간대에만 활동을 모니터링합니다."
           }
         }
       }
