@@ -431,7 +431,7 @@
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
-				SPARKLE_APPCAST_URL = "";
+				SPARKLE_APPCAST_URL = "https://lbin91.github.io/nudgewhip/release/appcast.xml";
 				SPARKLE_PUBLIC_ED_KEY = "efd+QzApPI572qmjojG2yVNc0Q7PaPEer5A0gXcO9ck=";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -471,7 +471,7 @@
 				PRODUCT_MODULE_NAME = nudgewhip;
 				PRODUCT_NAME = NudgeWhip;
 				REGISTER_APP_GROUPS = YES;
-				SPARKLE_APPCAST_URL = "";
+				SPARKLE_APPCAST_URL = "https://lbin91.github.io/nudgewhip/release/appcast.xml";
 				SPARKLE_PUBLIC_ED_KEY = "efd+QzApPI572qmjojG2yVNc0Q7PaPEer5A0gXcO9ck=";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
