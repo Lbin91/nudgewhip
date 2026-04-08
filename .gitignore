@@ -7,6 +7,7 @@
 !nudgewhip.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 build/
 .build/
+dist/
 .sisyphus
 # Track only product-facing docs and README assets under docs/.
 docs/*
