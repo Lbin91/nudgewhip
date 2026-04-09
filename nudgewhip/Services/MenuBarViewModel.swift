@@ -194,6 +194,33 @@ final class MenuBarViewModel {
     func resumeFromManualPause(at date: Date = .now) {
         idleMonitor.setManualPause(false, at: date)
     }
+
+    func relaxBreakSuggestionSensitivity(at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+
+        settings.idleThresholdSeconds = min(settings.idleThresholdSeconds + 60, 900)
+        settings.updatedAt = date
+        try? modelContext.save()
+
+        idleMonitor.acknowledgeBreakSuggestion()
+        apply(settings: settings, at: date)
+    }
+
+    func softenBreakSuggestionAlerts(at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+
+        settings.alertsPerHourLimit = max(1, settings.alertsPerHourLimit - 1)
+        settings.notificationNudgePerHourLimit = max(1, settings.notificationNudgePerHourLimit - 1)
+        settings.updatedAt = date
+        try? modelContext.save()
+
+        idleMonitor.acknowledgeBreakSuggestion()
+        apply(settings: settings, at: date)
+    }
+
+    func acknowledgeBreakSuggestion() {
+        idleMonitor.acknowledgeBreakSuggestion()
+    }
     
     /// 내부: 프롬프트 옵션과 함께 권한 새로고침
     private func refreshPermission(promptIfNeeded: Bool, at date: Date) {

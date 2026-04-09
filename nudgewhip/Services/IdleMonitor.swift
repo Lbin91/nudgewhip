@@ -583,6 +583,10 @@ final class IdleMonitor {
         processPendingObservedActivity()
     }
 
+    func acknowledgeBreakSuggestion() {
+        resetBreakSuggestion()
+    }
+
     private func processPendingObservedActivity() {
         guard let pendingObservedActivityAt else { return }
         observedActivityProcessingWorkItem?.cancel()

@@ -251,6 +251,57 @@
         }
       }
     },
+    "menu.break_suggestion.action.more_idle_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More idle time"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "유예 시간 늘리기"
+          }
+        }
+      }
+    },
+    "menu.break_suggestion.action.open_guide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open setup guide"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "초기 설정 다시 보기"
+          }
+        }
+      }
+    },
+    "menu.break_suggestion.action.soften_alerts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Softer alerts"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "알림 완화"
+          }
+        }
+      }
+    },
     "menu.break_suggestion.eyebrow" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -264,6 +315,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "제안"
+          }
+        }
+      }
+    },
+    "menu.break_suggestion.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These actions only tune alerts and do not start break mode."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 동작들은 알림만 조정하며, 휴식 모드로 바로 전환되지 않습니다."
           }
         }
       }

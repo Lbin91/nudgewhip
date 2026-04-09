@@ -866,6 +866,66 @@ struct nudgewhipTests {
         #expect(!viewModel.breakSuggestionTitleText.isEmpty)
         #expect(!viewModel.breakSuggestionBodyText.isEmpty)
     }
+
+    @MainActor
+    @Test
+    func menuBarViewModelBreakSuggestionActionsTuneSettingsWithoutStartingBreakMode() throws {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let settings = UserSettings(
+            idleThresholdSeconds: 180,
+            alertsPerHourLimit: 6,
+            notificationNudgePerHourLimit: 2
+        )
+        context.insert(settings)
+        try context.save()
+
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 180,
+            breakSuggestionTriggerCount: 2
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor, modelContext: context)
+
+        func triggerBreakSuggestion(startingAt date: Date, idleThreshold: TimeInterval) {
+            idleMonitor.recordInput(at: date)
+            var cycleBase = date
+            for _ in 0..<2 {
+                idleMonitor.fireIdleDeadline(at: cycleBase.addingTimeInterval(idleThreshold))
+                idleMonitor.recordInput(at: cycleBase.addingTimeInterval(idleThreshold + 1))
+                cycleBase = cycleBase.addingTimeInterval(idleThreshold + 1)
+            }
+        }
+
+        viewModel.startIfNeeded(at: baseDate)
+        triggerBreakSuggestion(startingAt: baseDate, idleThreshold: 180)
+        #expect(viewModel.shouldShowBreakSuggestion)
+
+        viewModel.relaxBreakSuggestionSensitivity(at: baseDate.addingTimeInterval(1_000))
+
+        let afterSensitivity = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        #expect(afterSensitivity.idleThresholdSeconds == 240)
+        #expect(!viewModel.shouldShowBreakSuggestion)
+        #expect(!viewModel.isManualPauseActive)
+        #expect(viewModel.runtimeState == .monitoring)
+
+        triggerBreakSuggestion(startingAt: baseDate.addingTimeInterval(2_000), idleThreshold: 240)
+        #expect(viewModel.shouldShowBreakSuggestion)
+
+        viewModel.softenBreakSuggestionAlerts(at: baseDate.addingTimeInterval(3_000))
+
+        let afterAlertSoftening = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
+        #expect(afterAlertSoftening.alertsPerHourLimit == 5)
+        #expect(afterAlertSoftening.notificationNudgePerHourLimit == 1)
+        #expect(!viewModel.shouldShowBreakSuggestion)
+        #expect(!viewModel.isManualPauseActive)
+        #expect(viewModel.runtimeState == .monitoring)
+    }
     
     @MainActor
     @Test

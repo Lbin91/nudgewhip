@@ -90,6 +90,44 @@ struct MenuBarDropdownView: View {
                     .font(.footnote)
                     .foregroundStyle(Color.nudgewhipTextSecondary)
                     .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: NudgeWhipSpacing.s2) {
+                    compactPauseButton(
+                        title: localizedAppString(
+                            "menu.break_suggestion.action.more_idle_time",
+                            defaultValue: "More idle time"
+                        ),
+                        action: { menuBarViewModel.relaxBreakSuggestionSensitivity() }
+                    )
+                    compactPauseButton(
+                        title: localizedAppString(
+                            "menu.break_suggestion.action.soften_alerts",
+                            defaultValue: "Softer alerts"
+                        ),
+                        action: { menuBarViewModel.softenBreakSuggestionAlerts() }
+                    )
+                }
+
+                Button {
+                    menuBarViewModel.acknowledgeBreakSuggestion()
+                    onOpenOnboarding()
+                } label: {
+                    Text(localizedAppString(
+                        "menu.break_suggestion.action.open_guide",
+                        defaultValue: "Open setup guide"
+                    ))
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color.nudgewhipFocus)
+                }
+                .buttonStyle(.plain)
+
+                Text(localizedAppString(
+                    "menu.break_suggestion.note",
+                    defaultValue: "These actions only tune alerts and do not start break mode."
+                ))
+                .font(.caption)
+                .foregroundStyle(Color.nudgewhipTextMuted)
+                .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer(minLength: 0)
