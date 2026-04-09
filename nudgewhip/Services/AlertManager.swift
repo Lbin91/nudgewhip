@@ -195,11 +195,11 @@ final class AlertManager: AlertManaging {
         }
         
         if snapshot.alertEscalationStep >= 4,
-           snapshot.alertEscalationStep > lastDeliveredNotificationStep,
+           lastDeliveredNotificationStep < 4,
            canPresentThirdStageNotification {
             notificationNudgeManager.deliverThirdStageNudge()
             thirdStageNotificationTimestamps.append(now)
-            lastDeliveredNotificationStep = snapshot.alertEscalationStep
+            lastDeliveredNotificationStep = 4
         }
     }
     

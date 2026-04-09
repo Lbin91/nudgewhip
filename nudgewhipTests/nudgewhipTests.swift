@@ -1368,8 +1368,64 @@ struct nudgewhipTests {
                 lastInputAt: nil
             )
         )
-        
+
         #expect(notificationManager.deliverCount == 1)
+    }
+
+    @MainActor
+    @Test
+    func alertManagerDeliversThirdStageNotificationOnlyOncePerAlertCycle() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
+
+        let stepFourSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .strongNudge,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 4,
+            lastInputAt: nil
+        )
+        let stepFiveSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .strongNudge,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 5,
+            lastInputAt: nil
+        )
+
+        alertManager.handle(snapshot: stepFourSnapshot)
+        alertManager.handle(snapshot: stepFiveSnapshot)
+
+        #expect(notificationManager.deliverCount == 1)
+
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .monitoring,
+                contentState: .recovery,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 0,
+                lastInputAt: nil
+            )
+        )
+        alertManager.handle(snapshot: stepFourSnapshot)
+
+        #expect(notificationManager.deliverCount == 2)
     }
 
     @MainActor
