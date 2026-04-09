@@ -29,6 +29,57 @@
         }
       }
     },
+    "alert.message.gentle_nudge.1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The flow paused. Coming back now will be easy."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "흐름이 잠시 끊겼습니다. 지금 돌아오면 이어가기 쉽습니다."
+          }
+        }
+      }
+    },
+    "alert.message.gentle_nudge.2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'll hold the line a little longer. Let's start again."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "조금만 더 붙잡아 두겠습니다. 다시 시작해 봅시다."
+          }
+        }
+      }
+    },
+    "alert.message.gentle_nudge.3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A brief detour. You can find your way back from here."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "잠시 빗나갔네요. 여기서 방향을 잡으면 됩니다."
+          }
+        }
+      }
+    },
     "alert.message.strong_nudge" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -46,6 +97,57 @@
         }
       }
     },
+    "alert.message.strong_nudge.1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have not returned yet. It is not too late to come back now."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "아직 돌아오지 않았네요. 지금 복귀해도 늦지 않습니다."
+          }
+        }
+      }
+    },
+    "alert.message.strong_nudge.2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The pause is getting longer. It is time to return to work."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이탈이 길어지고 있어요. 작업으로 돌아갈 시간입니다."
+          }
+        }
+      }
+    },
+    "alert.message.strong_nudge.3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have been away for a while. Now would be a good time to return."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "자리를 비운 지 꽤 됐습니다. 지금 돌아오는 것이 좋습니다."
+          }
+        }
+      }
+    },
     "alert.notification.third_stage.body" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -59,6 +161,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "자리를 오래 비웠어요. 다시 집중 흐름으로 돌아와주세요."
+          }
+        }
+      }
+    },
+    "alert.notification.third_stage.body.1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let's restart now."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금 다시 시작해 봅시다."
+          }
+        }
+      }
+    },
+    "alert.notification.third_stage.body.2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can continue right here."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여기서 바로 이어가면 됩니다."
+          }
+        }
+      }
+    },
+    "alert.notification.third_stage.body.3" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shall we settle back in?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "다시 자리에 앉아 볼까요?"
           }
         }
       }

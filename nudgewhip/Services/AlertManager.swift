@@ -17,13 +17,13 @@ protocol AlertManaging: AnyObject {
 
 @MainActor
 protocol AlertPresenting: AnyObject {
-    func show(style: AlertVisualStyle)
+    func show(style: AlertVisualStyle, message: String?)
     func hide()
 }
 
 @MainActor
 protocol NotificationNudgeManaging: AnyObject {
-    func deliverThirdStageNudge()
+    func deliverThirdStageNudge(body: String)
     func clearPendingNudges()
 }
 
@@ -113,6 +113,67 @@ struct AlertSoundPlan: Equatable, Sendable {
     let repeatInterval: TimeInterval
 }
 
+private enum AlertCopySlot: Hashable {
+    case gentleWarning
+    case strongWarning
+    case notificationLine
+}
+
+private struct AlertCopyVariant {
+    let key: String
+    let defaultValue: String
+}
+
+private func alertCopyVariants(for slot: AlertCopySlot) -> [AlertCopyVariant] {
+    switch slot {
+    case .gentleWarning:
+        return [
+            AlertCopyVariant(
+                key: "alert.message.gentle_nudge.1",
+                defaultValue: "The flow paused. Coming back now will be easy."
+            ),
+            AlertCopyVariant(
+                key: "alert.message.gentle_nudge.2",
+                defaultValue: "I'll hold the line a little longer. Let's start again."
+            ),
+            AlertCopyVariant(
+                key: "alert.message.gentle_nudge.3",
+                defaultValue: "A brief detour. You can find your way back from here."
+            )
+        ]
+    case .strongWarning:
+        return [
+            AlertCopyVariant(
+                key: "alert.message.strong_nudge.1",
+                defaultValue: "You have not returned yet. It is not too late to come back now."
+            ),
+            AlertCopyVariant(
+                key: "alert.message.strong_nudge.2",
+                defaultValue: "The pause is getting longer. It is time to return to work."
+            ),
+            AlertCopyVariant(
+                key: "alert.message.strong_nudge.3",
+                defaultValue: "You have been away for a while. Now would be a good time to return."
+            )
+        ]
+    case .notificationLine:
+        return [
+            AlertCopyVariant(
+                key: "alert.notification.third_stage.body.1",
+                defaultValue: "Let's restart now."
+            ),
+            AlertCopyVariant(
+                key: "alert.notification.third_stage.body.2",
+                defaultValue: "You can continue right here."
+            ),
+            AlertCopyVariant(
+                key: "alert.notification.third_stage.body.3",
+                defaultValue: "Shall we settle back in?"
+            )
+        ]
+    }
+}
+
 func alertSoundPlan(for style: AlertVisualStyle, theme: SoundTheme) -> AlertSoundPlan {
     if theme == .whip {
         let repeatCount: Int
@@ -155,6 +216,8 @@ final class AlertManager: AlertManaging {
     private var thirdStagePerHourLimit = 2
     private var currentSpecies: String = "default"
     private var currentSoundTheme: SoundTheme = .whip
+    private var lastPresentedCopy: String?
+    private var nextCopyIndexBySlot: [AlertCopySlot: Int] = [:]
     
     init(
         presenter: AlertPresenting? = nil,
@@ -184,12 +247,13 @@ final class AlertManager: AlertManaging {
         
         if activeStyle != nextStyle && canPresentVisualAlert {
             let soundPlan = alertSoundPlan(for: nextStyle, theme: currentSoundTheme)
+            let message = nextMessage(for: nextStyle)
             soundPlayer.play(
                 named: soundPlan.soundName,
                 repeatCount: soundPlan.repeatCount,
                 interval: soundPlan.repeatInterval
             )
-            presenter.show(style: nextStyle)
+            presenter.show(style: nextStyle, message: message)
             activeStyle = nextStyle
             visualAlertTimestamps.append(now)
         }
@@ -197,7 +261,7 @@ final class AlertManager: AlertManaging {
         if snapshot.alertEscalationStep >= 4,
            lastDeliveredNotificationStep < 4,
            canPresentThirdStageNotification {
-            notificationNudgeManager.deliverThirdStageNudge()
+            notificationNudgeManager.deliverThirdStageNudge(body: nextMessage(for: .notificationLine))
             thirdStageNotificationTimestamps.append(now)
             lastDeliveredNotificationStep = 4
         }
@@ -241,6 +305,39 @@ final class AlertManager: AlertManaging {
         visualAlertTimestamps.removeAll { $0 < cutoff }
         thirdStageNotificationTimestamps.removeAll { $0 < cutoff }
     }
+
+    private func nextMessage(for style: AlertVisualStyle) -> String? {
+        let slot: AlertCopySlot?
+        switch style {
+        case .perimeterPulse:
+            slot = nil
+        case .gentleNudge:
+            slot = .gentleWarning
+        case .strongVisualNudge:
+            slot = .strongWarning
+        }
+
+        guard let slot else { return nil }
+        return nextMessage(for: slot)
+    }
+
+    private func nextMessage(for slot: AlertCopySlot) -> String {
+        let variants = alertCopyVariants(for: slot)
+        guard !variants.isEmpty else { return "" }
+
+        let localizedVariants = variants.map { localizedAppString($0.key, defaultValue: $0.defaultValue) }
+        let startIndex = (nextCopyIndexBySlot[slot] ?? 0) % localizedVariants.count
+
+        let selectedIndex = (0..<localizedVariants.count)
+            .map { (startIndex + $0) % localizedVariants.count }
+            .first { localizedVariants[$0] != lastPresentedCopy }
+            ?? startIndex
+
+        let message = localizedVariants[selectedIndex]
+        nextCopyIndexBySlot[slot] = (selectedIndex + 1) % localizedVariants.count
+        lastPresentedCopy = message
+        return message
+    }
 }
 
 @MainActor
@@ -252,16 +349,16 @@ final class NotificationNudgeManager: NotificationNudgeManaging {
         self.center = center
     }
     
-    func deliverThirdStageNudge() {
+    func deliverThirdStageNudge(body: String) {
         Task {
             let settings = await center.notificationSettings()
             switch settings.authorizationStatus {
             case .authorized, .provisional, .ephemeral:
-                await schedule()
+                await schedule(body: body)
             case .notDetermined:
                 let granted = try? await center.requestAuthorization(options: [.alert, .sound])
                 if granted == true {
-                    await schedule()
+                    await schedule(body: body)
                 }
             case .denied:
                 break
@@ -276,15 +373,12 @@ final class NotificationNudgeManager: NotificationNudgeManaging {
         center.removeDeliveredNotifications(withIdentifiers: [identifier])
     }
     
-    private func schedule() async {
+    private func schedule(body: String) async {
         clearPendingNudges()
         
         let content = UNMutableNotificationContent()
         content.title = localizedAppString("app.menu.title", defaultValue: "NudgeWhip")
-        content.body = localizedAppString(
-            "alert.notification.third_stage.body",
-            defaultValue: "You've been away for a while. Come back to your focus flow."
-        )
+        content.body = body
         content.sound = .default
         
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
@@ -310,7 +404,7 @@ final class PerimeterPulsePresenter: AlertPresenting {
         self.panelFactory = panelFactory
     }
     
-    func show(style: AlertVisualStyle) {
+    func show(style: AlertVisualStyle, message: String?) {
         let frames = screenFramesProvider()
         guard !frames.isEmpty else { return }
         
@@ -319,7 +413,7 @@ final class PerimeterPulsePresenter: AlertPresenting {
             let key = Self.frameKey(for: frame)
             let panel = panelsByFrameKey[key] ?? panelFactory(frame)
             panel.setFrame(frame, display: false)
-            panel.contentView = NSHostingView(rootView: AlertOverlayView(style: style))
+            panel.contentView = NSHostingView(rootView: AlertOverlayView(style: style, message: message))
             panel.orderFrontRegardless()
             nextPanelsByFrameKey[key] = panel
         }
@@ -363,6 +457,7 @@ private func makeAlertPanel(contentRect: CGRect) -> NSPanel {
 
 private struct AlertOverlayView: View {
     let style: AlertVisualStyle
+    let message: String?
     @State private var isActive = false
     @State private var showCenterMessage = false
 
@@ -420,14 +515,7 @@ private struct AlertOverlayView: View {
     }
 
     private var alertMessage: String {
-        switch style {
-        case .perimeterPulse:
-            return ""
-        case .gentleNudge:
-            return localizedAppString("alert.message.gentle_nudge", defaultValue: "Let's refocus 💡")
-        case .strongVisualNudge:
-            return localizedAppString("alert.message.strong_nudge", defaultValue: "Come back now! ⚡")
-        }
+        message ?? ""
     }
 
     private var borderColor: Color {

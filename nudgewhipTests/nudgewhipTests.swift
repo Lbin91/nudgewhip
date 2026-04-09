@@ -155,10 +155,12 @@ private final class TestAlertPresenter: AlertPresenting {
     private(set) var showCount = 0
     private(set) var hideCount = 0
     private(set) var shownStyles: [AlertVisualStyle] = []
+    private(set) var shownMessages: [String?] = []
     
-    func show(style: AlertVisualStyle) {
+    func show(style: AlertVisualStyle, message: String?) {
         showCount += 1
         shownStyles.append(style)
+        shownMessages.append(message)
     }
     
     func hide() {
@@ -212,9 +214,11 @@ private final class TrackingPanel: NSPanel {
 private final class TestNotificationNudgeManager: NotificationNudgeManaging {
     private(set) var deliverCount = 0
     private(set) var clearCount = 0
+    private(set) var deliveredBodies: [String] = []
     
-    func deliverThirdStageNudge() {
+    func deliverThirdStageNudge(body: String) {
         deliverCount += 1
+        deliveredBodies.append(body)
     }
     
     func clearPendingNudges() {
@@ -1430,6 +1434,174 @@ struct nudgewhipTests {
 
     @MainActor
     @Test
+    func alertManagerRotatesStrongWarningCopyAcrossAlertCycles() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
+
+        let strongSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .strongNudge,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 3,
+            lastInputAt: nil
+        )
+        let recoverySnapshot = RuntimeSnapshot(
+            runtimeState: .monitoring,
+            contentState: .recovery,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 0,
+            lastInputAt: nil
+        )
+
+        for _ in 0..<4 {
+            alertManager.handle(snapshot: strongSnapshot)
+            alertManager.handle(snapshot: recoverySnapshot)
+        }
+
+        let shownMessages = presenter.shownMessages.compactMap { $0 }
+        #expect(shownMessages.count == 4)
+        #expect(Set(shownMessages).count == 3)
+        #expect(zip(shownMessages, shownMessages.dropFirst()).allSatisfy { pair in
+            pair.0 != pair.1
+        })
+    }
+
+    @MainActor
+    @Test
+    func alertManagerClearsPendingNotificationsWhenRecoveringFromThirdStageAlert() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
+
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .strongNudge,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 4,
+                lastInputAt: nil
+            )
+        )
+
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .monitoring,
+                contentState: .recovery,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 0,
+                lastInputAt: nil
+            )
+        )
+
+        #expect(notificationManager.deliverCount == 1)
+        #expect(notificationManager.clearCount == 1)
+    }
+
+    @MainActor
+    @Test
+    func alertManagerRotatesThirdStageNotificationCopyAcrossAlertCycles() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
+        alertManager.apply(
+            settings: UserSettings(
+                alertsPerHourLimit: 8,
+                notificationNudgePerHourLimit: 4
+            )
+        )
+
+        let notificationSnapshot = RuntimeSnapshot(
+            runtimeState: .alerting,
+            contentState: .strongNudge,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 4,
+            lastInputAt: nil
+        )
+        let recoverySnapshot = RuntimeSnapshot(
+            runtimeState: .monitoring,
+            contentState: .recovery,
+            accessibilityGranted: true,
+            manualPauseEnabled: false,
+            whitelistMatched: false,
+            schedulePaused: false,
+            suspended: false,
+            alertEscalationStep: 0,
+            lastInputAt: nil
+        )
+
+        for _ in 0..<4 {
+            alertManager.handle(snapshot: notificationSnapshot)
+            alertManager.handle(snapshot: recoverySnapshot)
+        }
+
+        #expect(notificationManager.deliverCount == 4)
+        #expect(Set(notificationManager.deliveredBodies).count == 3)
+        #expect(zip(notificationManager.deliveredBodies, notificationManager.deliveredBodies.dropFirst()).allSatisfy { pair in
+            pair.0 != pair.1
+        })
+    }
+
+    @MainActor
+    @Test
+    func alertManagerKeepsRemoteEscalationStateInactiveInFreeRuntime() {
+        let presenter = TestAlertPresenter()
+        let notificationManager = TestNotificationNudgeManager()
+        let alertManager = AlertManager(
+            presenter: presenter,
+            notificationNudgeManager: notificationManager
+        )
+
+        alertManager.handle(
+            snapshot: RuntimeSnapshot(
+                runtimeState: .alerting,
+                contentState: .remoteEscalation,
+                accessibilityGranted: true,
+                manualPauseEnabled: false,
+                whitelistMatched: false,
+                schedulePaused: false,
+                suspended: false,
+                alertEscalationStep: 10,
+                lastInputAt: nil
+            )
+        )
+
+        #expect(presenter.showCount == 0)
+        #expect(notificationManager.deliverCount == 0)
+        #expect(notificationManager.clearCount == 0)
+    }
+
+    @MainActor
+    @Test
     func alertManagerUsesStableWhipRepeatPlanByVisualStage() {
         let presenter = TestAlertPresenter()
         let notificationManager = TestNotificationNudgeManager()
@@ -1511,11 +1683,11 @@ struct nudgewhipTests {
             }
         )
         
-        presenter.show(style: .perimeterPulse)
+        presenter.show(style: .perimeterPulse, message: nil)
         #expect(createdPanels.count == 2)
         #expect(createdPanels.allSatisfy { $0.orderFrontCount == 1 })
         
-        presenter.show(style: .strongVisualNudge)
+        presenter.show(style: .strongVisualNudge, message: "Test message")
         #expect(createdPanels.count == 2)
         #expect(createdPanels.allSatisfy { $0.orderFrontCount == 2 })
         
