@@ -26,14 +26,16 @@
 </p>
 
 <p align="center">
-  <a href="docs/assets/readme/nudgewhip-alert-demo.mp4">
-    <img src="docs/assets/readme/nudgewhip-alert-preview.gif" alt="NudgeWhip alert demo" width="720" />
-  </a>
+  <img src="docs/assets/readme/nudgewhip-alert-preview.gif" alt="NudgeWhip alert demo" width="720" />
 </p>
 
-<p align="center">
-  <em>Click the preview to open the sound-on alert demo.</em>
-</p>
+## Download
+
+NudgeWhip is installable right now from the notarized DMG attached to the GitHub release.
+
+- GitHub Release: [v0.1.0](https://github.com/Lbin91/nudgewhip/releases/tag/v0.1.0)
+- Asset: `NudgeWhip-0.1.0-1.dmg`
+- Platform: macOS 15 or later
 
 <p align="center">
   <a href="docs/release/v0.1.0.md"><strong>Release Notes</strong></a>
