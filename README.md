@@ -26,6 +26,16 @@
 </p>
 
 <p align="center">
+  <a href="docs/assets/readme/nudgewhip-alert-demo.mp4">
+    <img src="docs/assets/readme/nudgewhip-alert-preview.gif" alt="NudgeWhip alert demo" width="720" />
+  </a>
+</p>
+
+<p align="center">
+  <em>Click the preview to open the sound-on alert demo.</em>
+</p>
+
+<p align="center">
   <a href="docs/release/v0.1.0.md"><strong>Release Notes</strong></a>
   ·
   <a href="docs/release/v0.1.0-rc-checklist.md"><strong>RC Checklist</strong></a>
