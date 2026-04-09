@@ -40,6 +40,8 @@ final class IdleMonitor {
     private var scheduleBoundaryWorkItem: DispatchWorkItem?
     private var manualPauseResumeWorkItem: DispatchWorkItem?
     private var alertSyncWorkItem: DispatchWorkItem?
+    private var observedActivityProcessingWorkItem: DispatchWorkItem?
+    private var pendingObservedActivityAt: Date?
     
     /// IdleMonitor 생성. 권한·상태·이벤트 모니터 주입 가능 (기본값 제공)
     init(
@@ -176,6 +178,19 @@ final class IdleMonitor {
     /// Event monitor에서 들어온 활동을 처리한다. 메뉴바 메뉴가 열려 있을 때는 무시한다.
     func handleObservedActivity(at date: Date = .now) {
         handleObservedActivity(at: date, isAppActive: NSApp.isActive)
+    }
+
+    /// 실제 NSEvent 콜백에서는 타임스탬프만 먼저 반영하고, 무거운 후속 처리는 짧게 지연시켜 분리한다.
+    func handleObservedActivityFromEventMonitor(at date: Date = .now, isAppActive: Bool) {
+        guard !(isMenuPresentationActive && isAppActive) else { return }
+
+        lastInputAt = date
+        pendingObservedActivityAt = date
+        scheduleObservedActivityProcessing()
+    }
+
+    func handleObservedActivityFromEventMonitor(at date: Date = .now) {
+        handleObservedActivityFromEventMonitor(at: date, isAppActive: NSApp.isActive)
     }
 
     func handleObservedActivity(at date: Date = .now, isAppActive: Bool) {
@@ -406,6 +421,9 @@ final class IdleMonitor {
         cooldownWorkItem = nil
         scheduleBoundaryWorkItem?.cancel()
         scheduleBoundaryWorkItem = nil
+        observedActivityProcessingWorkItem?.cancel()
+        observedActivityProcessingWorkItem = nil
+        pendingObservedActivityAt = nil
         idleDeadlineAt = nil
         alertEscalationDeadlineAt = nil
         cooldownDeadlineAt = nil
@@ -466,7 +484,7 @@ final class IdleMonitor {
     private func startEventMonitoringIfNeeded() {
         guard !eventMonitor.isMonitoring else { return }
         eventMonitor.start { [weak self] in
-            self?.handleObservedActivity()
+            self?.handleObservedActivityFromEventMonitor(at: .now, isAppActive: NSApp.isActive)
         }
     }
     
@@ -518,5 +536,28 @@ final class IdleMonitor {
 
         alertSyncWorkItem = workItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: workItem)
+    }
+
+    private func scheduleObservedActivityProcessing() {
+        guard observedActivityProcessingWorkItem == nil else { return }
+
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.processPendingObservedActivity()
+        }
+
+        observedActivityProcessingWorkItem = workItem
+        DispatchQueue.main.async(execute: workItem)
+    }
+
+    func flushPendingObservedActivityForTesting() {
+        processPendingObservedActivity()
+    }
+
+    private func processPendingObservedActivity() {
+        guard let pendingObservedActivityAt else { return }
+        observedActivityProcessingWorkItem?.cancel()
+        observedActivityProcessingWorkItem = nil
+        self.pendingObservedActivityAt = nil
+        recordInput(at: pendingObservedActivityAt)
     }
 }

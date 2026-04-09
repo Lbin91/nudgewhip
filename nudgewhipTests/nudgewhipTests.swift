@@ -503,6 +503,33 @@ struct nudgewhipTests {
         #expect(!frontmostAppProvider.isMonitoring)
         #expect(runtimeController.snapshot.runtimeState == .limitedNoAX)
     }
+
+    @MainActor
+    @Test
+    func idleMonitorDefersHeavyProcessingForObservedEventMonitorActivity() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        let originalDeadline = idleMonitor.idleDeadlineAt
+
+        idleMonitor.handleObservedActivityFromEventMonitor(at: baseDate.addingTimeInterval(10), isAppActive: false)
+
+        #expect(idleMonitor.lastInputAt == baseDate.addingTimeInterval(10))
+        #expect(idleMonitor.idleDeadlineAt == originalDeadline)
+
+        idleMonitor.flushPendingObservedActivityForTesting()
+
+        #expect(idleMonitor.idleDeadlineAt == baseDate.addingTimeInterval(310))
+    }
     
     @MainActor
     @Test
@@ -683,6 +710,33 @@ struct nudgewhipTests {
         #expect(viewModel.countdownText(now: baseDate.addingTimeInterval(300)) == nil)
     }
 
+    @MainActor
+    @Test
+    func menuBarViewModelReflectsObservedRecoveryActivityAfterDeferredProcessing() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let eventMonitor = TestEventMonitor()
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: eventMonitor,
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+
+        viewModel.startIfNeeded(at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+        idleMonitor.fireIdleDeadline(at: baseDate.addingTimeInterval(300))
+
+        #expect(viewModel.systemImageName == "exclamationmark.circle")
+
+        eventMonitor.emitActivity()
+        idleMonitor.flushPendingObservedActivityForTesting()
+
+        #expect(viewModel.systemImageName == "eye.circle")
+    }
+    
     @MainActor
     @Test
     func menuBarViewModelFormatsConfiguredIdleThresholdForDebugOverlay() {
