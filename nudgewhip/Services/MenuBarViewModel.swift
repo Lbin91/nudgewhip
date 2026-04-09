@@ -93,6 +93,21 @@ final class MenuBarViewModel {
     var isManualPauseActive: Bool {
         idleMonitor.runtimeStateController.snapshot.manualPauseEnabled
     }
+
+    var shouldShowBreakSuggestion: Bool {
+        idleMonitor.shouldSuggestBreak
+    }
+
+    var breakSuggestionTitleText: String {
+        localizedAppString("menu.break_suggestion.title", defaultValue: "Frequent interruptions noticed")
+    }
+
+    var breakSuggestionBodyText: String {
+        localizedAppString(
+            "menu.break_suggestion.body",
+            defaultValue: "You keep pausing. Want to take a breather or adjust sensitivity?"
+        )
+    }
     
     /// 런타임 상태에 대응하는 SF Symbol 이름
     var systemImageName: String {

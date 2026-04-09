@@ -434,6 +434,102 @@ struct nudgewhipTests {
         idleMonitor.fireCooldownExpired(at: baseDate.addingTimeInterval(391))
         #expect(runtimeController.snapshot.contentState == .focus)
     }
+
+    @MainActor
+    @Test
+    func idleMonitorShowsBreakSuggestionAfterRepeatedAlertRecoveries() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300,
+            alertEscalationInterval: 30,
+            cooldownDuration: 60,
+            breakSuggestionTriggerCount: 3
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+
+        var cycleBase = baseDate
+        for _ in 0..<3 {
+            idleMonitor.fireIdleDeadline(at: cycleBase.addingTimeInterval(300))
+            idleMonitor.recordInput(at: cycleBase.addingTimeInterval(301))
+            cycleBase = cycleBase.addingTimeInterval(301)
+        }
+
+        #expect(idleMonitor.alertRecoveryCountInCurrentSession == 3)
+        #expect(idleMonitor.shouldSuggestBreak)
+    }
+
+    @MainActor
+    @Test
+    func idleMonitorRespectsDisabledBreakSuggestionSetting() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300,
+            breakSuggestionTriggerCount: 2
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.applySettings(
+            UserSettings(
+                breakSuggestionEnabled: false
+            ),
+            at: baseDate
+        )
+        idleMonitor.recordInput(at: baseDate)
+
+        var cycleBase = baseDate
+        for _ in 0..<2 {
+            idleMonitor.fireIdleDeadline(at: cycleBase.addingTimeInterval(300))
+            idleMonitor.recordInput(at: cycleBase.addingTimeInterval(301))
+            cycleBase = cycleBase.addingTimeInterval(301)
+        }
+
+        #expect(idleMonitor.alertRecoveryCountInCurrentSession == 2)
+        #expect(!idleMonitor.shouldSuggestBreak)
+    }
+
+    @MainActor
+    @Test
+    func idleMonitorClearsBreakSuggestionWhenMonitoringSessionResets() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300,
+            breakSuggestionTriggerCount: 2
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+
+        var cycleBase = baseDate
+        for _ in 0..<2 {
+            idleMonitor.fireIdleDeadline(at: cycleBase.addingTimeInterval(300))
+            idleMonitor.recordInput(at: cycleBase.addingTimeInterval(301))
+            cycleBase = cycleBase.addingTimeInterval(301)
+        }
+
+        #expect(idleMonitor.shouldSuggestBreak)
+
+        idleMonitor.setManualPause(true, at: cycleBase.addingTimeInterval(1))
+
+        #expect(!idleMonitor.shouldSuggestBreak)
+        #expect(idleMonitor.alertRecoveryCountInCurrentSession == 0)
+    }
     
     @MainActor
     @Test
@@ -739,6 +835,36 @@ struct nudgewhipTests {
         idleMonitor.flushPendingObservedActivityForTesting()
 
         #expect(viewModel.systemImageName == "eye.circle")
+    }
+
+    @MainActor
+    @Test
+    func menuBarViewModelReflectsBreakSuggestionState() {
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: TestFrontmostAppProvider(),
+            idleThreshold: 300,
+            breakSuggestionTriggerCount: 2
+        )
+        let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
+
+        viewModel.startIfNeeded(at: baseDate)
+        idleMonitor.recordInput(at: baseDate)
+
+        var cycleBase = baseDate
+        for _ in 0..<2 {
+            idleMonitor.fireIdleDeadline(at: cycleBase.addingTimeInterval(300))
+            idleMonitor.recordInput(at: cycleBase.addingTimeInterval(301))
+            cycleBase = cycleBase.addingTimeInterval(301)
+        }
+
+        #expect(viewModel.shouldShowBreakSuggestion)
+        #expect(!viewModel.breakSuggestionTitleText.isEmpty)
+        #expect(!viewModel.breakSuggestionBodyText.isEmpty)
     }
     
     @MainActor

@@ -234,6 +234,57 @@
         }
       }
     },
+    "menu.break_suggestion.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You keep pausing. Want to take a breather or adjust sensitivity?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "반복해서 멈추고 있네요. 잠시 숨을 고르거나 민감도를 조정해 볼까요?"
+          }
+        }
+      }
+    },
+    "menu.break_suggestion.eyebrow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggestion"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "제안"
+          }
+        }
+      }
+    },
+    "menu.break_suggestion.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frequent interruptions noticed"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "반복 멈춤이 감지됐어요"
+          }
+        }
+      }
+    },
     "app.menu.title" : {
       "comment" : "Title shown for the menu bar extra.",
       "extractionState" : "stale",

@@ -9,6 +9,9 @@ struct MenuBarDropdownView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
             StatusSummaryView(menuBarViewModel: menuBarViewModel)
+            if menuBarViewModel.shouldShowBreakSuggestion {
+                breakSuggestionCard
+            }
             pauseControls
             DailySummaryView(
                 todayStats: menuBarViewModel.todayStats,
@@ -67,6 +70,39 @@ struct MenuBarDropdownView: View {
                 .stroke(Color.nudgewhipStrokeStrong.opacity(0.65), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.03), radius: 6, y: 2)
+    }
+
+    private var breakSuggestionCard: some View {
+        HStack(alignment: .top, spacing: NudgeWhipSpacing.s3) {
+            Image(systemName: "cup.and.saucer.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.nudgewhipAccent)
+                .frame(width: 18, height: 18)
+
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s1) {
+                sectionEyebrow(localizedAppString("menu.break_suggestion.eyebrow", defaultValue: "Suggestion"))
+
+                Text(menuBarViewModel.breakSuggestionTitleText)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                Text(menuBarViewModel.breakSuggestionBodyText)
+                    .font(.footnote)
+                    .foregroundStyle(Color.nudgewhipTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(NudgeWhipSpacing.s4)
+        .background(
+            Color.nudgewhipBgSurface,
+            in: RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous)
+                .stroke(Color.nudgewhipAccent.opacity(0.5), lineWidth: 1)
+        )
     }
 
     private var utilityActions: some View {

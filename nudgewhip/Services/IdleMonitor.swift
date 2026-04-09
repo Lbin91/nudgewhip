@@ -18,6 +18,8 @@ final class IdleMonitor {
     private(set) var cooldownDeadlineAt: Date?
     private(set) var manualPauseUntil: Date?
     private(set) var isMenuPresentationActive = false
+    private(set) var shouldSuggestBreak = false
+    private(set) var alertRecoveryCountInCurrentSession = 0
     
     let permissionManager: PermissionManager
     let runtimeStateController: RuntimeStateController
@@ -29,10 +31,12 @@ final class IdleMonitor {
     private(set) var idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
+    let breakSuggestionTriggerCount: Int
     private(set) var scheduleEnabled: Bool
     private(set) var scheduleStart: TimeInterval
     private(set) var scheduleEnd: TimeInterval
     private(set) var whitelistedBundleIdentifiers: Set<String> = []
+    private(set) var breakSuggestionEnabled: Bool
     
     private var idleDeadlineWorkItem: DispatchWorkItem?
     private var alertEscalationWorkItem: DispatchWorkItem?
@@ -55,6 +59,8 @@ final class IdleMonitor {
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
         cooldownDuration: TimeInterval = 60,
+        breakSuggestionTriggerCount: Int = 3,
+        breakSuggestionEnabled: Bool = true,
         scheduleEnabled: Bool = false,
         scheduleStart: TimeInterval = 32400,
         scheduleEnd: TimeInterval = 61200
@@ -69,6 +75,8 @@ final class IdleMonitor {
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
+        self.breakSuggestionTriggerCount = breakSuggestionTriggerCount
+        self.breakSuggestionEnabled = breakSuggestionEnabled
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStart = scheduleStart
         self.scheduleEnd = scheduleEnd
@@ -79,10 +87,15 @@ final class IdleMonitor {
         let oldThreshold = idleThreshold
         let oldScheduleEnabled = scheduleEnabled
         idleThreshold = TimeInterval(settings.idleThresholdSeconds)
+        breakSuggestionEnabled = settings.breakSuggestionEnabled
         scheduleEnabled = settings.scheduleEnabled
         scheduleStart = TimeInterval(settings.scheduleStartSecondsFromMidnight)
         scheduleEnd = TimeInterval(settings.scheduleEndSecondsFromMidnight)
         alertManager?.apply(settings: settings)
+
+        if !breakSuggestionEnabled {
+            resetBreakSuggestion()
+        }
 
         checkSchedule(at: date)
 
@@ -108,6 +121,7 @@ final class IdleMonitor {
     /// 권한 확인 후 유휴 감시 시작
     /// 권한 확인 후 유휴 감시 시작
     func start(at date: Date = .now, promptForPermission: Bool = false) {
+        resetBreakSuggestion()
         refreshPermission(promptIfNeeded: promptForPermission, at: date)
         checkSchedule(at: date)
         if runtimeStateController.snapshot.runtimeState == .monitoring {
@@ -117,17 +131,22 @@ final class IdleMonitor {
     
     /// 접근성 권한 상태 재확인. 승인 시 모니터링 시작, 거부 시 정지
     func refreshPermission(promptIfNeeded: Bool = false, at date: Date = .now) {
+        let wasGranted = runtimeStateController.snapshot.accessibilityGranted
         let permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: promptIfNeeded)
         runtimeStateController.handle(permissionState == .granted ? .accessibilityGranted : .accessibilityDenied, at: date)
         scheduleAlertSync()
         
         if permissionState == .granted {
+            if !wasGranted {
+                resetBreakSuggestion()
+            }
             startEventMonitoringIfNeeded()
             startLifecycleMonitoringIfNeeded()
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
         } else {
+            resetBreakSuggestion()
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
@@ -137,17 +156,22 @@ final class IdleMonitor {
     
     /// 접근성 권한 상태를 직접 설정. 테스트/프리뷰에서 사용
     func setAccessibilityPermission(_ state: AccessibilityPermissionState, at date: Date = .now) {
+        let wasGranted = runtimeStateController.snapshot.accessibilityGranted
         permissionManager.accessibilityPermissionState = state
         runtimeStateController.handle(state == .granted ? .accessibilityGranted : .accessibilityDenied, at: date)
         scheduleAlertSync()
         
         if state == .granted {
+            if !wasGranted {
+                resetBreakSuggestion()
+            }
             startEventMonitoringIfNeeded()
             startLifecycleMonitoringIfNeeded()
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
         } else {
+            resetBreakSuggestion()
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
@@ -165,6 +189,7 @@ final class IdleMonitor {
         
         if wasAlerting {
             sessionTracker?.recordRecovery(at: date)
+            registerAlertRecovery()
         }
         
         scheduleIdleDeadline(from: date)
@@ -208,6 +233,7 @@ final class IdleMonitor {
     
     /// 수동 일시정지 토글. 활성 시 모든 모니터링 데드라인을 취소하고, 필요 시 자동 해제 시각을 예약
     func setManualPause(_ enabled: Bool, until pauseUntil: Date? = nil, at date: Date = .now) {
+        resetBreakSuggestion()
         runtimeStateController.handle(enabled ? .manualPauseEnabled : .manualPauseDisabled, at: date)
         
         if enabled {
@@ -239,6 +265,7 @@ final class IdleMonitor {
         // block MenuBarExtra from ever becoming visible at launch.
         guard runtimeStateController.snapshot.whitelistMatched != matched else { return }
 
+        resetBreakSuggestion()
         runtimeStateController.handle(matched ? .whitelistMatched : .whitelistUnmatched, at: date)
         scheduleAlertSync()
         
@@ -257,6 +284,7 @@ final class IdleMonitor {
     
     /// 수면/잠금/사용자 전환 등 시스템 이벤트 처리
     func handleSystemEvent(_ event: NudgeWhipRuntimeEvent, at date: Date = .now) {
+        resetBreakSuggestion()
         runtimeStateController.handle(event, at: date)
         scheduleAlertSync()
         
@@ -344,12 +372,14 @@ final class IdleMonitor {
         
         let snapshot = runtimeStateController.snapshot
         if inWindow && snapshot.schedulePaused {
+            resetBreakSuggestion()
             runtimeStateController.handle(.scheduleWindowExited, at: date)
             lastInputAt = date
             scheduleAlertSync()
             scheduleIdleDeadline(from: date)
             sessionTracker?.beginSession(at: date)
         } else if !inWindow && !snapshot.schedulePaused {
+            resetBreakSuggestion()
             runtimeStateController.handle(.scheduleWindowEntered, at: date)
             scheduleAlertSync()
             sessionTracker?.endSession(reason: .completed, at: date)
@@ -559,5 +589,16 @@ final class IdleMonitor {
         observedActivityProcessingWorkItem = nil
         self.pendingObservedActivityAt = nil
         recordInput(at: pendingObservedActivityAt)
+    }
+
+    private func registerAlertRecovery() {
+        alertRecoveryCountInCurrentSession += 1
+        guard breakSuggestionEnabled else { return }
+        shouldSuggestBreak = alertRecoveryCountInCurrentSession >= breakSuggestionTriggerCount
+    }
+
+    private func resetBreakSuggestion() {
+        shouldSuggestBreak = false
+        alertRecoveryCountInCurrentSession = 0
     }
 }
