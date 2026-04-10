@@ -40,6 +40,7 @@ final class CountdownOverlayController {
     private func observeVisibility() {
         withObservationTracking {
             _ = menuBarViewModel.countdownOverlayEnabled
+            _ = menuBarViewModel.countdownOverlayPosition
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
                 self?.updateVisibility()
@@ -77,9 +78,11 @@ final class CountdownOverlayController {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
 
         let visibleFrame = screen.visibleFrame
-        let origin = CGPoint(
-            x: visibleFrame.minX + Self.panelInset,
-            y: visibleFrame.maxY - Self.panelInset - Self.panelSize.height
+        let origin = countdownOverlayOrigin(
+            visibleFrame: visibleFrame,
+            panelSize: Self.panelSize,
+            inset: Self.panelInset,
+            position: menuBarViewModel.countdownOverlayPosition
         )
         panel.setFrame(CGRect(origin: origin, size: Self.panelSize), display: false)
     }
@@ -98,6 +101,36 @@ final class CountdownOverlayController {
         panel.ignoresMouseEvents = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         return panel
+    }
+}
+
+func countdownOverlayOrigin(
+    visibleFrame: CGRect,
+    panelSize: CGSize,
+    inset: CGFloat,
+    position: CountdownOverlayPosition
+) -> CGPoint {
+    switch position {
+    case .topLeft:
+        return CGPoint(
+            x: visibleFrame.minX + inset,
+            y: visibleFrame.maxY - inset - panelSize.height
+        )
+    case .topRight:
+        return CGPoint(
+            x: visibleFrame.maxX - inset - panelSize.width,
+            y: visibleFrame.maxY - inset - panelSize.height
+        )
+    case .bottomLeft:
+        return CGPoint(
+            x: visibleFrame.minX + inset,
+            y: visibleFrame.minY + inset
+        )
+    case .bottomRight:
+        return CGPoint(
+            x: visibleFrame.maxX - inset - panelSize.width,
+            y: visibleFrame.minY + inset
+        )
     }
 }
 

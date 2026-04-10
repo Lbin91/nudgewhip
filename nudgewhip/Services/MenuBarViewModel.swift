@@ -19,6 +19,7 @@ final class MenuBarViewModel {
     private(set) var petPresentationMode = PetPresentationMode.sprout
     private(set) var scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
     private(set) var countdownOverlayEnabled = true
+    private(set) var countdownOverlayPosition = CountdownOverlayPosition.topLeft
     private(set) var scheduleEnabled = false
     private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
     private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
@@ -288,6 +289,14 @@ final class MenuBarViewModel {
         try? modelContext.save()
         apply(settings: settings, at: date)
     }
+
+    func updateCountdownOverlayPosition(_ position: CountdownOverlayPosition, at date: Date = .now) {
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.countdownOverlayPosition = position
+        settings.updatedAt = date
+        try? modelContext.save()
+        apply(settings: settings, at: date)
+    }
     
     func updateScheduleStartTime(_ dateValue: Date, at date: Date = .now) {
         guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
@@ -316,6 +325,7 @@ final class MenuBarViewModel {
             petPresentationMode = .sprout
             scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
             countdownOverlayEnabled = true
+            countdownOverlayPosition = .topLeft
             scheduleEnabled = false
             return
         }
@@ -327,6 +337,7 @@ final class MenuBarViewModel {
             : localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
         
         countdownOverlayEnabled = settings.countdownOverlayEnabled
+        countdownOverlayPosition = settings.countdownOverlayPosition
         scheduleEnabled = settings.scheduleEnabled
         scheduleStartTime = dateFromSeconds(settings.scheduleStartSecondsFromMidnight)
         scheduleEndTime = dateFromSeconds(settings.scheduleEndSecondsFromMidnight)

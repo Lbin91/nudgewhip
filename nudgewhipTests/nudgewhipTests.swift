@@ -116,6 +116,18 @@ func countdownOverlayAccessibilityConfigurationStrengthensContrastWhenNeeded() {
     #expect(accessible.closeButtonBackgroundOpacity == 0.18)
 }
 
+@Test
+func countdownOverlayOriginPlacesPanelAtRequestedCorner() {
+    let visibleFrame = CGRect(x: 100, y: 50, width: 1440, height: 900)
+    let panelSize = CGSize(width: 146, height: 72)
+    let inset: CGFloat = 14
+
+    #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .topLeft) == CGPoint(x: 114, y: 864))
+    #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .topRight) == CGPoint(x: 1380, y: 864))
+    #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .bottomLeft) == CGPoint(x: 114, y: 64))
+    #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .bottomRight) == CGPoint(x: 1380, y: 64))
+}
+
 @MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool
@@ -455,6 +467,7 @@ struct nudgewhipTests {
         #expect(settings.count == 1)
         #expect(settings.first?.petPresentationMode == .sprout)
         #expect(settings.first?.countdownOverlayEnabled == true)
+        #expect(settings.first?.countdownOverlayPosition == .topLeft)
         #expect(settings.first?.soundTheme == .whip)
         #expect(settings.first?.preferredLocaleIdentifier == nil)
         #expect(settings.first?.languageDefaultMigrationCompleted == true)
@@ -1138,6 +1151,7 @@ struct nudgewhipTests {
         settings.scheduleEnabled = true
         settings.scheduleStartSecondsFromMidnight = 32_400
         settings.scheduleEndSecondsFromMidnight = 61_200
+        settings.countdownOverlayPosition = .bottomRight
         settings.petPresentationMode = .minimal
         
         let petState = try #require(try context.fetch(FetchDescriptor<PetState>()).first)
@@ -1169,6 +1183,7 @@ struct nudgewhipTests {
         
         #expect(viewModel.idleThresholdText.contains("10"))
         #expect(viewModel.scheduleEnabled)
+        #expect(viewModel.countdownOverlayPosition == .bottomRight)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
         #expect(viewModel.petPresentationMode == .minimal)
@@ -1256,6 +1271,7 @@ struct nudgewhipTests {
         
         viewModel.updateIdleThreshold(600)
         viewModel.updateCountdownOverlayEnabled(false)
+        viewModel.updateCountdownOverlayPosition(.bottomRight)
         viewModel.updateScheduleEnabled(true)
         viewModel.updateLaunchAtLogin(true)
         viewModel.openOnboarding()
@@ -1263,11 +1279,14 @@ struct nudgewhipTests {
         let settings = try #require(try context.fetch(FetchDescriptor<UserSettings>()).first)
         #expect(settings.idleThresholdSeconds == 600)
         #expect(settings.countdownOverlayEnabled == false)
+        #expect(settings.countdownOverlayPosition == .bottomRight)
         #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
         #expect(viewModel.countdownOverlayEnabledValue == false)
+        #expect(viewModel.countdownOverlayPositionValue == .bottomRight)
+        #expect(menuBarViewModel.countdownOverlayPosition == .bottomRight)
 
         viewModel.updatePetPresentationMode(.minimal)
 

@@ -17,6 +17,13 @@ enum SoundTheme: String, Codable, CaseIterable, Sendable {
     case whip
 }
 
+enum CountdownOverlayPosition: String, Codable, CaseIterable, Sendable {
+    case topLeft
+    case topRight
+    case bottomLeft
+    case bottomRight
+}
+
 @Model
 final class UserSettings {
     var idleThresholdSeconds: Int
@@ -30,6 +37,7 @@ final class UserSettings {
     var petPresentationRawValue: String
     var soundThemeRawValue: String
     var countdownOverlayEnabled: Bool
+    var countdownOverlayPositionRawValue: String?
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
     var scheduleEndSecondsFromMidnight: Int
@@ -48,6 +56,11 @@ final class UserSettings {
         get { SoundTheme(rawValue: soundThemeRawValue) ?? .whip }
         set { soundThemeRawValue = newValue.rawValue }
     }
+
+    var countdownOverlayPosition: CountdownOverlayPosition {
+        get { CountdownOverlayPosition(rawValue: countdownOverlayPositionRawValue ?? "") ?? .topLeft }
+        set { countdownOverlayPositionRawValue = newValue.rawValue }
+    }
     
     /// 모든 설정값의 기본값을 제공하는 이니셜라이저
     init(
@@ -62,6 +75,7 @@ final class UserSettings {
         petPresentationMode: PetPresentationMode = .sprout,
         soundTheme: SoundTheme = .whip,
         countdownOverlayEnabled: Bool = true,
+        countdownOverlayPosition: CountdownOverlayPosition = .topLeft,
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,
         scheduleEndSecondsFromMidnight: Int = 61200,
@@ -80,6 +94,7 @@ final class UserSettings {
         self.petPresentationRawValue = petPresentationMode.rawValue
         self.soundThemeRawValue = soundTheme.rawValue
         self.countdownOverlayEnabled = countdownOverlayEnabled
+        self.countdownOverlayPositionRawValue = countdownOverlayPosition.rawValue
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight

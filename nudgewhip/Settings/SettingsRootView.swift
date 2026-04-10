@@ -102,6 +102,35 @@ struct SettingsRootView: View {
                 }
                 .toggleStyle(.checkbox)
 
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.overlay_position", defaultValue: "Countdown overlay position"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Text(localizedAppString("settings.section.monitoring.overlay_position.desc", defaultValue: "Pin the countdown overlay to one of the four screen corners."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: NudgeWhipSpacing.s2) {
+                        overlayPositionButton(
+                            title: localizedAppString("settings.section.monitoring.overlay_position.top_left", defaultValue: "Top Left"),
+                            position: .topLeft
+                        )
+                        overlayPositionButton(
+                            title: localizedAppString("settings.section.monitoring.overlay_position.top_right", defaultValue: "Top Right"),
+                            position: .topRight
+                        )
+                        overlayPositionButton(
+                            title: localizedAppString("settings.section.monitoring.overlay_position.bottom_left", defaultValue: "Bottom Left"),
+                            position: .bottomLeft
+                        )
+                        overlayPositionButton(
+                            title: localizedAppString("settings.section.monitoring.overlay_position.bottom_right", defaultValue: "Bottom Right"),
+                            position: .bottomRight
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -340,6 +369,25 @@ struct SettingsRootView: View {
         let isSelected = viewModel.idleThresholdSecondsValue == value
         return Button {
             viewModel.updateIdleThreshold(value)
+        } label: {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 36)
+                .padding(.vertical, 8)
+                .background(
+                    isSelected ? Color.nudgewhipFocus : Color.nudgewhipBgSurfaceAlt,
+                    in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button, style: .continuous)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: NudgeWhipRadius.button, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(isSelected ? .white : Color.nudgewhipTextPrimary)
+    }
+
+    private func overlayPositionButton(title: String, position: CountdownOverlayPosition) -> some View {
+        let isSelected = viewModel.countdownOverlayPositionValue == position
+        return Button {
+            viewModel.updateCountdownOverlayPosition(position)
         } label: {
             Text(title)
                 .font(.subheadline.weight(.semibold))

@@ -21,6 +21,7 @@ final class SettingsViewModel {
     private(set) var launchAtLoginEnabled: Bool
     private(set) var idleThresholdSecondsValue: Int
     private(set) var countdownOverlayEnabledValue: Bool
+    private(set) var countdownOverlayPositionValue: CountdownOverlayPosition
     private(set) var petPresentationModeValue: PetPresentationMode
     private(set) var soundThemeValue: SoundTheme
     private(set) var preferredLanguage: AppLanguage
@@ -49,6 +50,7 @@ final class SettingsViewModel {
         let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 180
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
+        self.countdownOverlayPositionValue = currentSettings?.countdownOverlayPosition ?? .topLeft
         self.petPresentationModeValue = currentSettings?.petPresentationMode ?? .sprout
         self.soundThemeValue = currentSettings?.soundTheme ?? .whip
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
@@ -153,6 +155,12 @@ final class SettingsViewModel {
         refreshSettingsSnapshot()
     }
 
+    func updateCountdownOverlayPosition(_ position: CountdownOverlayPosition) {
+        countdownOverlayPositionValue = position
+        menuBarViewModel.updateCountdownOverlayPosition(position)
+        refreshSettingsSnapshot()
+    }
+
     func updatePetPresentationMode(_ mode: PetPresentationMode) {
         petPresentationModeValue = mode
         guard let settings else { return }
@@ -220,6 +228,7 @@ final class SettingsViewModel {
         let resolvedSettings = settings ?? self.settings
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
+        countdownOverlayPositionValue = resolvedSettings?.countdownOverlayPosition ?? countdownOverlayPositionValue
         petPresentationModeValue = resolvedSettings?.petPresentationMode ?? petPresentationModeValue
         soundThemeValue = resolvedSettings?.soundTheme ?? soundThemeValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
