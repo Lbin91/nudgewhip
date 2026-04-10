@@ -14,8 +14,7 @@ struct MenuBarDropdownView: View {
             }
             pauseControls
             DailySummaryView(
-                todayStats: menuBarViewModel.todayStats,
-                whitelistCount: menuBarViewModel.whitelistCount
+                todayStats: menuBarViewModel.todayStats
             )
             utilityActions
         }

@@ -27,6 +27,7 @@ struct SettingsRootView: View {
                     
                     VStack(spacing: NudgeWhipSpacing.s4) {
                         monitoringSection
+                        statisticsSection
                         scheduleSection
                         accessibilitySection
                         appSection
@@ -186,6 +187,12 @@ struct SettingsRootView: View {
                     .background(Color.nudgewhipBgSurfaceAlt.opacity(0.5), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
                 }
             }
+        }
+    }
+
+    private var statisticsSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.statistics", defaultValue: "Statistics"), systemImage: "chart.bar.xaxis") {
+            StatisticsDashboardView(snapshot: viewModel.statisticsSnapshot)
         }
     }
     

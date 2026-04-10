@@ -30,6 +30,7 @@ final class MenuBarViewModel {
     private(set) var petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
     private(set) var petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
     private(set) var todayStats = DailyStats.derive(for: [], on: .now)
+    private(set) var statisticsSnapshot = StatisticsSnapshot.derive(for: [], on: .now)
     
     init(idleMonitor: IdleMonitor? = nil) {
         self.idleMonitor = idleMonitor ?? IdleMonitor()
@@ -261,6 +262,7 @@ final class MenuBarViewModel {
         let focusSessions = (try? modelContext.fetch(FetchDescriptor<FocusSession>())) ?? []
         
         todayStats = DailyStats.derive(for: focusSessions, on: now)
+        statisticsSnapshot = StatisticsSnapshot.derive(for: focusSessions, on: now)
         whitelistCount = whitelistApps.count
         
         if let settings {

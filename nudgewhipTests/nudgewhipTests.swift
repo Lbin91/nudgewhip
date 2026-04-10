@@ -364,6 +364,81 @@ struct nudgewhipTests {
         #expect(stats.longestFocusDuration == 5_400)
         #expect(stats.completedSessionCount == 2)
     }
+
+    @Test
+    func dailyStatsDerivesRecoveryMetrics() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+        let dayStart = Date(timeIntervalSince1970: 1_775_088_000) // 2026-04-02 00:00:00 UTC
+        let session = FocusSession(
+            startedAt: dayStart.addingTimeInterval(9 * 60 * 60),
+            endedAt: dayStart.addingTimeInterval(11 * 60 * 60),
+            alertCount: 2
+        )
+        session.alertingSegments = [
+            AlertingSegment(
+                startedAt: dayStart.addingTimeInterval(9 * 60 * 60 + 10 * 60),
+                recoveredAt: dayStart.addingTimeInterval(9 * 60 * 60 + 14 * 60),
+                focusSession: session
+            ),
+            AlertingSegment(
+                startedAt: dayStart.addingTimeInterval(10 * 60 * 60 + 5 * 60),
+                recoveredAt: dayStart.addingTimeInterval(10 * 60 * 60 + 12 * 60),
+                focusSession: session
+            )
+        ]
+
+        let stats = DailyStats.derive(for: [session], on: dayStart.addingTimeInterval(12 * 60 * 60), calendar: calendar)
+
+        #expect(stats.recoverySampleCount == 2)
+        #expect(stats.recoveryDurationTotal == 660)
+        #expect(stats.recoveryDurationMax == 420)
+        #expect(stats.averageRecoveryDuration == 330)
+        #expect(stats.recoveryRate == 1)
+    }
+
+    @Test
+    func statisticsSnapshotAggregatesCurrentWeekAndTrailingSevenDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.firstWeekday = 2
+
+        let referenceDate = Date(timeIntervalSince1970: 1_775_606_400) // 2026-04-08 00:00:00 UTC
+        let monday = Date(timeIntervalSince1970: 1_775_433_600) // 2026-04-06 00:00:00 UTC
+        let sessions = [
+            FocusSession(
+                startedAt: monday.addingTimeInterval(9 * 60 * 60),
+                endedAt: monday.addingTimeInterval(10 * 60 * 60),
+                alertCount: 1
+            ),
+            FocusSession(
+                startedAt: monday.addingTimeInterval(24 * 60 * 60 + 13 * 60 * 60),
+                endedAt: monday.addingTimeInterval(24 * 60 * 60 + 15 * 60 * 60),
+                alertCount: 2
+            ),
+            FocusSession(
+                startedAt: monday.addingTimeInterval(2 * 24 * 60 * 60 + 8 * 60 * 60),
+                endedAt: monday.addingTimeInterval(2 * 24 * 60 * 60 + 11 * 60 * 60),
+                alertCount: 1
+            ),
+            FocusSession(
+                startedAt: monday.addingTimeInterval(-4 * 24 * 60 * 60 + 7 * 60 * 60),
+                endedAt: monday.addingTimeInterval(-4 * 24 * 60 * 60 + 8 * 60 * 60),
+                alertCount: 3
+            )
+        ]
+
+        let snapshot = StatisticsSnapshot.derive(for: sessions, on: referenceDate, calendar: calendar)
+
+        #expect(snapshot.today.dayStart == calendar.startOfDay(for: referenceDate))
+        #expect(snapshot.thisWeek.days.count == 7)
+        #expect(snapshot.last7Days.days.count == 7)
+        #expect(snapshot.thisWeek.totalFocusDuration == 21_600)
+        #expect(snapshot.thisWeek.alertCount == 4)
+        #expect(snapshot.last7Days.totalFocusDuration == 25_200)
+        #expect(snapshot.last7Days.alertCount == 7)
+    }
     
     @MainActor
     @Test

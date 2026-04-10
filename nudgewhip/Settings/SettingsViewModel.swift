@@ -68,6 +68,10 @@ final class SettingsViewModel {
     var runtimeState: NudgeWhipRuntimeState {
         menuBarViewModel.runtimeState
     }
+
+    var statisticsSnapshot: StatisticsSnapshot {
+        menuBarViewModel.statisticsSnapshot
+    }
     
     var scheduleEnabledValue: Bool {
         menuBarViewModel.scheduleEnabled

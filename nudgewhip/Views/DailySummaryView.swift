@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DailySummaryView: View {
     let todayStats: DailyStats
-    let whitelistCount: Int
 
     private let columns = [
         GridItem(.flexible(), spacing: NudgeWhipSpacing.s2),
@@ -23,8 +22,8 @@ struct DailySummaryView: View {
                 )
 
                 statCard(
-                    value: "\(todayStats.completedSessionCount)",
-                    label: localizedAppString("menu.dropdown.label.completed_sessions", defaultValue: "Sessions")
+                    value: formattedPercent(todayStats.recoveryRate),
+                    label: localizedAppString("menu.dropdown.label.recovery_rate", defaultValue: "Recovery")
                 )
 
                 statCard(
@@ -33,8 +32,8 @@ struct DailySummaryView: View {
                 )
 
                 statCard(
-                    value: "\(whitelistCount)",
-                    label: localizedAppString("menu.dropdown.label.whitelist_apps", defaultValue: "Whitelist")
+                    value: formattedDuration(todayStats.longestFocusDuration),
+                    label: localizedAppString("menu.dropdown.label.longest_focus", defaultValue: "Longest focus")
                 )
             }
         }
@@ -70,5 +69,14 @@ struct DailySummaryView: View {
     private func formattedDuration(_ duration: TimeInterval) -> String {
         return localizedDurationString(duration)
             ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+    }
+
+    private func formattedPercent(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .percent
+        formatter.locale = appDisplayLocale()
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: max(0, min(1, value))))
+            ?? "\(Int((max(0, min(1, value)) * 100).rounded()))%"
     }
 }
