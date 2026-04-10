@@ -28,18 +28,26 @@ struct OnboardingRootView: View {
         }
         .onAppear {
             notifyPreferredContentHeight()
+            // SwiftUI's first layout pass can under-measure the onboarding content.
+            // Re-check on the next run loop so the window expands to the settled size
+            // before the user has to interact with it.
             DispatchQueue.main.async {
                 notifyPreferredContentHeight()
             }
         }
         .onChange(of: viewModel.step) { _, _ in
             notifyPreferredContentHeight()
+            // Step transitions can change both the preferred baseline and the measured
+            // content size in separate layout passes, so we intentionally request a
+            // second update after the view tree settles.
             DispatchQueue.main.async {
                 notifyPreferredContentHeight()
             }
         }
         .onChange(of: viewModel.permissionState) { _, _ in
             notifyPreferredContentHeight()
+            // Permission banners can appear/disappear asynchronously after AppKit
+            // notifies the app, so mirror the delayed re-measure here as well.
             DispatchQueue.main.async {
                 notifyPreferredContentHeight()
             }

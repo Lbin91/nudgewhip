@@ -39,8 +39,10 @@ final class CountdownOverlayController {
 
     private func observeVisibility() {
         withObservationTracking {
-            _ = menuBarViewModel.countdownOverlayEnabled
-            _ = menuBarViewModel.countdownOverlayPosition
+            let isEnabled = menuBarViewModel.countdownOverlayEnabled
+            if isEnabled {
+                _ = menuBarViewModel.countdownOverlayPosition
+            }
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
                 self?.updateVisibility()

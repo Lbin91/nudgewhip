@@ -206,20 +206,4 @@ struct StatisticsDashboardView: View {
                 .minimumScaleFactor(0.8)
         }
     }
-
-    private func localizedPercentString(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .percent
-        formatter.locale = appDisplayLocale()
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: max(0, min(1, value))))
-            ?? "\(Int((max(0, min(1, value)) * 100).rounded()))%"
-    }
-
-    private func localizedWeekdayLabel(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = appDisplayLocale()
-        formatter.setLocalizedDateFormatFromTemplate("EEE")
-        return formatter.string(from: date)
-    }
 }

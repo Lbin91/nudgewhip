@@ -72,11 +72,6 @@ struct DailySummaryView: View {
     }
 
     private func formattedPercent(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .percent
-        formatter.locale = appDisplayLocale()
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: max(0, min(1, value))))
-            ?? "\(Int((max(0, min(1, value)) * 100).rounded()))%"
+        localizedPercentString(value)
     }
 }

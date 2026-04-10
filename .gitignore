@@ -8,6 +8,7 @@
 build/
 .build/
 dist/
+reports/
 scripts/
 .sisyphus
 # Track only product-facing docs and README assets under docs/.
@@ -32,3 +33,4 @@ CLAUDE.md
 GEMINI.md
 TODO.md
 xcuserdata/
+.omx/

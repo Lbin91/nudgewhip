@@ -66,15 +66,8 @@ final class PermissionManager {
     
     /// 기본 접근성 권한 확인 로직 (AXIsProcessTrusted 호출)
     private static func defaultTrustCheck(promptIfNeeded: Bool) -> Bool {
-        if let override = ProcessInfo.processInfo.environment["NUDGE_TEST_ACCESSIBILITY"]?.lowercased() {
-            switch override {
-            case "granted":
-                return true
-            case "denied":
-                return false
-            default:
-                break
-            }
+        if let override = defaultStateOverride() {
+            return override == .granted
         }
 
         if promptIfNeeded {
@@ -87,7 +80,7 @@ final class PermissionManager {
     }
 
     private static func defaultStateOverride() -> AccessibilityPermissionState? {
-        switch ProcessInfo.processInfo.environment["NUDGE_TEST_ACCESSIBILITY"]?.lowercased() {
+        switch testAccessibilityOverrideValue() {
         case "granted":
             return .granted
         case "denied":
@@ -95,6 +88,10 @@ final class PermissionManager {
         default:
             return nil
         }
+    }
+
+    private static func testAccessibilityOverrideValue() -> String? {
+        ProcessInfo.processInfo.environment["NUDGE_TEST_ACCESSIBILITY"]?.lowercased()
     }
     
     /// 기본 설정 앱 열기 로직 (NSWorkspace.shared.open)

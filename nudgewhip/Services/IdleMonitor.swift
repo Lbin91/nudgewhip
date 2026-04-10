@@ -569,6 +569,9 @@ final class IdleMonitor {
     }
 
     private func scheduleObservedActivityProcessing() {
+        // Keep exactly one deferred flush in flight. High-frequency input can update
+        // `pendingObservedActivityAt` many times before the work item executes, and
+        // the eventual flush should consume only the latest observed timestamp.
         guard observedActivityProcessingWorkItem == nil else { return }
 
         let workItem = DispatchWorkItem { [weak self] in
@@ -602,6 +605,9 @@ final class IdleMonitor {
     }
 
     private func resetBreakSuggestion() {
+        // Break suggestions are scoped to the current uninterrupted monitoring span.
+        // Any permission/pause/schedule/whitelist/system transition should restart
+        // the fatigue counter so stale recoveries do not leak into a new context.
         shouldSuggestBreak = false
         alertRecoveryCountInCurrentSession = 0
     }

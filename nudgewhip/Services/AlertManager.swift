@@ -368,7 +368,7 @@ final class AlertManager: AlertManaging {
         
         if activeStyle != nextStyle && canPresentVisualAlert {
             let soundPlan = alertSoundPlan(for: nextStyle, theme: currentSoundTheme)
-            let message = nextMessage(for: nextStyle)
+            let message = nextCopyMessage(for: nextStyle)
             soundPlayer.play(
                 named: soundPlan.soundName,
                 repeatCount: soundPlan.repeatCount,
@@ -382,7 +382,7 @@ final class AlertManager: AlertManaging {
         if snapshot.alertEscalationStep >= 4,
            lastDeliveredNotificationStep < 4,
            canPresentThirdStageNotification {
-            notificationNudgeManager.deliverThirdStageNudge(body: nextMessage(for: .notificationLine))
+            notificationNudgeManager.deliverThirdStageNudge(body: nextCopyMessage(for: .notificationLine))
             thirdStageNotificationTimestamps.append(now)
             lastDeliveredNotificationStep = 4
         }
@@ -427,7 +427,7 @@ final class AlertManager: AlertManaging {
         thirdStageNotificationTimestamps.removeAll { $0 < cutoff }
     }
 
-    private func nextMessage(for style: AlertVisualStyle) -> String? {
+    private func nextCopyMessage(for style: AlertVisualStyle) -> String? {
         let slot: AlertCopySlot?
         switch style {
         case .perimeterPulse:
@@ -439,10 +439,10 @@ final class AlertManager: AlertManaging {
         }
 
         guard let slot else { return nil }
-        return nextMessage(for: slot)
+        return nextCopyMessage(for: slot)
     }
 
-    private func nextMessage(for slot: AlertCopySlot) -> String {
+    private func nextCopyMessage(for slot: AlertCopySlot) -> String {
         let variants = alertCopyVariants(for: slot)
         guard !variants.isEmpty else { return "" }
 
