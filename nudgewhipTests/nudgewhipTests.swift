@@ -56,6 +56,66 @@ func appLanguageFallsBackToSupportedSystemLanguage() {
     #expect(AppLanguage.resolve(nil, preferredLanguages: ["ja-JP"]) == .english)
 }
 
+@Test
+func alertVisualConfigurationDisablesPulseForReduceMotion() {
+    let configuration = alertVisualConfiguration(
+        for: .gentleNudge,
+        accessibility: AlertAccessibilityOptions(reduceMotion: true)
+    )
+
+    #expect(!configuration.animatePulse)
+    #expect(!configuration.animatesMessageEntrance)
+    #expect(configuration.activeOpacity == 1.0)
+    #expect(configuration.idleOpacity >= 0.52)
+}
+
+@Test
+func alertVisualConfigurationAddsNonColorMarkersForDifferentiateWithoutColor() {
+    let perimeterConfiguration = alertVisualConfiguration(
+        for: .perimeterPulse,
+        accessibility: AlertAccessibilityOptions(differentiateWithoutColor: true)
+    )
+    let gentleConfiguration = alertVisualConfiguration(
+        for: .gentleNudge,
+        accessibility: AlertAccessibilityOptions(differentiateWithoutColor: true)
+    )
+
+    #expect(perimeterConfiguration.showsStageBadge)
+    #expect(perimeterConfiguration.dashPattern == [18, 12])
+    #expect(gentleConfiguration.showsStageBadge)
+    #expect(gentleConfiguration.dashPattern == [8, 8])
+}
+
+@Test
+func alertVisualConfigurationStrengthensSurfaceForHighContrast() {
+    let configuration = alertVisualConfiguration(
+        for: .strongVisualNudge,
+        accessibility: AlertAccessibilityOptions(increaseContrast: true, reduceTransparency: true)
+    )
+
+    #expect(configuration.usesOpaqueSurface)
+    #expect(configuration.borderWidth == 20)
+    #expect(configuration.shadowRadius == 28)
+    #expect(configuration.backdropActiveOpacity == 0.24)
+}
+
+@Test
+func countdownOverlayAccessibilityConfigurationStrengthensContrastWhenNeeded() {
+    let baseline = countdownOverlayAccessibilityConfiguration(
+        increaseContrast: false,
+        reduceTransparency: false
+    )
+    let accessible = countdownOverlayAccessibilityConfiguration(
+        increaseContrast: true,
+        reduceTransparency: true
+    )
+
+    #expect(baseline.backgroundOpacity == 0.68)
+    #expect(accessible.backgroundOpacity == 0.9)
+    #expect(accessible.strokeOpacity == 0.24)
+    #expect(accessible.closeButtonBackgroundOpacity == 0.18)
+}
+
 @MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool

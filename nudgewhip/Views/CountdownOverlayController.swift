@@ -105,6 +105,8 @@ private struct CountdownOverlayView: View {
     let menuBarViewModel: MenuBarViewModel
     let onClose: () -> Void
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var now = Date()
     private let timer = Timer.publish(every: 1, tolerance: 0.2, on: .main, in: .common).autoconnect()
 
@@ -122,7 +124,7 @@ private struct CountdownOverlayView: View {
                         .font(.system(size: 8, weight: .bold))
                         .foregroundStyle(Color.white.opacity(0.7))
                         .frame(width: 14, height: 14)
-                        .background(Color.white.opacity(0.08), in: Circle())
+                        .background(Color.white.opacity(overlayConfiguration.closeButtonBackgroundOpacity), in: Circle())
                 }
                 .buttonStyle(.plain)
             }
@@ -141,15 +143,22 @@ private struct CountdownOverlayView: View {
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.black.opacity(0.68))
+                .fill(Color.black.opacity(overlayConfiguration.backgroundOpacity))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                .stroke(Color.white.opacity(overlayConfiguration.strokeOpacity), lineWidth: 1)
         )
         .onReceive(timer) { value in
             now = value
         }
+    }
+
+    private var overlayConfiguration: CountdownOverlayAccessibilityConfiguration {
+        countdownOverlayAccessibilityConfiguration(
+            increaseContrast: colorSchemeContrast == .increased,
+            reduceTransparency: reduceTransparency
+        )
     }
 
     private var primaryText: String {

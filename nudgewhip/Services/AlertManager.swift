@@ -8,6 +8,127 @@ enum AlertVisualStyle: Equatable, Sendable {
     case strongVisualNudge
 }
 
+struct AlertAccessibilityOptions: Equatable {
+    var reduceMotion = false
+    var increaseContrast = false
+    var differentiateWithoutColor = false
+    var reduceTransparency = false
+}
+
+struct AlertVisualConfiguration: Equatable {
+    let animatePulse: Bool
+    let animatesMessageEntrance: Bool
+    let usesOpaqueSurface: Bool
+    let showsStageBadge: Bool
+    let borderWidth: CGFloat
+    let activeOpacity: Double
+    let idleOpacity: Double
+    let shadowOpacity: Double
+    let shadowRadius: CGFloat
+    let backdropActiveOpacity: Double
+    let backdropIdleOpacity: Double
+    let dashPattern: [CGFloat]
+}
+
+func alertVisualConfiguration(
+    for style: AlertVisualStyle,
+    accessibility: AlertAccessibilityOptions
+) -> AlertVisualConfiguration {
+    let baseBorderWidth: CGFloat
+    let baseActiveOpacity: Double
+    let baseIdleOpacity: Double
+    let baseShadowOpacity: Double
+    let baseShadowRadius: CGFloat
+
+    switch style {
+    case .perimeterPulse:
+        baseBorderWidth = 12
+        baseActiveOpacity = 0.92
+        baseIdleOpacity = 0.18
+        baseShadowOpacity = 0.45
+        baseShadowRadius = 14
+    case .gentleNudge:
+        baseBorderWidth = 14
+        baseActiveOpacity = 0.95
+        baseIdleOpacity = 0.22
+        baseShadowOpacity = 0.55
+        baseShadowRadius = 18
+    case .strongVisualNudge:
+        baseBorderWidth = 18
+        baseActiveOpacity = 0.98
+        baseIdleOpacity = 0.28
+        baseShadowOpacity = 0.65
+        baseShadowRadius = 24
+    }
+
+    let usesOpaqueSurface = accessibility.increaseContrast || accessibility.reduceTransparency
+    let animatePulse = !accessibility.reduceMotion
+    let animatesMessageEntrance = !accessibility.reduceMotion
+    let showsStageBadge = accessibility.differentiateWithoutColor
+    let dashPattern: [CGFloat]
+    if accessibility.differentiateWithoutColor {
+        switch style {
+        case .perimeterPulse:
+            dashPattern = [18, 12]
+        case .gentleNudge:
+            dashPattern = [8, 8]
+        case .strongVisualNudge:
+            dashPattern = []
+        }
+    } else {
+        dashPattern = []
+    }
+
+    let borderWidth = baseBorderWidth + (accessibility.increaseContrast ? 2 : 0)
+    let activeOpacity = accessibility.reduceMotion ? 1.0 : baseActiveOpacity
+    let idleOpacity = accessibility.reduceMotion ? max(baseActiveOpacity - 0.12, 0.52) : baseIdleOpacity
+    let shadowOpacity = accessibility.increaseContrast ? min(baseShadowOpacity + 0.12, 0.9) : baseShadowOpacity
+    let shadowRadius = baseShadowRadius + (accessibility.increaseContrast ? 4 : 0)
+
+    let backdropActiveOpacity: Double
+    let backdropIdleOpacity: Double
+    if style == .strongVisualNudge {
+        backdropActiveOpacity = accessibility.increaseContrast ? 0.24 : 0.16
+        backdropIdleOpacity = accessibility.reduceMotion || accessibility.increaseContrast ? 0.12 : 0.04
+    } else {
+        backdropActiveOpacity = 0
+        backdropIdleOpacity = 0
+    }
+
+    return AlertVisualConfiguration(
+        animatePulse: animatePulse,
+        animatesMessageEntrance: animatesMessageEntrance,
+        usesOpaqueSurface: usesOpaqueSurface,
+        showsStageBadge: showsStageBadge,
+        borderWidth: borderWidth,
+        activeOpacity: activeOpacity,
+        idleOpacity: idleOpacity,
+        shadowOpacity: shadowOpacity,
+        shadowRadius: shadowRadius,
+        backdropActiveOpacity: backdropActiveOpacity,
+        backdropIdleOpacity: backdropIdleOpacity,
+        dashPattern: dashPattern
+    )
+}
+
+struct CountdownOverlayAccessibilityConfiguration: Equatable {
+    let backgroundOpacity: Double
+    let strokeOpacity: Double
+    let closeButtonBackgroundOpacity: Double
+}
+
+func countdownOverlayAccessibilityConfiguration(
+    increaseContrast: Bool,
+    reduceTransparency: Bool
+) -> CountdownOverlayAccessibilityConfiguration {
+    let prefersOpaqueSurface = increaseContrast || reduceTransparency
+    return CountdownOverlayAccessibilityConfiguration(
+        backgroundOpacity: prefersOpaqueSurface ? 0.9 : 0.68,
+        strokeOpacity: prefersOpaqueSurface ? 0.24 : 0.08,
+        closeButtonBackgroundOpacity: prefersOpaqueSurface ? 0.18 : 0.08
+    )
+}
+
 @MainActor
 protocol AlertManaging: AnyObject {
     func handle(snapshot: RuntimeSnapshot)
@@ -458,6 +579,10 @@ private func makeAlertPanel(contentRect: CGRect) -> NSPanel {
 private struct AlertOverlayView: View {
     let style: AlertVisualStyle
     let message: String?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var isActive = false
     @State private var showCenterMessage = false
 
@@ -465,26 +590,44 @@ private struct AlertOverlayView: View {
         GeometryReader { geometry in
             ZStack {
                 if style == .strongVisualNudge {
-                    Color.black.opacity(isActive ? 0.16 : 0.04)
+                    Color.black.opacity(isActive ? visualConfiguration.backdropActiveOpacity : visualConfiguration.backdropIdleOpacity)
                         .ignoresSafeArea()
                 }
 
                 Rectangle()
-                    .strokeBorder(borderColor.opacity(isActive ? activeOpacity : idleOpacity), lineWidth: borderWidth)
+                    .strokeBorder(
+                        borderColor.opacity(isActive ? visualConfiguration.activeOpacity : visualConfiguration.idleOpacity),
+                        style: StrokeStyle(lineWidth: visualConfiguration.borderWidth, dash: visualConfiguration.dashPattern)
+                    )
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .padding(style == .strongVisualNudge ? 0 : 6)
-                    .shadow(color: borderColor.opacity(isActive ? shadowOpacity : 0.08), radius: shadowRadius)
+                    .shadow(
+                        color: borderColor.opacity(isActive ? visualConfiguration.shadowOpacity : 0.08),
+                        radius: visualConfiguration.shadowRadius
+                    )
 
                 if style != .perimeterPulse {
                     centerMessageView
                 }
+
+                if visualConfiguration.showsStageBadge {
+                    stageBadge
+                }
             }
             .onAppear {
-                withAnimation(animation.repeatForever(autoreverses: true)) {
+                if visualConfiguration.animatePulse {
+                    withAnimation(animation.repeatForever(autoreverses: true)) {
+                        isActive = true
+                    }
+                } else {
                     isActive = true
                 }
                 if style != .perimeterPulse {
-                    withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                    if visualConfiguration.animatesMessageEntrance {
+                        withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                            showCenterMessage = true
+                        }
+                    } else {
                         showCenterMessage = true
                     }
                 }
@@ -509,8 +652,40 @@ private struct AlertOverlayView: View {
                     .multilineTextAlignment(.center)
             }
             .padding(32)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-            .transition(.scale.combined(with: .opacity))
+            .background(messageSurface)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(visualConfiguration.usesOpaqueSurface ? 0.34 : 0.12), lineWidth: 1)
+            )
+            .transition(
+                visualConfiguration.animatesMessageEntrance
+                ? .scale.combined(with: .opacity)
+                : .opacity
+            )
+        }
+    }
+
+    private var stageBadge: some View {
+        VStack {
+            HStack {
+                Text(stageBadgeText)
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(visualConfiguration.usesOpaqueSurface ? Color.black.opacity(0.88) : Color.black.opacity(0.56))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(visualConfiguration.usesOpaqueSurface ? 0.34 : 0.14), lineWidth: 1)
+                    )
+                    .padding(.top, 16)
+                    .padding(.leading, 16)
+                Spacer()
+            }
+            Spacer()
         }
     }
 
@@ -518,50 +693,44 @@ private struct AlertOverlayView: View {
         message ?? ""
     }
 
+    private var stageBadgeText: String {
+        switch style {
+        case .perimeterPulse:
+            return localizedAppString("alert.badge.perimeter", defaultValue: "Idle detected")
+        case .gentleNudge:
+            return localizedAppString("alert.badge.gentle", defaultValue: "Gentle nudge")
+        case .strongVisualNudge:
+            return localizedAppString("alert.badge.strong", defaultValue: "Strong alert")
+        }
+    }
+
+    @ViewBuilder
+    private var messageSurface: some View {
+        if visualConfiguration.usesOpaqueSurface {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.black.opacity(0.9))
+        } else {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(.ultraThinMaterial)
+        }
+    }
+
+    private var visualConfiguration: AlertVisualConfiguration {
+        alertVisualConfiguration(
+            for: style,
+            accessibility: AlertAccessibilityOptions(
+                reduceMotion: reduceMotion,
+                increaseContrast: colorSchemeContrast == .increased,
+                differentiateWithoutColor: differentiateWithoutColor,
+                reduceTransparency: reduceTransparency
+            )
+        )
+    }
+
     private var borderColor: Color {
         switch style {
         case .perimeterPulse, .gentleNudge: .orange
         case .strongVisualNudge: .red
-        }
-    }
-
-    private var borderWidth: CGFloat {
-        switch style {
-        case .perimeterPulse: 12
-        case .gentleNudge: 14
-        case .strongVisualNudge: 18
-        }
-    }
-
-    private var activeOpacity: Double {
-        switch style {
-        case .perimeterPulse: 0.92
-        case .gentleNudge: 0.95
-        case .strongVisualNudge: 0.98
-        }
-    }
-
-    private var idleOpacity: Double {
-        switch style {
-        case .perimeterPulse: 0.18
-        case .gentleNudge: 0.22
-        case .strongVisualNudge: 0.28
-        }
-    }
-
-    private var shadowOpacity: Double {
-        switch style {
-        case .perimeterPulse: 0.45
-        case .gentleNudge: 0.55
-        case .strongVisualNudge: 0.65
-        }
-    }
-
-    private var shadowRadius: CGFloat {
-        switch style {
-        case .perimeterPulse: 14
-        case .gentleNudge: 18
-        case .strongVisualNudge: 24
         }
     }
 

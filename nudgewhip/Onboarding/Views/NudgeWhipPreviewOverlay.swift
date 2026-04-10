@@ -7,23 +7,36 @@ struct NudgeWhipPreviewOverlay: View {
     @State private var isActive = false
     @State private var showCenterMessage = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
                 if style == .strongVisualNudge {
-                    Color.black.opacity(isActive ? 0.16 : 0.04)
+                    Color.black.opacity(isActive ? visualConfiguration.backdropActiveOpacity : visualConfiguration.backdropIdleOpacity)
                         .ignoresSafeArea()
                 }
 
                 Rectangle()
-                    .strokeBorder(borderColor.opacity(isActive ? activeOpacity : idleOpacity), lineWidth: borderWidth)
+                    .strokeBorder(
+                        borderColor.opacity(isActive ? visualConfiguration.activeOpacity : visualConfiguration.idleOpacity),
+                        style: StrokeStyle(lineWidth: visualConfiguration.borderWidth, dash: visualConfiguration.dashPattern)
+                    )
                     .frame(width: geometry.size.width, height: geometry.size.height)
                     .padding(style == .strongVisualNudge ? 0 : 6)
-                    .shadow(color: borderColor.opacity(isActive ? shadowOpacity : 0.08), radius: shadowRadius)
+                    .shadow(
+                        color: borderColor.opacity(isActive ? visualConfiguration.shadowOpacity : 0.08),
+                        radius: visualConfiguration.shadowRadius
+                    )
 
                 if style != .perimeterPulse {
                     centerMessageView
+                }
+
+                if visualConfiguration.showsStageBadge {
+                    stageBadge
                 }
 
                 // "Preview" badge — runtime alert과 구분
@@ -35,7 +48,11 @@ struct NudgeWhipPreviewOverlay: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(.ultraThinMaterial, in: Capsule())
+                            .background(previewBadgeBackground, in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(visualConfiguration.usesOpaqueSurface ? 0.34 : 0.14), lineWidth: 1)
+                            )
                             .shadow(color: .black.opacity(0.3), radius: 4)
                             .padding(.top, 16)
                             .padding(.trailing, 16)
@@ -44,15 +61,19 @@ struct NudgeWhipPreviewOverlay: View {
                 }
             }
             .onAppear {
-                if reduceMotion {
-                    isActive = true
-                } else {
+                if visualConfiguration.animatePulse {
                     withAnimation(animation.repeatForever(autoreverses: true)) {
                         isActive = true
                     }
+                } else {
+                    isActive = true
                 }
                 if style != .perimeterPulse {
-                    withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                    if visualConfiguration.animatesMessageEntrance {
+                        withAnimation(.easeOut(duration: 0.4).delay(0.3)) {
+                            showCenterMessage = true
+                        }
+                    } else {
                         showCenterMessage = true
                     }
                 }
@@ -83,8 +104,40 @@ struct NudgeWhipPreviewOverlay: View {
                     .multilineTextAlignment(.center)
             }
             .padding(40)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
-            .transition(.scale.combined(with: .opacity))
+            .background(messageSurface, in: RoundedRectangle(cornerRadius: 24))
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .stroke(Color.white.opacity(visualConfiguration.usesOpaqueSurface ? 0.34 : 0.14), lineWidth: 1)
+            )
+            .transition(
+                visualConfiguration.animatesMessageEntrance
+                ? .scale.combined(with: .opacity)
+                : .opacity
+            )
+        }
+    }
+
+    private var stageBadge: some View {
+        VStack {
+            HStack {
+                Text(stageBadgeText)
+                    .font(.caption.bold())
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(visualConfiguration.usesOpaqueSurface ? Color.black.opacity(0.88) : Color.black.opacity(0.56))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.white.opacity(visualConfiguration.usesOpaqueSurface ? 0.34 : 0.14), lineWidth: 1)
+                    )
+                    .padding(.top, 16)
+                    .padding(.leading, 16)
+                Spacer()
+            }
+            Spacer()
         }
     }
 
@@ -99,50 +152,47 @@ struct NudgeWhipPreviewOverlay: View {
         }
     }
 
+    private var stageBadgeText: String {
+        switch style {
+        case .perimeterPulse:
+            return localizedAppString("alert.badge.perimeter", defaultValue: "Idle detected")
+        case .gentleNudge:
+            return localizedAppString("alert.badge.gentle", defaultValue: "Gentle nudge")
+        case .strongVisualNudge:
+            return localizedAppString("alert.badge.strong", defaultValue: "Strong alert")
+        }
+    }
+
+    private var messageSurface: AnyShapeStyle {
+        if visualConfiguration.usesOpaqueSurface {
+            return AnyShapeStyle(Color.black.opacity(0.9))
+        }
+        return AnyShapeStyle(.ultraThinMaterial)
+    }
+
+    private var previewBadgeBackground: AnyShapeStyle {
+        if visualConfiguration.usesOpaqueSurface {
+            return AnyShapeStyle(Color.black.opacity(0.88))
+        }
+        return AnyShapeStyle(.ultraThinMaterial)
+    }
+
+    private var visualConfiguration: AlertVisualConfiguration {
+        alertVisualConfiguration(
+            for: style,
+            accessibility: AlertAccessibilityOptions(
+                reduceMotion: reduceMotion,
+                increaseContrast: colorSchemeContrast == .increased,
+                differentiateWithoutColor: differentiateWithoutColor,
+                reduceTransparency: reduceTransparency
+            )
+        )
+    }
+
     private var borderColor: Color {
         switch style {
         case .perimeterPulse, .gentleNudge: return .orange
         case .strongVisualNudge: return .red
-        }
-    }
-
-    private var borderWidth: CGFloat {
-        switch style {
-        case .perimeterPulse: return 12
-        case .gentleNudge: return 14
-        case .strongVisualNudge: return 18
-        }
-    }
-
-    private var activeOpacity: Double {
-        switch style {
-        case .perimeterPulse: return 0.92
-        case .gentleNudge: return 0.95
-        case .strongVisualNudge: return 0.98
-        }
-    }
-
-    private var idleOpacity: Double {
-        switch style {
-        case .perimeterPulse: return 0.18
-        case .gentleNudge: return 0.22
-        case .strongVisualNudge: return 0.28
-        }
-    }
-
-    private var shadowOpacity: Double {
-        switch style {
-        case .perimeterPulse: return 0.45
-        case .gentleNudge: return 0.55
-        case .strongVisualNudge: return 0.65
-        }
-    }
-
-    private var shadowRadius: CGFloat {
-        switch style {
-        case .perimeterPulse: return 14
-        case .gentleNudge: return 18
-        case .strongVisualNudge: return 24
         }
     }
 
