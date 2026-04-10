@@ -4,6 +4,7 @@ import SwiftUI
 struct OnboardingRootView: View {
     @Bindable var viewModel: OnboardingViewModel
     let onPreferredContentHeightChange: (CGFloat) -> Void
+    @State private var measuredContentHeight: CGFloat = 0
     
     init(viewModel: OnboardingViewModel, onPreferredContentHeightChange: @escaping (CGFloat) -> Void) {
         self.viewModel = viewModel
@@ -26,18 +27,32 @@ struct OnboardingRootView: View {
             viewModel.handleDidBecomeActive()
         }
         .onAppear {
-            onPreferredContentHeightChange(viewModel.preferredContentHeight)
+            notifyPreferredContentHeight()
+            DispatchQueue.main.async {
+                notifyPreferredContentHeight()
+            }
         }
         .onChange(of: viewModel.step) { _, _ in
-            onPreferredContentHeightChange(viewModel.preferredContentHeight)
+            notifyPreferredContentHeight()
+            DispatchQueue.main.async {
+                notifyPreferredContentHeight()
+            }
         }
         .onChange(of: viewModel.permissionState) { _, _ in
-            onPreferredContentHeightChange(viewModel.preferredContentHeight)
+            notifyPreferredContentHeight()
+            DispatchQueue.main.async {
+                notifyPreferredContentHeight()
+            }
         }
         .onPreferenceChange(OnboardingContentHeightPreferenceKey.self) { measuredHeight in
             guard measuredHeight > 0 else { return }
-            onPreferredContentHeightChange(measuredHeight)
+            measuredContentHeight = measuredHeight
+            notifyPreferredContentHeight()
         }
+    }
+
+    private func notifyPreferredContentHeight() {
+        onPreferredContentHeightChange(max(viewModel.preferredContentHeight, measuredContentHeight))
     }
     
     private var content: some View {
@@ -117,8 +132,7 @@ struct OnboardingRootView: View {
                 idleThresholdSeconds: $viewModel.idleThresholdSeconds,
                 launchAtLoginEnabled: $viewModel.launchAtLoginEnabled,
                 countdownOverlayEnabled: $viewModel.countdownOverlayEnabled,
-                preferredLanguage: $viewModel.preferredLanguage,
-                petPresentationMode: $viewModel.petPresentationMode
+                preferredLanguage: $viewModel.preferredLanguage
             )
         case .scheduleSetup:
             ScheduleSetupStepView(
@@ -138,8 +152,7 @@ struct OnboardingRootView: View {
                 scheduleText: scheduleText,
                 launchAtLoginText: toggleText(viewModel.launchAtLoginEnabled),
                 overlayText: toggleText(viewModel.countdownOverlayEnabled),
-                languageText: viewModel.preferredLanguage.displayName,
-                petPresentationText: petPresentationText
+                languageText: viewModel.preferredLanguage.displayName
             )
         case .completionLimited:
             CompletionLimitedStepView()
@@ -258,16 +271,6 @@ struct OnboardingRootView: View {
         }
         return "\(formattedClock(dateFromSeconds(viewModel.scheduleStartSecondsFromMidnight))) - \(formattedClock(dateFromSeconds(viewModel.scheduleEndSecondsFromMidnight)))"
     }
-
-    private var petPresentationText: String {
-        switch viewModel.petPresentationMode {
-        case .sprout:
-            return localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
-        case .minimal:
-            return localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
-        }
-    }
-    
     private func toggleText(_ isOn: Bool) -> String {
         isOn
             ? localizedAppString("onboarding.common.toggle.on", defaultValue: "On")

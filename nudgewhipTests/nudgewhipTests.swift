@@ -2277,6 +2277,17 @@ struct nudgewhipTests {
     @MainActor
     @Test
     func onboardingViewModelExposesStepSpecificPreferredHeights() {
+        let welcomeDefaults = UserDefaults(suiteName: "nudgewhipTests.onboarding.heights.welcome.\(UUID().uuidString)")!
+        let welcomeStorage = OnboardingStorage(defaults: welcomeDefaults)
+        let welcomeViewModel = OnboardingViewModel(
+            storage: welcomeStorage,
+            modelContainer: NudgeWhipModelContainer.preview,
+            permissionManager: PermissionManager(accessibilityPermissionState: .unknown),
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+
+        #expect(welcomeViewModel.preferredContentHeight == 520)
+
         let deniedDefaults = UserDefaults(suiteName: "nudgewhipTests.onboarding.heights.denied.\(UUID().uuidString)")!
         let deniedStorage = OnboardingStorage(defaults: deniedDefaults)
         deniedStorage.saveResumeStep(.permission)

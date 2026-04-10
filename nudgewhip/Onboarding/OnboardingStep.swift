@@ -43,7 +43,7 @@ enum OnboardingWindowMetrics {
     ) -> CGFloat {
         switch step {
         case .welcome:
-            return 460
+            return 520
         case .permission:
             return permissionState == .granted ? 560 : 640
         case .basicSetup:
