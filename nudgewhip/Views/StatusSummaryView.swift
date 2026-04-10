@@ -72,7 +72,17 @@ struct StatusSummaryView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    @ViewBuilder
     private var petAnchor: some View {
+        switch menuBarViewModel.petPresentationMode {
+        case .sprout:
+            sproutPetAnchor
+        case .minimal:
+            minimalPetAnchor
+        }
+    }
+
+    private var sproutPetAnchor: some View {
         VStack(alignment: .center, spacing: NudgeWhipSpacing.s2) {
             Image("whip_devil")
                 .resizable()
@@ -94,6 +104,60 @@ struct StatusSummaryView: View {
             RoundedRectangle(cornerRadius: NudgeWhipRadius.default, style: .continuous)
                 .stroke(heroTone.opacity(0.18), lineWidth: 1)
         )
+    }
+
+    private var minimalPetAnchor: some View {
+        VStack(alignment: .center, spacing: NudgeWhipSpacing.s2) {
+            ZStack {
+                Circle()
+                    .fill(heroTone.opacity(0.12))
+
+                Circle()
+                    .stroke(heroTone.opacity(0.24), lineWidth: 1)
+
+                Image(systemName: minimalAnchorSymbolName)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(heroTone)
+            }
+            .frame(width: 64, height: 64)
+            .accessibilityHidden(true)
+
+            Text(menuBarViewModel.petPresentationText)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.nudgewhipTextPrimary)
+                .lineLimit(1)
+        }
+        .padding(NudgeWhipSpacing.s3)
+        .background(
+            RoundedRectangle(cornerRadius: NudgeWhipRadius.default, style: .continuous)
+                .fill(Color.nudgewhipBgSurface.opacity(0.88))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: NudgeWhipRadius.default, style: .continuous)
+                .stroke(heroTone.opacity(0.18), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            localizedAppString(
+                "menu.status.pet_mode.minimal.accessibility",
+                defaultValue: "Minimal pet presentation"
+            )
+        )
+    }
+
+    private var minimalAnchorSymbolName: String {
+        switch menuBarViewModel.contentState {
+        case .focus, .recovery:
+            return "sparkles"
+        case .idleDetected:
+            return "circle.dashed"
+        case .gentleNudge:
+            return "hand.wave.fill"
+        case .strongNudge, .remoteEscalation:
+            return "exclamationmark"
+        case .break:
+            return "pause.fill"
+        }
     }
 
     private func heroMetric(label: String, value: String) -> some View {

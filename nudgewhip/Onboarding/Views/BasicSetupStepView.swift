@@ -5,6 +5,7 @@ struct BasicSetupStepView: View {
     @Binding var launchAtLoginEnabled: Bool
     @Binding var countdownOverlayEnabled: Bool
     @Binding var preferredLanguage: AppLanguage
+    @Binding var petPresentationMode: PetPresentationMode
     
     @State private var activePreviewStyle: AlertVisualStyle? = nil
     
@@ -55,6 +56,22 @@ struct BasicSetupStepView: View {
                     ForEach(AppLanguage.allCases, id: \.rawValue) { language in
                         Text(language.displayName).tag(language)
                     }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.setup.pet_mode.title", defaultValue: "Pet presentation"),
+                subtitle: localizedAppString("onboarding.setup.pet_mode.subtitle", defaultValue: "Keep the mascot visible or switch to a lighter minimal badge in the menu bar.")
+            ) {
+                Picker(
+                    localizedAppString("onboarding.setup.pet_mode.title", defaultValue: "Pet presentation"),
+                    selection: $petPresentationMode
+                ) {
+                    Text(localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout"))
+                        .tag(PetPresentationMode.sprout)
+                    Text(localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal"))
+                        .tag(PetPresentationMode.minimal)
                 }
                 .pickerStyle(.segmented)
             }

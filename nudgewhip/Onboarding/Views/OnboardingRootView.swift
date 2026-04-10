@@ -117,7 +117,8 @@ struct OnboardingRootView: View {
                 idleThresholdSeconds: $viewModel.idleThresholdSeconds,
                 launchAtLoginEnabled: $viewModel.launchAtLoginEnabled,
                 countdownOverlayEnabled: $viewModel.countdownOverlayEnabled,
-                preferredLanguage: $viewModel.preferredLanguage
+                preferredLanguage: $viewModel.preferredLanguage,
+                petPresentationMode: $viewModel.petPresentationMode
             )
         case .scheduleSetup:
             ScheduleSetupStepView(
@@ -137,7 +138,8 @@ struct OnboardingRootView: View {
                 scheduleText: scheduleText,
                 launchAtLoginText: toggleText(viewModel.launchAtLoginEnabled),
                 overlayText: toggleText(viewModel.countdownOverlayEnabled),
-                languageText: viewModel.preferredLanguage.displayName
+                languageText: viewModel.preferredLanguage.displayName,
+                petPresentationText: petPresentationText
             )
         case .completionLimited:
             CompletionLimitedStepView()
@@ -255,6 +257,15 @@ struct OnboardingRootView: View {
             return localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
         }
         return "\(formattedClock(dateFromSeconds(viewModel.scheduleStartSecondsFromMidnight))) - \(formattedClock(dateFromSeconds(viewModel.scheduleEndSecondsFromMidnight)))"
+    }
+
+    private var petPresentationText: String {
+        switch viewModel.petPresentationMode {
+        case .sprout:
+            return localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
+        case .minimal:
+            return localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
+        }
     }
     
     private func toggleText(_ isOn: Bool) -> String {

@@ -21,6 +21,7 @@ final class SettingsViewModel {
     private(set) var launchAtLoginEnabled: Bool
     private(set) var idleThresholdSecondsValue: Int
     private(set) var countdownOverlayEnabledValue: Bool
+    private(set) var petPresentationModeValue: PetPresentationMode
     private(set) var soundThemeValue: SoundTheme
     private(set) var preferredLanguage: AppLanguage
     private(set) var canCheckForUpdates: Bool
@@ -48,6 +49,7 @@ final class SettingsViewModel {
         let currentSettings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 180
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
+        self.petPresentationModeValue = currentSettings?.petPresentationMode ?? .sprout
         self.soundThemeValue = currentSettings?.soundTheme ?? .whip
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
         self.canCheckForUpdates = appUpdater.canCheckForUpdates
@@ -147,6 +149,14 @@ final class SettingsViewModel {
         refreshSettingsSnapshot()
     }
 
+    func updatePetPresentationMode(_ mode: PetPresentationMode) {
+        petPresentationModeValue = mode
+        guard let settings else { return }
+        settings.petPresentationMode = mode
+        settings.updatedAt = .now
+        save(settings)
+    }
+
     func updateSoundTheme(_ theme: SoundTheme) {
         soundThemeValue = theme
         guard let settings else { return }
@@ -206,6 +216,7 @@ final class SettingsViewModel {
         let resolvedSettings = settings ?? self.settings
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
+        petPresentationModeValue = resolvedSettings?.petPresentationMode ?? petPresentationModeValue
         soundThemeValue = resolvedSettings?.soundTheme ?? soundThemeValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
     }

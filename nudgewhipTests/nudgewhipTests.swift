@@ -1096,6 +1096,7 @@ struct nudgewhipTests {
         #expect(viewModel.scheduleEnabled)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
+        #expect(viewModel.petPresentationMode == .minimal)
         #expect(viewModel.petHatchStage == .hatched)
         #expect(viewModel.petCharacter == .devil)
         #expect(viewModel.petEmotion == .happy)
@@ -1192,6 +1193,12 @@ struct nudgewhipTests {
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
         #expect(viewModel.countdownOverlayEnabledValue == false)
+
+        viewModel.updatePetPresentationMode(.minimal)
+
+        #expect(settings.petPresentationMode == .minimal)
+        #expect(viewModel.petPresentationModeValue == .minimal)
+        #expect(menuBarViewModel.petPresentationMode == .minimal)
     }
 
     @MainActor
@@ -2076,6 +2083,7 @@ struct nudgewhipTests {
         viewModel.idleThresholdSeconds = 600
         viewModel.countdownOverlayEnabled = false
         viewModel.preferredLanguage = .korean
+        viewModel.petPresentationMode = .minimal
         viewModel.launchAtLoginEnabled = true
         viewModel.continueFromBasicSetup()
         #expect(viewModel.step == .scheduleSetup)
@@ -2094,6 +2102,7 @@ struct nudgewhipTests {
         #expect(settings.first?.idleThresholdSeconds == 600)
         #expect(settings.first?.countdownOverlayEnabled == false)
         #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.korean.rawValue)
+        #expect(settings.first?.petPresentationMode == .minimal)
         #expect(settings.first?.scheduleEnabled == true)
         #expect(settings.first?.scheduleStartSecondsFromMidnight == 32_400)
         #expect(settings.first?.scheduleEndSecondsFromMidnight == 61_200)

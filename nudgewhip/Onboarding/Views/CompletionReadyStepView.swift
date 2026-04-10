@@ -6,6 +6,7 @@ struct CompletionReadyStepView: View {
     let launchAtLoginText: String
     let overlayText: String
     let languageText: String
+    let petPresentationText: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -24,6 +25,7 @@ struct CompletionReadyStepView: View {
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), launchAtLoginText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.overlay", defaultValue: "Top overlay"), overlayText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.language", defaultValue: "Language"), languageText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.pet_mode", defaultValue: "Pet presentation"), petPresentationText)
                     }
                 }
             }

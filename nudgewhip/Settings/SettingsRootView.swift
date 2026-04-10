@@ -100,6 +100,29 @@ struct SettingsRootView: View {
                     }
                 }
                 .toggleStyle(.checkbox)
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.pet_mode", defaultValue: "Pet presentation"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Text(localizedAppString("settings.section.monitoring.pet_mode.desc", defaultValue: "Show the mascot in the menu bar card or switch to a lighter minimal badge."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+
+                    Picker("", selection: Binding(
+                        get: { viewModel.petPresentationModeValue },
+                        set: viewModel.updatePetPresentationMode
+                    )) {
+                        Text(localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")).tag(PetPresentationMode.sprout)
+                        Text(localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")).tag(PetPresentationMode.minimal)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
             }
         }
     }
