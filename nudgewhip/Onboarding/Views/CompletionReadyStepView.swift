@@ -36,6 +36,27 @@ struct CompletionReadyStepView: View {
                     completionBullet(localizedAppString("onboarding.completion.ready.next.settings", defaultValue: "You can reopen setup and change these defaults later from the menu."))
                 }
             }
+
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.completion.ready.section.menu_bar", defaultValue: "When you continue")
+            ) {
+                VStack(alignment: .leading, spacing: 10) {
+                    menuBarRow(
+                        systemImage: "menubar.rectangle",
+                        text: localizedAppString("onboarding.completion.ready.menu_bar.primary", defaultValue: "NudgeWhip stays in the menu bar even after this window closes.")
+                    )
+                    menuBarRow(
+                        systemImage: "timer",
+                        text: localizedAppString("onboarding.completion.ready.menu_bar.secondary", defaultValue: "The first monitoring session starts immediately with your saved defaults.")
+                    )
+
+                    Text(localizedAppString("onboarding.completion.ready.menu_bar.note", defaultValue: "Use the menu bar icon any time to pause, reopen setup, or adjust settings."))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 2)
+                }
+            }
         }
     }
     
@@ -58,6 +79,19 @@ struct CompletionReadyStepView: View {
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.green)
                 .padding(.top, 4)
+            Text(text)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func menuBarRow(systemImage: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.nudgewhipFocus)
+                .padding(.top, 4)
+
             Text(text)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)

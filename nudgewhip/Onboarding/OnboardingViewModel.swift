@@ -148,12 +148,6 @@ final class OnboardingViewModel {
         storage.saveResumeStep(step)
     }
     
-    func retryPermission() {
-        step = .permission
-        storage.saveResumeStep(step)
-        requestPermission()
-    }
-    
     func finish() {
         errorMessage = nil
         
@@ -187,9 +181,17 @@ final class OnboardingViewModel {
     
     private func refreshPermission(promptIfNeeded: Bool) {
         permissionState = permissionManager.refreshAccessibilityPermission(promptIfNeeded: promptIfNeeded)
-        if permissionManager.isAccessibilityGranted, step == .permission {
-            step = .basicSetup
-            storage.saveResumeStep(step)
+        if permissionManager.isAccessibilityGranted {
+            switch step {
+            case .permission:
+                step = .basicSetup
+                storage.saveResumeStep(step)
+            case .completionLimited:
+                step = .completionReady
+                storage.saveResumeStep(step)
+            default:
+                break
+            }
         }
     }
     

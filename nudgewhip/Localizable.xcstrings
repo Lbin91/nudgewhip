@@ -1403,13 +1403,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue in Menu Bar"
+            "value" : "Continue in Limited Mode"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "메뉴바에서 계속"
+            "value" : "제한 모드로 계속"
           }
         }
       }
@@ -1421,13 +1421,47 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Set Up Permission Again"
+            "value" : "Open System Settings"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "권한 다시 설정"
+            "value" : "시스템 설정 열기"
+          }
+        }
+      }
+    },
+    "onboarding.completion.limited.available.menu" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The menu bar app still opens, shows status, and keeps your saved defaults."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "메뉴바 앱은 계속 열리고, 상태와 저장된 기본값도 그대로 유지됩니다."
+          }
+        }
+      }
+    },
+    "onboarding.completion.limited.available.recovery" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can reopen setup or go straight to System Settings any time to finish permission recovery."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "언제든 설정 가이드를 다시 열거나 시스템 설정으로 이동해서 권한 복구를 마칠 수 있습니다."
           }
         }
       }
@@ -1464,6 +1498,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "제한되는 내용"
+          }
+        }
+      }
+    },
+    "onboarding.completion.limited.section.available" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What still works"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지금도 가능한 것"
+          }
+        }
+      }
+    },
+    "onboarding.completion.limited.section.recovery" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best next step"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "가장 좋은 다음 단계"
+          }
+        }
+      }
+    },
+    "onboarding.completion.limited.recovery.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you allow Accessibility and come back, this screen will switch to the ready state automatically."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "손쉬운 사용 권한을 허용하고 돌아오면 이 화면은 자동으로 준비 완료 상태로 바뀝니다."
           }
         }
       }
@@ -1529,13 +1614,64 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue to Menu Bar"
+            "value" : "Start in Menu Bar"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "메뉴바에서 시작"
+          }
+        }
+      }
+    },
+    "onboarding.completion.ready.menu_bar.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use the menu bar icon any time to pause, reopen setup, or adjust settings."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "메뉴바 아이콘에서 언제든 일시정지, 설정 가이드 재오픈, 기본값 변경을 할 수 있습니다."
+          }
+        }
+      }
+    },
+    "onboarding.completion.ready.menu_bar.primary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NudgeWhip stays in the menu bar even after this window closes."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 창을 닫아도 NudgeWhip는 계속 메뉴바에 남아 있습니다."
+          }
+        }
+      }
+    },
+    "onboarding.completion.ready.menu_bar.secondary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first monitoring session starts immediately with your saved defaults."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "저장한 기본값으로 첫 모니터링 세션이 바로 시작됩니다."
           }
         }
       }
@@ -1588,6 +1724,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "나중에 메뉴에서 설정 가이드를 다시 열고 기본값을 바꿀 수 있어요."
+          }
+        }
+      }
+    },
+    "onboarding.completion.ready.section.menu_bar" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you continue"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "계속하면 바로"
           }
         }
       }
@@ -3084,6 +3237,40 @@
         }
       }
     },
+    "settings.section.accessibility.recovery.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen the setup guide to review what limited mode means and where to grant Accessibility permission."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 가이드를 다시 열어 제한 모드 의미와 손쉬운 사용 권한을 어디서 허용하는지 다시 확인할 수 있습니다."
+          }
+        }
+      }
+    },
+    "settings.section.accessibility.recovery.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Need a guided recovery path?"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "복구 경로를 다시 보고 싶다면"
+          }
+        }
+      }
+    },
     "settings.section.accessibility.request" : {
       "comment" : "Button to request accessibility permission.",
       "extractionState" : "stale",
@@ -3187,6 +3374,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "언어"
+          }
+        }
+      }
+    },
+    "settings.section.app.setup" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setup guide"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "설정 가이드"
+          }
+        }
+      }
+    },
+    "settings.section.app.setup.desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen onboarding to review defaults, permissions, and limited-mode recovery steps."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "온보딩을 다시 열어 기본값, 권한, 제한 모드 복구 단계를 다시 확인할 수 있습니다."
           }
         }
       }

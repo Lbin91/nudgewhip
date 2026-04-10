@@ -21,6 +21,35 @@ struct CompletionLimitedStepView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.completion.limited.section.available", defaultValue: "What still works")
+            ) {
+                VStack(alignment: .leading, spacing: 8) {
+                    completionBullet(localizedAppString("onboarding.completion.limited.available.menu", defaultValue: "The menu bar app still opens, shows status, and keeps your saved defaults."))
+                    completionBullet(localizedAppString("onboarding.completion.limited.available.recovery", defaultValue: "You can reopen setup or go straight to System Settings any time to finish permission recovery."))
+                }
+            }
+
+            OnboardingSectionCard(
+                title: localizedAppString("onboarding.completion.limited.section.recovery", defaultValue: "Best next step")
+            ) {
+                Text(localizedAppString("onboarding.completion.limited.recovery.note", defaultValue: "If you allow Accessibility and come back, this screen will switch to the ready state automatically."))
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func completionBullet(_ text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "checkmark")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.orange)
+                .padding(.top, 4)
+            Text(text)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

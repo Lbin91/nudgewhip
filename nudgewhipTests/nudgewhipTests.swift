@@ -2152,6 +2152,36 @@ struct nudgewhipTests {
         #expect(viewModel.step == .welcome)
         #expect(storage.resumeStep == .welcome)
     }
+
+    @MainActor
+    @Test
+    func onboardingViewModelPromotesLimitedCompletionAfterPermissionRecovery() {
+        let defaults = UserDefaults(suiteName: "nudgewhipTests.onboarding.permission-recovery.\(UUID().uuidString)")!
+        let storage = OnboardingStorage(defaults: defaults)
+        var isGranted = false
+        let permissionManager = PermissionManager(
+            accessibilityPermissionState: .denied,
+            trustCheck: { _ in isGranted },
+            settingsOpener: { _ in true }
+        )
+        let viewModel = OnboardingViewModel(
+            storage: storage,
+            modelContainer: NudgeWhipModelContainer.preview,
+            permissionManager: permissionManager,
+            launchAtLoginManager: TestLaunchAtLoginManager()
+        ) {}
+
+        viewModel.continueFromWelcome()
+        viewModel.setUpLater()
+        #expect(viewModel.step == .completionLimited)
+
+        isGranted = true
+        viewModel.handleDidBecomeActive()
+
+        #expect(viewModel.permissionState == .granted)
+        #expect(viewModel.step == .completionReady)
+        #expect(storage.resumeStep == .completionReady)
+    }
     
     @Test
     func onboardingWindowMetricsClampOversizedHeightsToVisibleFrame() {

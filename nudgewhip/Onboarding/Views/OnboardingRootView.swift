@@ -225,7 +225,7 @@ struct OnboardingRootView: View {
     
     private var completionReadyFooter: some View {
         OnboardingFooterView(
-            primaryTitle: localizedAppString("onboarding.completion.ready.cta.finish", defaultValue: "Continue to Menu Bar"),
+            primaryTitle: localizedAppString("onboarding.completion.ready.cta.finish", defaultValue: "Start in Menu Bar"),
             primaryAction: viewModel.finish,
             secondaryTitle: nil,
             secondaryAction: nil,
@@ -236,10 +236,10 @@ struct OnboardingRootView: View {
     
     private var completionLimitedFooter: some View {
         OnboardingFooterView(
-            primaryTitle: localizedAppString("onboarding.completion.limited.cta.finish", defaultValue: "Continue in Menu Bar"),
+            primaryTitle: localizedAppString("onboarding.completion.limited.cta.finish", defaultValue: "Continue in Limited Mode"),
             primaryAction: viewModel.finish,
-            secondaryTitle: localizedAppString("onboarding.completion.limited.cta.retry", defaultValue: "Set Up Permission Again"),
-            secondaryAction: viewModel.retryPermission,
+            secondaryTitle: localizedAppString("onboarding.completion.limited.cta.retry", defaultValue: "Open System Settings"),
+            secondaryAction: { _ = viewModel.openAccessibilitySettings() },
             tertiaryTitle: nil,
             tertiaryAction: nil
         )

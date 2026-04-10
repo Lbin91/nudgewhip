@@ -30,7 +30,12 @@ final class PermissionManager {
         trustCheck: @escaping AccessibilityTrustCheck = PermissionManager.defaultTrustCheck,
         settingsOpener: @escaping AccessibilitySettingsOpener = PermissionManager.defaultSettingsOpener
     ) {
-        self.accessibilityPermissionState = accessibilityPermissionState
+        if accessibilityPermissionState == .unknown,
+           let overriddenState = PermissionManager.defaultStateOverride() {
+            self.accessibilityPermissionState = overriddenState
+        } else {
+            self.accessibilityPermissionState = accessibilityPermissionState
+        }
         self.trustCheck = trustCheck
         self.settingsOpener = settingsOpener
     }
@@ -61,6 +66,17 @@ final class PermissionManager {
     
     /// 기본 접근성 권한 확인 로직 (AXIsProcessTrusted 호출)
     private static func defaultTrustCheck(promptIfNeeded: Bool) -> Bool {
+        if let override = ProcessInfo.processInfo.environment["NUDGE_TEST_ACCESSIBILITY"]?.lowercased() {
+            switch override {
+            case "granted":
+                return true
+            case "denied":
+                return false
+            default:
+                break
+            }
+        }
+
         if promptIfNeeded {
             let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
             let options = [promptKey: true] as CFDictionary
@@ -68,6 +84,17 @@ final class PermissionManager {
         }
         
         return AXIsProcessTrusted()
+    }
+
+    private static func defaultStateOverride() -> AccessibilityPermissionState? {
+        switch ProcessInfo.processInfo.environment["NUDGE_TEST_ACCESSIBILITY"]?.lowercased() {
+        case "granted":
+            return .granted
+        case "denied":
+            return .denied
+        default:
+            return nil
+        }
     }
     
     /// 기본 설정 앱 열기 로직 (NSWorkspace.shared.open)

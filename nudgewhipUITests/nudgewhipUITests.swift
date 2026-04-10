@@ -30,19 +30,69 @@ final class nudgewhipUITests: XCTestCase {
 
     @MainActor
     func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+        let app = makeConfiguredApp(accessibility: "granted")
         app.launch()
-
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssertTrue(element(in: app, label: "Get Started").waitForExistence(timeout: 5))
     }
 
     @MainActor
     func testLaunchPerformance() throws {
         // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
+            makeConfiguredApp(accessibility: "granted").launch()
         }
+    }
+
+    @MainActor
+    func testOnboardingReadyFlowCompletesFromFreshLaunch() throws {
+        let app = makeConfiguredApp(accessibility: "granted")
+        app.launch()
+
+        let getStarted = element(in: app, label: "Get Started")
+        XCTAssertTrue(getStarted.waitForExistence(timeout: 5))
+        getStarted.tap()
+
+        let continueFromPermission = element(in: app, label: "Continue")
+        XCTAssertTrue(continueFromPermission.waitForExistence(timeout: 5))
+        continueFromPermission.tap()
+
+        XCTAssertTrue(element(in: app, label: "Launch at login").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(in: app, label: "Show top countdown overlay").exists)
+    }
+
+    @MainActor
+    func testOnboardingLimitedFlowShowsRecoveryActions() throws {
+        let app = makeConfiguredApp(accessibility: "denied")
+        app.launch()
+
+        let getStarted = element(in: app, label: "Get Started")
+        XCTAssertTrue(getStarted.waitForExistence(timeout: 5))
+        getStarted.tap()
+
+        let requestAccess = element(in: app, label: "Request Access")
+        XCTAssertTrue(requestAccess.waitForExistence(timeout: 5))
+
+        let setUpLater = element(in: app, label: "Set Up Later")
+        XCTAssertTrue(setUpLater.waitForExistence(timeout: 5))
+        setUpLater.tap()
+
+        XCTAssertTrue(element(in: app, label: "Continue in Limited Mode").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(in: app, label: "Open System Settings").exists)
+    }
+
+    private func makeConfiguredApp(accessibility: String) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchEnvironment["NUDGE_RESET_ON_LAUNCH"] = "1"
+        app.launchEnvironment["NUDGE_UI_TEST_ONBOARDING"] = "1"
+        app.launchEnvironment["NUDGE_TEST_ACCESSIBILITY"] = accessibility
+        app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
+        return app
+    }
+
+    private func element(in app: XCUIApplication, label: String) -> XCUIElement {
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", label))
+            .firstMatch
     }
     
     private func terminateRunningAppIfNeeded() throws {

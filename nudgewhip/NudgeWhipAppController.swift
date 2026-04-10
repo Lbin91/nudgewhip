@@ -113,7 +113,10 @@ final class NudgeWhipAppController {
     }
     
     private func startFlow() {
-        guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else {
+        let isRunningUnderTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+        let forcesOnboardingInUITests = ProcessInfo.processInfo.environment["NUDGE_UI_TEST_ONBOARDING"] == "1"
+
+        guard !isRunningUnderTests || forcesOnboardingInUITests else {
             menuBarViewModel.startIfNeeded()
             return
         }

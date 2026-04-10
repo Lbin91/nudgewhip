@@ -202,6 +202,22 @@ struct SettingsRootView: View {
                     
                     secondaryButton(localizedAppString("settings.section.accessibility.open", defaultValue: "Open System Settings"), action: { _ = viewModel.openAccessibilitySettings() })
                 }
+
+                if viewModel.permissionState == .denied {
+                    VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                        Text(localizedAppString("settings.section.accessibility.recovery.title", defaultValue: "Need a guided recovery path?"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                        Text(localizedAppString("settings.section.accessibility.recovery.body", defaultValue: "Reopen the setup guide to review what limited mode means and where to grant Accessibility permission."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+
+                        secondaryButton(localizedAppString("menu.action.open_onboarding", defaultValue: "Open setup guide"), action: viewModel.openOnboarding)
+                    }
+                    .padding(NudgeWhipSpacing.s3)
+                    .background(Color.nudgewhipAlert.opacity(0.06), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
+                }
             }
         }
     }
@@ -242,6 +258,25 @@ struct SettingsRootView: View {
                     }
                 }
                 .toggleStyle(.checkbox)
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s3) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(localizedAppString("settings.section.app.setup", defaultValue: "Setup guide"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                        Text(localizedAppString("settings.section.app.setup.desc", defaultValue: "Reopen onboarding to review defaults, permissions, and limited-mode recovery steps."))
+                            .font(.caption)
+                            .foregroundStyle(Color.nudgewhipTextMuted)
+                    }
+
+                    HStack(spacing: NudgeWhipSpacing.s3) {
+                        secondaryButton(localizedAppString("menu.action.open_onboarding", defaultValue: "Open setup guide"), action: viewModel.openOnboarding)
+                    }
+                }
 
                 Divider()
                     .overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
