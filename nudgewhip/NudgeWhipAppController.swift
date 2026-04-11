@@ -20,14 +20,23 @@ final class NudgeWhipAppController {
         self.appUpdater = appUpdater
         let alertManager = AlertManager()
         self.alertManager = alertManager
-        let sessionTracker = SessionTracker()
-        let idleMonitor = IdleMonitor(permissionManager: permissionManager, alertManager: alertManager, sessionTracker: sessionTracker)
+        let modelContext = NudgeWhipModelContainer.shared.mainContext
+        let sessionTracker = SessionTracker(modelContext: modelContext)
+        let appUsageTracker = AppUsageTracker(modelContext: modelContext)
+        let idleMonitor = IdleMonitor(
+            permissionManager: permissionManager,
+            alertManager: alertManager,
+            sessionTracker: sessionTracker,
+            appUsageTracker: appUsageTracker
+        )
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
         sessionTracker.onSessionUpdated = { [weak menuBarViewModel] in
             menuBarViewModel?.refreshMenuSnapshot()
         }
+        appUsageTracker.onUsageUpdated = { [weak menuBarViewModel] in
+            menuBarViewModel?.refreshMenuSnapshot()
+        }
         self.menuBarViewModel = menuBarViewModel
-        let modelContext = NudgeWhipModelContainer.shared.mainContext
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             self.countdownOverlayController = CountdownOverlayController(menuBarViewModel: menuBarViewModel)
         } else {

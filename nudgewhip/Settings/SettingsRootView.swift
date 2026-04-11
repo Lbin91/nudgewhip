@@ -199,7 +199,10 @@ struct SettingsRootView: View {
 
     private var statisticsSection: some View {
         SettingsSection(title: localizedAppString("settings.section.statistics", defaultValue: "Statistics"), systemImage: "chart.bar.xaxis") {
-            StatisticsDashboardView(snapshot: viewModel.statisticsSnapshot)
+            StatisticsDashboardView(
+                snapshot: viewModel.statisticsSnapshot,
+                appUsageSnapshot: viewModel.appUsageSnapshot
+            )
         }
     }
     

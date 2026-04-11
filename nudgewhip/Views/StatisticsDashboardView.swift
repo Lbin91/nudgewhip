@@ -21,6 +21,7 @@ private enum StatisticsDisplayPeriod: String, CaseIterable, Identifiable {
 
 struct StatisticsDashboardView: View {
     let snapshot: StatisticsSnapshot
+    let appUsageSnapshot: AppUsageSnapshot
 
     @State private var selectedPeriod: StatisticsDisplayPeriod = .thisWeek
 
@@ -44,32 +45,38 @@ struct StatisticsDashboardView: View {
             .pickerStyle(.segmented)
             .labelsHidden()
 
-            if selectedSummary.hasData {
+            if selectedSummary.hasData || !selectedTopApps.isEmpty {
                 LazyVGrid(columns: summaryColumns, spacing: NudgeWhipSpacing.s2) {
-                    metricCard(
-                        title: localizedAppString("settings.section.statistics.metric.focus", defaultValue: "Focus"),
-                        value: localizedDurationString(selectedSummary.totalFocusDuration)
-                            ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-                    )
-                    metricCard(
-                        title: localizedAppString("settings.section.statistics.metric.alerts", defaultValue: "Alerts"),
-                        value: "\(selectedSummary.alertCount)"
-                    )
-                    metricCard(
-                        title: localizedAppString("settings.section.statistics.metric.recovery", defaultValue: "Recovery"),
-                        value: localizedPercentString(selectedSummary.recoveryRate)
-                    )
-                    metricCard(
-                        title: localizedAppString("settings.section.statistics.metric.longest", defaultValue: "Longest focus"),
-                        value: localizedDurationString(selectedSummary.longestFocusDuration)
-                            ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-                    )
+                    if selectedSummary.hasData {
+                        metricCard(
+                            title: localizedAppString("settings.section.statistics.metric.focus", defaultValue: "Focus"),
+                            value: localizedDurationString(selectedSummary.totalFocusDuration)
+                                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+                        )
+                        metricCard(
+                            title: localizedAppString("settings.section.statistics.metric.alerts", defaultValue: "Alerts"),
+                            value: "\(selectedSummary.alertCount)"
+                        )
+                        metricCard(
+                            title: localizedAppString("settings.section.statistics.metric.recovery", defaultValue: "Recovery"),
+                            value: localizedPercentString(selectedSummary.recoveryRate)
+                        )
+                        metricCard(
+                            title: localizedAppString("settings.section.statistics.metric.longest", defaultValue: "Longest focus"),
+                            value: localizedDurationString(selectedSummary.longestFocusDuration)
+                                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+                        )
+                    }
                 }
 
-                HStack(alignment: .top, spacing: NudgeWhipSpacing.s4) {
-                    chartCard
-                    detailCard
+                if selectedSummary.hasData {
+                    HStack(alignment: .top, spacing: NudgeWhipSpacing.s4) {
+                        chartCard
+                        detailCard
+                    }
                 }
+
+                topAppsCard
             } else {
                 emptyState
             }
@@ -101,6 +108,25 @@ struct StatisticsDashboardView: View {
         case .last7Days:
             return snapshot.last7Days.days
         }
+    }
+
+    private var selectedAppUsagePeriod: AppUsagePeriod {
+        switch selectedPeriod {
+        case .today:
+            return .today
+        case .thisWeek:
+            return .thisWeek
+        case .last7Days:
+            return .last7Days
+        }
+    }
+
+    private var selectedTopApps: [AppUsageEntry] {
+        appUsageSnapshot.topApps(for: selectedAppUsagePeriod)
+    }
+
+    private var selectedPrimaryApp: AppUsageEntry? {
+        appUsageSnapshot.primaryApp(for: selectedAppUsagePeriod)
     }
 
     private var chartMaxDuration: TimeInterval {
@@ -161,6 +187,46 @@ struct StatisticsDashboardView: View {
         .background(Color.nudgewhipBgSurfaceAlt.opacity(0.72), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous))
     }
 
+    private var topAppsCard: some View {
+        VStack(alignment: .leading, spacing: NudgeWhipSpacing.s3) {
+            Text(localizedAppString("settings.section.statistics.top_apps.title", defaultValue: "Top apps"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.nudgewhipTextMuted)
+                .textCase(.uppercase)
+
+            Text(localizedAppString("settings.section.statistics.top_apps.desc", defaultValue: "Used during focus sessions. This does not inspect window titles, URLs, or typed content."))
+                .font(.caption)
+                .foregroundStyle(Color.nudgewhipTextMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let selectedPrimaryApp {
+                Text(
+                    localizedAppString(
+                        "settings.section.statistics.top_apps.primary",
+                        defaultValue: "Primary app: \(selectedPrimaryApp.localizedName)"
+                    )
+                )
+                .font(.caption.weight(.medium))
+                .foregroundStyle(Color.nudgewhipTextPrimary)
+            }
+
+            if selectedTopApps.isEmpty {
+                Text(localizedAppString("settings.section.statistics.top_apps.empty", defaultValue: "No app usage captured for this period yet."))
+                    .font(.caption)
+                    .foregroundStyle(Color.nudgewhipTextMuted)
+            } else {
+                VStack(spacing: NudgeWhipSpacing.s2) {
+                    ForEach(Array(selectedTopApps.enumerated()), id: \.offset) { index, entry in
+                        topAppRow(rank: index + 1, entry: entry)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(NudgeWhipSpacing.s4)
+        .background(Color.nudgewhipBgSurfaceAlt.opacity(0.72), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous))
+    }
+
     private var emptyState: some View {
         VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
             Text(localizedAppString("settings.section.statistics.empty.title", defaultValue: "No focus history yet"))
@@ -204,6 +270,39 @@ struct StatisticsDashboardView: View {
                 .font(.subheadline.monospacedDigit().weight(.semibold))
                 .foregroundStyle(Color.nudgewhipTextPrimary)
                 .minimumScaleFactor(0.8)
+        }
+    }
+
+    private func topAppRow(rank: Int, entry: AppUsageEntry) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: NudgeWhipSpacing.s3) {
+            Text("\(rank)")
+                .font(.caption.monospacedDigit().weight(.semibold))
+                .foregroundStyle(Color.nudgewhipTextMuted)
+                .frame(width: 16, alignment: .leading)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.localizedName)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                Text(
+                    localizedAppString(
+                        "settings.section.statistics.top_apps.transitions",
+                        defaultValue: "\(entry.transitionCount) transitions"
+                    )
+                )
+                .font(.caption2)
+                .foregroundStyle(Color.nudgewhipTextMuted)
+            }
+
+            Spacer(minLength: NudgeWhipSpacing.s3)
+
+            Text(
+                localizedDurationString(entry.duration)
+                    ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+            )
+            .font(.subheadline.monospacedDigit().weight(.semibold))
+            .foregroundStyle(Color.nudgewhipTextPrimary)
         }
     }
 }

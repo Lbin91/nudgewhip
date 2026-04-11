@@ -35,6 +35,18 @@ private final class TestEventMonitor: EventMonitoring {
     }
 }
 
+private func appSnapshot(
+    bundleIdentifier: String?,
+    localizedName: String? = nil,
+    processIdentifier: pid_t? = nil
+) -> FrontmostAppSnapshot {
+    FrontmostAppSnapshot(
+        bundleIdentifier: bundleIdentifier,
+        localizedName: localizedName,
+        processIdentifier: processIdentifier
+    )
+}
+
 @Test
 func localizedDurationStringUsesSelectedAppLanguage() {
     let originalLocaleIdentifier = AppLanguageStore.shared.preferredLocaleIdentifier
@@ -170,25 +182,43 @@ private final class TestFrontmostAppProvider: FrontmostAppProviding {
     private(set) var isMonitoring = false
     private(set) var startCount = 0
     private(set) var stopCount = 0
-    var currentBundleIdentifier: String?
-    private var onBundleIdentifierChange: (@MainActor (String?) -> Void)?
-    
-    func start(onBundleIdentifierChange: @escaping @MainActor (String?) -> Void) {
+    var currentApp: FrontmostAppSnapshot?
+    private var onChange: (@MainActor (FrontmostAppSnapshot?) -> Void)?
+
+    func start(onChange: @escaping @MainActor (FrontmostAppSnapshot?) -> Void) {
         isMonitoring = true
         startCount += 1
-        self.onBundleIdentifierChange = onBundleIdentifierChange
-        onBundleIdentifierChange(currentBundleIdentifier)
+        self.onChange = onChange
+        onChange(currentApp)
     }
-    
+
     func stop() {
         isMonitoring = false
         stopCount += 1
-        onBundleIdentifierChange = nil
+        onChange = nil
     }
-    
-    func emit(bundleIdentifier: String?) {
-        currentBundleIdentifier = bundleIdentifier
-        onBundleIdentifierChange?(bundleIdentifier)
+
+    func emit(
+        bundleIdentifier: String?,
+        localizedName: String? = nil,
+        processIdentifier: pid_t? = nil
+    ) {
+        let resolvedLocalizedName: String?
+        if let localizedName {
+            resolvedLocalizedName = localizedName
+        } else {
+            resolvedLocalizedName = bundleIdentifier.flatMap { bundleIdentifier in
+                bundleIdentifier.split(separator: ".").last.map(String.init)
+            }
+        }
+
+        let snapshot = FrontmostAppSnapshot(
+            bundleIdentifier: bundleIdentifier,
+            localizedName: resolvedLocalizedName,
+            processIdentifier: processIdentifier
+        )
+        currentApp = snapshot
+        onChange?(snapshot)
     }
 }
 
@@ -450,6 +480,211 @@ struct nudgewhipTests {
         #expect(snapshot.thisWeek.alertCount == 4)
         #expect(snapshot.last7Days.totalFocusDuration == 25_200)
         #expect(snapshot.last7Days.alertCount == 7)
+    }
+
+    @Test
+    func appUsageSnapshotAggregatesDurationsTransitionsAndFallbackLabels() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+        let dayStart = Date(timeIntervalSince1970: 1_775_088_000)
+        let referenceDate = dayStart.addingTimeInterval(18 * 60 * 60)
+        let session = FocusSession(
+            startedAt: dayStart.addingTimeInterval(9 * 60 * 60),
+            endedAt: dayStart.addingTimeInterval(14 * 60 * 60)
+        )
+        session.appUsageSegments = [
+            AppUsageSegment(
+                bundleIdentifier: "com.apple.dt.Xcode",
+                localizedName: "Xcode",
+                processIdentifier: 11,
+                startedAt: dayStart.addingTimeInterval(9 * 60 * 60),
+                endedAt: dayStart.addingTimeInterval(10 * 60 * 60),
+                focusSession: session
+            ),
+            AppUsageSegment(
+                bundleIdentifier: "com.apple.dt.Xcode",
+                localizedName: "Xcode",
+                processIdentifier: 12,
+                startedAt: dayStart.addingTimeInterval(10 * 60 * 60 + 30 * 60),
+                endedAt: dayStart.addingTimeInterval(12 * 60 * 60 + 30 * 60),
+                focusSession: session
+            ),
+            AppUsageSegment(
+                bundleIdentifier: "com.apple.Safari",
+                localizedName: "Safari",
+                processIdentifier: 21,
+                startedAt: dayStart.addingTimeInterval(12 * 60 * 60 + 30 * 60),
+                endedAt: dayStart.addingTimeInterval(13 * 60 * 60 + 30 * 60),
+                focusSession: session
+            ),
+            AppUsageSegment(
+                bundleIdentifier: nil,
+                localizedName: nil,
+                processIdentifier: nil,
+                startedAt: dayStart.addingTimeInterval(13 * 60 * 60 + 30 * 60),
+                endedAt: dayStart.addingTimeInterval(13 * 60 * 60 + 45 * 60),
+                focusSession: session
+            )
+        ]
+
+        let snapshot = AppUsageSnapshot.derive(for: [session], on: referenceDate, calendar: calendar)
+
+        #expect(snapshot.todayTopApps.count == 3)
+        #expect(snapshot.todayTopApps[0].localizedName == "Xcode")
+        #expect(snapshot.todayTopApps[0].duration == 10_800)
+        #expect(snapshot.todayTopApps[0].transitionCount == 2)
+        #expect(snapshot.todayTopApps[1].localizedName == "Safari")
+        #expect(snapshot.todayTopApps[1].duration == 3_600)
+        #expect(snapshot.todayTopApps[2].localizedName == "Unknown App")
+        #expect(snapshot.todayPrimaryApp?.localizedName == "Xcode")
+    }
+
+    @MainActor
+    @Test
+    func appUsageTrackerDedupesRepeatedSnapshotsAndClosesSegments() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let sessionTracker = SessionTracker(modelContext: context)
+        let tracker = AppUsageTracker(modelContext: context)
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+
+        sessionTracker.beginSession(at: baseDate)
+        tracker.resumeFocusWindow(
+            at: baseDate,
+            currentApp: appSnapshot(
+                bundleIdentifier: "com.apple.dt.Xcode",
+                localizedName: "Xcode",
+                processIdentifier: 11
+            )
+        )
+        tracker.handleFrontmostAppChange(
+            appSnapshot(
+                bundleIdentifier: "com.apple.dt.Xcode",
+                localizedName: "Xcode",
+                processIdentifier: 11
+            ),
+            at: baseDate.addingTimeInterval(60)
+        )
+        tracker.handleFrontmostAppChange(
+            appSnapshot(
+                bundleIdentifier: "com.apple.Safari",
+                localizedName: "Safari",
+                processIdentifier: 21
+            ),
+            at: baseDate.addingTimeInterval(120)
+        )
+        tracker.pauseFocusWindow(at: baseDate.addingTimeInterval(180))
+
+        let segments = try context.fetch(
+            FetchDescriptor<AppUsageSegment>(
+                sortBy: [SortDescriptor(\AppUsageSegment.startedAt)]
+            )
+        )
+
+        #expect(segments.count == 2)
+        #expect(segments[0].bundleIdentifier == "com.apple.dt.Xcode")
+        #expect(segments[0].startedAt == baseDate)
+        #expect(segments[0].endedAt == baseDate.addingTimeInterval(120))
+        #expect(segments[1].bundleIdentifier == "com.apple.Safari")
+        #expect(segments[1].startedAt == baseDate.addingTimeInterval(120))
+        #expect(segments[1].endedAt == baseDate.addingTimeInterval(180))
+    }
+
+    @MainActor
+    @Test
+    func idleMonitorIgnoresMenuSelfActivationForAppUsageTracking() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let frontmostAppProvider = TestFrontmostAppProvider()
+        frontmostAppProvider.currentApp = appSnapshot(
+            bundleIdentifier: "com.apple.dt.Xcode",
+            localizedName: "Xcode",
+            processIdentifier: 11
+        )
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: frontmostAppProvider,
+            sessionTracker: SessionTracker(modelContext: context),
+            appUsageTracker: AppUsageTracker(modelContext: context),
+            ownBundleIdentifier: "dev.nudgewhip.app"
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.setMenuPresentationActive(true)
+        frontmostAppProvider.emit(
+            bundleIdentifier: "dev.nudgewhip.app",
+            localizedName: "NudgeWhip",
+            processIdentifier: 99
+        )
+        idleMonitor.setMenuPresentationActive(false)
+        frontmostAppProvider.emit(
+            bundleIdentifier: "com.apple.Safari",
+            localizedName: "Safari",
+            processIdentifier: 21
+        )
+        idleMonitor.setManualPause(true, at: baseDate.addingTimeInterval(120))
+
+        let segments = try context.fetch(
+            FetchDescriptor<AppUsageSegment>(
+                sortBy: [SortDescriptor(\AppUsageSegment.startedAt)]
+            )
+        )
+
+        #expect(segments.count == 2)
+        #expect(segments.allSatisfy { $0.bundleIdentifier != "dev.nudgewhip.app" })
+        #expect(segments[0].bundleIdentifier == "com.apple.dt.Xcode")
+        #expect(segments[0].endedAt != nil)
+        #expect(segments[1].bundleIdentifier == "com.apple.Safari")
+        #expect(segments[1].endedAt != nil)
+    }
+
+    @MainActor
+    @Test
+    func idleMonitorClosesOpenAppUsageSegmentWhenWhitelistMatchStarts() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date(timeIntervalSince1970: 1_775_088_000)
+        let frontmostAppProvider = TestFrontmostAppProvider()
+        frontmostAppProvider.currentApp = appSnapshot(
+            bundleIdentifier: "com.apple.dt.Xcode",
+            localizedName: "Xcode",
+            processIdentifier: 11
+        )
+        let idleMonitor = IdleMonitor(
+            permissionManager: PermissionManager(accessibilityPermissionState: .granted),
+            runtimeStateController: RuntimeStateController(),
+            eventMonitor: TestEventMonitor(),
+            lifecycleMonitor: TestSystemLifecycleMonitor(),
+            frontmostAppProvider: frontmostAppProvider,
+            sessionTracker: SessionTracker(modelContext: context),
+            appUsageTracker: AppUsageTracker(modelContext: context)
+        )
+
+        idleMonitor.setAccessibilityPermission(.granted, at: baseDate)
+        idleMonitor.applyWhitelistApps(
+            [WhitelistApp(bundleIdentifier: "com.apple.Safari")],
+            at: baseDate.addingTimeInterval(10)
+        )
+        frontmostAppProvider.emit(
+            bundleIdentifier: "com.apple.Safari",
+            localizedName: "Safari",
+            processIdentifier: 21
+        )
+
+        let segments = try context.fetch(
+            FetchDescriptor<AppUsageSegment>(
+                sortBy: [SortDescriptor(\AppUsageSegment.startedAt)]
+            )
+        )
+
+        #expect(segments.count == 1)
+        #expect(segments[0].bundleIdentifier == "com.apple.dt.Xcode")
+        #expect(segments[0].endedAt != nil)
     }
     
     @MainActor
@@ -2093,7 +2328,10 @@ struct nudgewhipTests {
         let runtimeController = RuntimeStateController()
         let sessionTracker = TestSessionTracker()
         let frontmostAppProvider = TestFrontmostAppProvider()
-        frontmostAppProvider.currentBundleIdentifier = "com.apple.finder"
+        frontmostAppProvider.currentApp = appSnapshot(
+            bundleIdentifier: "com.apple.finder",
+            localizedName: "Finder"
+        )
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             runtimeStateController: runtimeController,

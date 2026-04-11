@@ -28,6 +28,8 @@ final class IdleMonitor {
     let frontmostAppProvider: any FrontmostAppProviding
     let alertManager: (any AlertManaging)?
     let sessionTracker: (any SessionTracking)?
+    let appUsageTracker: AppUsageTracker?
+    private let ownBundleIdentifier: String?
     private(set) var idleThreshold: TimeInterval
     let alertEscalationInterval: TimeInterval
     let cooldownDuration: TimeInterval
@@ -56,6 +58,8 @@ final class IdleMonitor {
         frontmostAppProvider: (any FrontmostAppProviding)? = nil,
         alertManager: (any AlertManaging)? = nil,
         sessionTracker: (any SessionTracking)? = nil,
+        appUsageTracker: AppUsageTracker? = nil,
+        ownBundleIdentifier: String? = Bundle.main.bundleIdentifier,
         idleThreshold: TimeInterval = 300,
         alertEscalationInterval: TimeInterval = 30,
         cooldownDuration: TimeInterval = 60,
@@ -72,6 +76,8 @@ final class IdleMonitor {
         self.frontmostAppProvider = frontmostAppProvider ?? FrontmostAppProvider()
         self.alertManager = alertManager
         self.sessionTracker = sessionTracker
+        self.appUsageTracker = appUsageTracker
+        self.ownBundleIdentifier = ownBundleIdentifier
         self.idleThreshold = idleThreshold
         self.alertEscalationInterval = alertEscalationInterval
         self.cooldownDuration = cooldownDuration
@@ -115,7 +121,7 @@ final class IdleMonitor {
                 .filter(\.isEnabled)
                 .map(\.bundleIdentifier)
         )
-        updateWhitelistMatch(for: frontmostAppProvider.currentBundleIdentifier, at: date)
+        updateWhitelistMatch(for: frontmostAppProvider.currentApp?.bundleIdentifier, at: date)
     }
     
     /// 권한 확인 후 유휴 감시 시작
@@ -145,8 +151,10 @@ final class IdleMonitor {
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         } else {
             resetBreakSuggestion()
+            appUsageTracker?.pauseFocusWindow(at: date)
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
@@ -170,8 +178,10 @@ final class IdleMonitor {
             startFrontmostAppMonitoringIfNeeded()
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         } else {
             resetBreakSuggestion()
+            appUsageTracker?.pauseFocusWindow(at: date)
             stopEventMonitoring()
             stopLifecycleMonitoring()
             stopFrontmostAppMonitoring()
@@ -237,6 +247,7 @@ final class IdleMonitor {
         runtimeStateController.handle(enabled ? .manualPauseEnabled : .manualPauseDisabled, at: date)
         
         if enabled {
+            appUsageTracker?.pauseFocusWindow(at: date)
             sessionTracker?.endSession(reason: .manualPause, at: date)
             manualPauseUntil = pauseUntil
             scheduleManualPauseResumeIfNeeded(from: date)
@@ -248,6 +259,7 @@ final class IdleMonitor {
             checkSchedule(at: date)
             scheduleIdleDeadline(from: date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         }
         
         scheduleAlertSync()
@@ -270,6 +282,7 @@ final class IdleMonitor {
         scheduleAlertSync()
         
         if matched {
+            appUsageTracker?.pauseFocusWindow(at: date)
             sessionTracker?.endSession(reason: .whitelistPause, at: date)
             cancelMonitoringDeadlines()
         // Only resume the session when the resolved post-whitelist state is truly
@@ -279,6 +292,7 @@ final class IdleMonitor {
         } else if runtimeStateController.snapshot.runtimeState == .monitoring {
             scheduleIdleDeadline(from: lastInputAt ?? date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         }
     }
     
@@ -290,6 +304,7 @@ final class IdleMonitor {
         
         switch event {
         case .sleepDetected, .screenLocked, .fastUserSwitchingStarted:
+            appUsageTracker?.pauseFocusWindow(at: date)
             sessionTracker?.endSession(reason: .suspended, at: date)
             cancelMonitoringDeadlines()
         case .wakeDetected, .screenUnlocked, .fastUserSwitchingEnded:
@@ -297,6 +312,7 @@ final class IdleMonitor {
             checkSchedule(at: date)
             scheduleIdleDeadline(from: date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         default:
             break
         }
@@ -351,6 +367,7 @@ final class IdleMonitor {
                 scheduleAlertSync()
                 scheduleIdleDeadline(from: date)
                 sessionTracker?.beginSession(at: date)
+                appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
             }
             scheduleBoundaryWorkItem?.cancel()
             scheduleBoundaryWorkItem = nil
@@ -378,10 +395,12 @@ final class IdleMonitor {
             scheduleAlertSync()
             scheduleIdleDeadline(from: date)
             sessionTracker?.beginSession(at: date)
+            appUsageTracker?.resumeFocusWindow(at: date, currentApp: frontmostAppProvider.currentApp)
         } else if !inWindow && !snapshot.schedulePaused {
             resetBreakSuggestion()
             runtimeStateController.handle(.scheduleWindowEntered, at: date)
             scheduleAlertSync()
+            appUsageTracker?.pauseFocusWindow(at: date)
             sessionTracker?.endSession(reason: .completed, at: date)
             cancelMonitoringDeadlines()
         }
@@ -539,8 +558,8 @@ final class IdleMonitor {
     /// frontmost app 변경 모니터 시작
     private func startFrontmostAppMonitoringIfNeeded() {
         guard !frontmostAppProvider.isMonitoring else { return }
-        frontmostAppProvider.start { [weak self] bundleIdentifier in
-            self?.updateWhitelistMatch(for: bundleIdentifier)
+        frontmostAppProvider.start { [weak self] snapshot in
+            self?.handleFrontmostAppChange(snapshot)
         }
     }
     
@@ -553,6 +572,16 @@ final class IdleMonitor {
     private func updateWhitelistMatch(for bundleIdentifier: String?, at date: Date = .now) {
         let matched = bundleIdentifier.map { whitelistedBundleIdentifiers.contains($0) } ?? false
         setWhitelistMatched(matched, at: date)
+    }
+
+    private func handleFrontmostAppChange(_ snapshot: FrontmostAppSnapshot?, at date: Date = .now) {
+        updateWhitelistMatch(for: snapshot?.bundleIdentifier, at: date)
+
+        if isMenuPresentationActive, snapshot?.bundleIdentifier == ownBundleIdentifier {
+            return
+        }
+
+        appUsageTracker?.handleFrontmostAppChange(snapshot, at: date)
     }
     
     /// alert side effects는 이벤트 핸들러에서 바로 무겁게 수행하지 않도록 비동기로 동기화

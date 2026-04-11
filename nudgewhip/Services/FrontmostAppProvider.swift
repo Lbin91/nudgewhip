@@ -1,11 +1,41 @@
 import AppKit
 import Foundation
 
+struct FrontmostAppSnapshot: Equatable, Sendable {
+    let bundleIdentifier: String?
+    let localizedName: String?
+    let processIdentifier: pid_t?
+
+    init(
+        bundleIdentifier: String?,
+        localizedName: String?,
+        processIdentifier: pid_t?
+    ) {
+        self.bundleIdentifier = bundleIdentifier
+        self.localizedName = localizedName
+        self.processIdentifier = processIdentifier
+    }
+
+    init(application: NSRunningApplication?) {
+        self.init(
+            bundleIdentifier: application?.bundleIdentifier,
+            localizedName: application?.localizedName,
+            processIdentifier: application?.processIdentifier
+        )
+    }
+
+    var hasIdentity: Bool {
+        let hasBundleIdentifier = !(bundleIdentifier?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        let hasLocalizedName = !(localizedName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        return hasBundleIdentifier || hasLocalizedName || processIdentifier != nil
+    }
+}
+
 @MainActor
 protocol FrontmostAppProviding: AnyObject {
     var isMonitoring: Bool { get }
-    var currentBundleIdentifier: String? { get }
-    func start(onBundleIdentifierChange: @escaping @MainActor (String?) -> Void)
+    var currentApp: FrontmostAppSnapshot? { get }
+    func start(onChange: @escaping @MainActor (FrontmostAppSnapshot?) -> Void)
     func stop()
 }
 
@@ -26,14 +56,14 @@ final class FrontmostAppProvider: FrontmostAppProviding {
     var isMonitoring: Bool {
         observer != nil
     }
-    
-    var currentBundleIdentifier: String? {
-        workspace.frontmostApplication?.bundleIdentifier
+
+    var currentApp: FrontmostAppSnapshot? {
+        FrontmostAppSnapshot(application: workspace.frontmostApplication)
     }
-    
-    func start(onBundleIdentifierChange: @escaping @MainActor (String?) -> Void) {
+
+    func start(onChange: @escaping @MainActor (FrontmostAppSnapshot?) -> Void) {
         guard observer == nil else { return }
-        
+
         observer = notificationCenter.addObserver(
             forName: NSWorkspace.didActivateApplicationNotification,
             object: nil,
@@ -41,11 +71,11 @@ final class FrontmostAppProvider: FrontmostAppProviding {
         ) { notification in
             let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
             Task { @MainActor in
-                onBundleIdentifierChange(application?.bundleIdentifier)
+                onChange(FrontmostAppSnapshot(application: application))
             }
         }
-        
-        onBundleIdentifierChange(currentBundleIdentifier)
+
+        onChange(currentApp)
     }
     
     func stop() {

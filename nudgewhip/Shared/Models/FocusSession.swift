@@ -30,6 +30,9 @@ final class FocusSession {
 
     /// alerting → recovery 구간 기록. SwiftData 자동 relationship
     var alertingSegments: [AlertingSegment] = []
+
+    /// focus session 동안 전면에 있었던 앱 usage 구간 기록
+    var appUsageSegments: [AppUsageSegment] = []
     
     /// 종료 사유 로우 밸류 ↔ enum 편의 변환
     var endReason: FocusSessionEndReason? {
