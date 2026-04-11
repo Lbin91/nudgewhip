@@ -1,7 +1,7 @@
 # Nudge Release Readiness Checklist
 
-- Version: 0.1
-- Last Updated: 2026-04-02
+- Version: 0.2.0
+- Last Updated: 2026-04-12
 - Owner: `qa-integrator`
 - Scope: beta launch and Pro launch readiness gate
 

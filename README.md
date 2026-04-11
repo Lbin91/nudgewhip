@@ -6,8 +6,8 @@
   <a href="LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-3DA639?style=for-the-badge&logo=license">
   </a>
-  <a href="docs/release/v0.1.0.md">
-    <img alt="v0.1.0 Public Beta" src="https://img.shields.io/badge/release-v0.1.0%20public%20beta-E35D3D?style=for-the-badge">
+  <a href="docs/release/v0.2.0.md">
+    <img alt="v0.2.0 Stabilization" src="https://img.shields.io/badge/release-v0.2.0%20stabilization-E35D3D?style=for-the-badge">
   </a>
   <img alt="macOS 15+" src="https://img.shields.io/badge/platform-macOS%2015%2B-111827?style=for-the-badge&logo=apple">
   <img alt="SwiftUI + AppKit" src="https://img.shields.io/badge/stack-SwiftUI%20%2B%20AppKit-F97316?style=for-the-badge&logo=swift&logoColor=white">
@@ -31,16 +31,16 @@
 
 ## Download
 
-NudgeWhip is installable right now from the notarized DMG attached to the GitHub release.
+NudgeWhip is distributed through the notarized DMG attached to the GitHub release.
 
-- GitHub Release: [v0.1.0](https://github.com/Lbin91/nudgewhip/releases/tag/v0.1.0)
-- Asset: `NudgeWhip-0.1.0-1.dmg`
+- GitHub Release: [v0.2.0](https://github.com/Lbin91/nudgewhip/releases/tag/v0.2.0)
+- Asset: `NudgeWhip-0.2.0-1.dmg`
 - Platform: macOS 15 or later
 
 <p align="center">
-  <a href="docs/release/v0.1.0.md"><strong>Release Notes</strong></a>
+  <a href="docs/release/v0.2.0.md"><strong>Release Notes</strong></a>
   ·
-  <a href="docs/release/v0.1.0-rc-checklist.md"><strong>RC Checklist</strong></a>
+  <a href="docs/release/v0.2.0-rc-checklist.md"><strong>RC Checklist</strong></a>
   ·
   <a href="docs/privacy/accessibility-and-data-disclosure.md"><strong>Privacy</strong></a>
   ·
@@ -66,7 +66,7 @@ It is an `attention recall tool`: a local intervention layer for people whose wo
 
 ## Release Status
 
-`v0.1.0` is the first public beta for the macOS core loop.
+`v0.2.0` is the first stabilization update for the macOS core loop.
 
 Current release lane:
 
@@ -74,7 +74,7 @@ Current release lane:
 - `source-first GitHub release`
 - `Free core loop only`
 
-Not in scope for `v0.1.0`:
+Not in scope for `v0.2.0`:
 
 - iPhone companion app
 - CloudKit sync
@@ -82,7 +82,7 @@ Not in scope for `v0.1.0`:
 - richer exception handling and advanced whitelist workflows
 - expanded progression systems
 
-## What Ships In `v0.1.0`
+## What Ships In `v0.2.0`
 
 This beta already includes a real working loop:
 
@@ -175,7 +175,7 @@ xcodebuild test -scheme nudgewhip -destination 'platform=macOS' -only-testing:nu
 Note:
 
 - menu bar agent UI tests are more timing-sensitive than standard foreground app UI tests
-- release verification steps are tracked in [docs/release/v0.1.0-rc-checklist.md](docs/release/v0.1.0-rc-checklist.md)
+- release verification steps are tracked in [docs/release/v0.2.0-rc-checklist.md](docs/release/v0.2.0-rc-checklist.md)
 
 ## Technical Shape
 
@@ -204,8 +204,8 @@ nudgewhip/
 
 ## Documentation Map
 
-- [docs/release/v0.1.0.md](docs/release/v0.1.0.md): public beta release notes
-- [docs/release/v0.1.0-rc-checklist.md](docs/release/v0.1.0-rc-checklist.md): release candidate execution checklist
+- [docs/release/v0.2.0.md](docs/release/v0.2.0.md): release notes
+- [docs/release/v0.2.0-rc-checklist.md](docs/release/v0.2.0-rc-checklist.md): release candidate execution checklist
 - [docs/release/release-readiness-checklist.md](docs/release/release-readiness-checklist.md): release gate matrix
 - [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md): permission and data disclosure
 
