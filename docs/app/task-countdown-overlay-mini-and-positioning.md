@@ -152,12 +152,17 @@ mini mode에서는 정보 우선순위를 강하게 줄인다.
 - mini mode에서는 close affordance를 상시 노출하지 않는다.
 - overlay on/off는 menu/settings에서 제어한다.
 - mini mode는 `display utility`이지 `조작 UI`가 아니다.
-- mini mode에서는 panel이 마우스 이벤트를 가로채지 않도록 `ignoresMouseEvents = true`를 사용한다.
+- baseline contract에서는 mini mode가 마우스 이벤트를 가로채지 않는 방향을 우선한다.
 - standard mode는 기존 close affordance를 유지하므로 `ignoresMouseEvents = false`를 유지한다.
 
 후속 검토 항목:
 
 - hover 시에만 닫기 버튼을 노출할지 여부는 별도 polish 항목으로 둔다.
+
+현재 follow-up:
+
+- `countdown-overlay-mini-hover-affordance-experiment.md`에서 mini hover close affordance 실험을 별도 추적한다.
+- 이 실험이 활성화된 빌드에서는 mini mode도 hover 감지를 위해 mouse events를 받는다.
 
 ## 8. Standard Overlay Contract
 

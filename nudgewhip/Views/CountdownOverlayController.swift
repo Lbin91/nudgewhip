@@ -124,7 +124,7 @@ func countdownOverlayIgnoresMouseEvents(for variant: CountdownOverlayVariant) ->
     case .standard:
         return false
     case .mini:
-        return true
+        return false
     }
 }
 
@@ -165,6 +165,7 @@ private struct CountdownOverlayView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var now = Date()
+    @State private var isHoveringMini = false
     private let timer = Timer.publish(every: 1, tolerance: 0.2, on: .main, in: .common).autoconnect()
 
     var body: some View {
@@ -232,18 +233,36 @@ private struct CountdownOverlayView: View {
     }
 
     private var miniOverlay: some View {
-        Text(miniPrimaryText)
-            .font(.system(size: 16, weight: .bold, design: .monospaced))
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(Color.black.opacity(miniBackgroundOpacity))
-            )
-            .overlay(
-                Capsule(style: .continuous)
-                    .stroke(Color.white.opacity(miniStrokeOpacity), lineWidth: 1)
-            )
+        ZStack {
+            Text(miniPrimaryText)
+                .font(.system(size: 16, weight: .bold, design: .monospaced))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            if isHoveringMini {
+                Button(action: onClose) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 7, weight: .bold))
+                        .foregroundStyle(Color.white.opacity(0.82))
+                        .frame(width: 14, height: 14)
+                        .background(Color.white.opacity(0.12), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                .padding(.trailing, 4)
+            }
+        }
+        .background(
+            Capsule(style: .continuous)
+                .fill(Color.black.opacity(miniBackgroundOpacity))
+        )
+        .overlay(
+            Capsule(style: .continuous)
+                .stroke(Color.white.opacity(miniStrokeOpacity), lineWidth: 1)
+        )
+        .onHover { hovering in
+            isHoveringMini = hovering
+        }
     }
 
     private var standardPrimaryText: String {

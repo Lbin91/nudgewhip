@@ -8,6 +8,7 @@ Current release focus:
 - Reduce countdown overlay fatigue without removing quick-glance value.
 - Keep 4-corner positioning as the official product contract.
 - Preserve the menu-presentation guard and do not treat MenuBarExtra hover/depth-menu tracking as activity.
+- Track the mini hover close affordance as an active follow-up experiment.
 
 ## 1. Product and copy alignment
 
@@ -26,7 +27,7 @@ Current release focus:
 - [x] Expose overlay variant through `MenuBarViewModel` and `SettingsViewModel`
 - [x] Observe `countdownOverlayVariant` in `CountdownOverlayController`
 - [x] Switch panel size dynamically between standard and mini
-- [x] Switch `ignoresMouseEvents` by variant (`standard = false`, `mini = true`)
+- [x] Ship the baseline variant wiring and record the hover-affordance deviation separately
 
 ## 3. Overlay UI implementation
 
@@ -53,3 +54,9 @@ Current release focus:
 
 - [x] All items above complete
 - [x] TODO stays aligned with the shipped overlay scope only
+
+## 7. Follow-up completed after ship decision
+
+- [x] Add Dock magnify / multi-monitor visual QA matrix
+- [x] Add mini hover affordance experiment and keep it documented as an experiment
+- [x] Add fresh-install mini-default checklist

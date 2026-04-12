@@ -66,7 +66,7 @@ func countdownOverlayHelpersSupportMiniVariantAndCornerPlacement() {
     #expect(countdownOverlayPanelSize(for: .standard) == CGSize(width: 146, height: 72))
     #expect(countdownOverlayPanelSize(for: .mini) == CGSize(width: 96, height: 32))
     #expect(countdownOverlayIgnoresMouseEvents(for: .standard) == false)
-    #expect(countdownOverlayIgnoresMouseEvents(for: .mini))
+    #expect(countdownOverlayIgnoresMouseEvents(for: .mini) == false)
 
     let visibleFrame = CGRect(x: 10, y: 20, width: 200, height: 300)
     let panelSize = countdownOverlayPanelSize(for: .mini)
@@ -749,6 +749,7 @@ struct nudgewhipTests {
         #expect(settings.count == 1)
         #expect(settings.first?.countdownOverlayEnabled == true)
         #expect(settings.first?.countdownOverlayPosition == .topLeft)
+        #expect(settings.first?.countdownOverlayVariant == .mini)
         #expect(settings.first?.soundTheme == .whip)
         #expect(settings.first?.preferredLocaleIdentifier == nil)
         #expect(settings.first?.languageDefaultMigrationCompleted == true)
