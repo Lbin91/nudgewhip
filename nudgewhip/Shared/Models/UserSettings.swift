@@ -1,16 +1,11 @@
 // UserSettings.swift
 // 사용자 설정을 저장하는 SwiftData 모델.
 //
-// 유휴 임계값, 알림 설정, Pro 잠금 해제, 펫 표시 모드 등을 관리한다.
+// 유휴 임계값, 알림 설정, Pro 잠금 해제 등을 관리한다.
 // preferredLocaleIdentifier로 로컬라이즈 언어 설정도 보관한다.
 
 import Foundation
 import SwiftData
-
-enum PetPresentationMode: String, Codable, CaseIterable, Sendable {
-    case sprout
-    case minimal
-}
 
 enum SoundTheme: String, Codable, CaseIterable, Sendable {
     case normal
@@ -34,7 +29,6 @@ final class UserSettings {
     var breakSuggestionEnabled: Bool
     var proUnlocked: Bool
     var preferredLocaleIdentifier: String?
-    var petPresentationRawValue: String
     var soundThemeRawValue: String
     var countdownOverlayEnabled: Bool
     var countdownOverlayPositionRawValue: String?
@@ -45,12 +39,6 @@ final class UserSettings {
     var createdAt: Date
     var updatedAt: Date
     
-    /// 로우 밸류와 편의 enum(PetPresentationMode) 간 변환
-    var petPresentationMode: PetPresentationMode {
-        get { PetPresentationMode(rawValue: petPresentationRawValue) ?? .sprout }
-        set { petPresentationRawValue = newValue.rawValue }
-    }
-
     /// 사운드 테마 설정 변환
     var soundTheme: SoundTheme {
         get { SoundTheme(rawValue: soundThemeRawValue) ?? .whip }
@@ -72,7 +60,6 @@ final class UserSettings {
         breakSuggestionEnabled: Bool = true,
         proUnlocked: Bool = false,
         preferredLocaleIdentifier: String? = nil,
-        petPresentationMode: PetPresentationMode = .sprout,
         soundTheme: SoundTheme = .whip,
         countdownOverlayEnabled: Bool = true,
         countdownOverlayPosition: CountdownOverlayPosition = .topLeft,
@@ -91,7 +78,6 @@ final class UserSettings {
         self.breakSuggestionEnabled = breakSuggestionEnabled
         self.proUnlocked = proUnlocked
         self.preferredLocaleIdentifier = preferredLocaleIdentifier
-        self.petPresentationRawValue = petPresentationMode.rawValue
         self.soundThemeRawValue = soundTheme.rawValue
         self.countdownOverlayEnabled = countdownOverlayEnabled
         self.countdownOverlayPositionRawValue = countdownOverlayPosition.rawValue

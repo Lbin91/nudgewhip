@@ -1,6 +1,6 @@
 # Statistics Dashboard Data Selection
 
-- Version: draft-1
+- Version: draft-2
 - Last Updated: 2026-04-12
 - Status: active
 - Owner: product / engineering
@@ -39,7 +39,7 @@
 
 ## 3. 현재 수집 중인 정보 목록
 
-아래 목록은 현재 코드베이스 기준이다.
+아래 목록은 현재 작업 트리 기준이다.
 
 ### 3.1 포커스 세션 데이터
 
@@ -51,7 +51,8 @@ Source:
 
 - 세션 시작 시각 `startedAt`
 - 세션 종료 시각 `endedAt`
-- 세션 종료 사유 `endReason`
+- 세션 종료 사유 raw 값 `endReasonRawValue`
+  편의 접근용 computed property로 `endReason`을 제공한다.
 - 모니터링 활성 여부 `monitoringActive`
 - 휴식 모드 여부 `breakMode`
 - 화이트리스트에 의한 pause 여부 `whitelistedPause`
@@ -59,6 +60,23 @@ Source:
 - 복귀 횟수 `recoveryCount`
 - 마지막 알림 시각 `lastAlertAt`
 - 레코드 생성 시각 `createdAt`
+- 관계 필드 `alertingSegments`
+- 관계 필드 `appUsageSegments`
+
+통계 집계 포함 조건:
+
+- `monitoringActive == true`
+- `breakMode == false`
+- `whitelistedPause == false`
+- `endedAt != nil`
+
+종료 사유 enum(`FocusSessionEndReason`) 값:
+
+- `completed`
+- `idleTimeout`
+- `manualPause`
+- `whitelistPause`
+- `suspended`
 
 이 데이터로 이미 계산 가능한 것:
 
@@ -94,7 +112,6 @@ Source:
 Source:
 `nudgewhip/Shared/Models/AppUsageSegment.swift`
 `nudgewhip/Services/AppUsageTracker.swift`
-`nudgewhip/Shared/Models/AppUsageSnapshot.swift`
 
 현재 저장 중인 정보:
 
@@ -103,6 +120,7 @@ Source:
 - 프로세스 식별자 `processIdentifier`
 - 앱 활성 시작 시각 `startedAt`
 - 앱 비활성 전환 시각 `endedAt`
+- 레코드 생성 시각 `createdAt`
 - 어떤 focus session에 속하는지 관계 정보
 
 이 데이터로 이미 계산 가능한 것:
@@ -121,6 +139,7 @@ Source:
 
 Source:
 `nudgewhip/Shared/Models/DailyStats.swift`
+`nudgewhip/Shared/Models/AppUsageSnapshot.swift`
 `nudgewhip/Views/StatisticsDashboardView.swift`
 `nudgewhip/Services/MenuBarViewModel.swift`
 
@@ -137,6 +156,11 @@ Source:
 - recovered alert 수
 - 평균 복귀 시간
 - top apps
+
+주의:
+
+- `recoveryDurationMax`는 `DailyStats(today)`에는 있지만, 주간/최근 7일 집계 구조체인 `StatisticsPeriodSummary`에는 없다.
+- 따라서 "최장 복귀 시간"은 현재 기준으로 today 범위에서는 설명 가능하지만, 주간/7일 summary의 기본 필드라고 보기는 어렵다.
 
 즉, 통계 대시보드의 핵심 뼈대는 이미 존재한다.
 
@@ -155,29 +179,11 @@ Source:
 - break suggestion 사용 여부
 - Pro 잠금 해제 여부
 - 언어 설정
-- 펫 표시 모드
 - countdown overlay on/off 및 위치
 - schedule 사용 여부와 시작/종료 시각
 - whitelist 앱 목록
 
 이 데이터는 제품 동작에 중요하지만, 대부분은 통계 대시보드용 정보가 아니다.
-
-### 3.6 펫/보상 데이터
-
-Source:
-`nudgewhip/Shared/Models/PetState.swift`
-
-현재 저장 중인 정보:
-
-- 펫 부화 단계
-- 캐릭터 타입
-- 감정 상태
-- 경험치
-- 레벨
-- 일일 streak
-- 마지막 focus session 종료 시각
-
-이 정보는 동기부여 시스템에는 중요하지만, 통계 대시보드의 중심이 되면 제품이 가볍게 보일 수 있다.
 
 ## 4. 대시보드 관점의 사용자 가치 평가
 
@@ -264,12 +270,6 @@ Source:
 
 - 기능적으로 중요하지만 통계 대시보드의 핵심 질문과는 거리가 있다.
 - 설정 또는 관리 화면에 두는 편이 맞다.
-
-#### 펫 레벨 / 경험치 / 부화 상태
-
-- 리텐션 장치로는 의미가 있다.
-- 하지만 통계 대시보드 중심부에 두면 제품의 seriousness가 약해진다.
-- 별도 `Pet` 섹션이나 요약 위젯으로 분리하는 편이 낫다.
 
 ## 5. 추천 대시보드 정보 구조
 
@@ -359,6 +359,8 @@ Source:
   어떤 시간대에 흐름이 자주 깨지는지 확인 가능
 - `endReason` 기반 회고 카드
   수동 pause와 whitelist pause가 많으면 설정 조정 유도 가능
+- 게임화 지표(향후 재도입 시)
+  현재 작업 트리에는 펫/보상 persistence가 없으므로 대시보드 범위에서 제외한다.
 
 단, 아래 원칙은 유지해야 한다.
 
@@ -385,7 +387,6 @@ Source:
 - process / bundle 식별자
 - 상세 설정값
 - whitelist 목록
-- 펫 레벨/경험치
 - minute-by-minute 로그
 
-정리하면, NudgeWhip의 대시보드는 `얼마나 감시했는가`를 보여주는 화면이 아니라 `사용자가 얼마나 다시 흐름으로 돌아왔는가`를 보여주는 화면이어야 한다. 현재 코드베이스는 이미 그 방향의 핵심 지표를 계산할 수 있는 상태이며, 제품적으로도 그 선택이 가장 타당하다.
+정리하면, NudgeWhip의 대시보드는 `얼마나 감시했는가`를 보여주는 화면이 아니라 `사용자가 얼마나 다시 흐름으로 돌아왔는가`를 보여주는 화면이어야 한다. 현재 작업 트리는 이미 그 방향의 핵심 지표를 계산할 수 있는 상태이며, 제품적으로도 그 선택이 가장 타당하다.

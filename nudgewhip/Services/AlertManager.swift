@@ -133,7 +133,6 @@ func countdownOverlayAccessibilityConfiguration(
 protocol AlertManaging: AnyObject {
     func handle(snapshot: RuntimeSnapshot)
     func apply(settings: UserSettings)
-    func update(species: String)
 }
 
 @MainActor
@@ -335,7 +334,6 @@ final class AlertManager: AlertManaging {
     private var thirdStageNotificationTimestamps: [Date] = []
     private var alertsPerHourLimit = 6
     private var thirdStagePerHourLimit = 2
-    private var currentSpecies: String = "default"
     private var currentSoundTheme: SoundTheme = .whip
     private var lastPresentedCopy: String?
     private var nextCopyIndexBySlot: [AlertCopySlot: Int] = [:]
@@ -392,10 +390,6 @@ final class AlertManager: AlertManaging {
         alertsPerHourLimit = max(0, settings.alertsPerHourLimit)
         thirdStagePerHourLimit = max(0, settings.notificationNudgePerHourLimit)
         currentSoundTheme = settings.soundTheme
-    }
-
-    func update(species: String) {
-        self.currentSpecies = species
     }
 
     private func visualStyle(for snapshot: RuntimeSnapshot) -> AlertVisualStyle? {

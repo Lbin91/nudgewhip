@@ -25,7 +25,6 @@ struct OnboardingDraft: Equatable, Sendable {
     var launchAtLoginEnabled: Bool
     var countdownOverlayEnabled: Bool
     var preferredLanguage: AppLanguage
-    var petPresentationMode: PetPresentationMode
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
     var scheduleEndSecondsFromMidnight: Int

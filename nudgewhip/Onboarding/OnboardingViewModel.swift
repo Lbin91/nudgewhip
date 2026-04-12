@@ -30,9 +30,6 @@ final class OnboardingViewModel {
             persistDraft()
         }
     }
-    var petPresentationMode: PetPresentationMode {
-        didSet { persistDraft() }
-    }
     var scheduleEnabled: Bool {
         didSet { persistDraft() }
     }
@@ -68,7 +65,6 @@ final class OnboardingViewModel {
         self.launchAtLoginEnabled = initialDraft.launchAtLoginEnabled
         self.countdownOverlayEnabled = initialDraft.countdownOverlayEnabled
         self.preferredLanguage = initialDraft.preferredLanguage
-        self.petPresentationMode = initialDraft.petPresentationMode
         self.scheduleEnabled = initialDraft.scheduleEnabled
         self.scheduleStartSecondsFromMidnight = initialDraft.scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = initialDraft.scheduleEndSecondsFromMidnight
@@ -203,7 +199,6 @@ final class OnboardingViewModel {
             settings.idleThresholdSeconds = idleThresholdSeconds
             settings.countdownOverlayEnabled = countdownOverlayEnabled
             settings.preferredLocaleIdentifier = preferredLanguage.rawValue
-            settings.petPresentationMode = petPresentationMode
             settings.scheduleEnabled = scheduleEnabled
             settings.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
             settings.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight
@@ -221,7 +216,6 @@ final class OnboardingViewModel {
                 launchAtLoginEnabled: launchAtLoginEnabled,
                 countdownOverlayEnabled: countdownOverlayEnabled,
                 preferredLanguage: preferredLanguage,
-                petPresentationMode: petPresentationMode,
                 scheduleEnabled: scheduleEnabled,
                 scheduleStartSecondsFromMidnight: scheduleStartSecondsFromMidnight,
                 scheduleEndSecondsFromMidnight: scheduleEndSecondsFromMidnight
@@ -247,7 +241,6 @@ final class OnboardingViewModel {
             launchAtLoginEnabled: storage.shouldPresentOnboarding ? true : launchAtLoginManager.isEnabled,
             countdownOverlayEnabled: settings?.countdownOverlayEnabled ?? true,
             preferredLanguage: AppLanguage.resolve(settings?.preferredLocaleIdentifier),
-            petPresentationMode: settings?.petPresentationMode ?? .sprout,
             scheduleEnabled: settings?.scheduleEnabled ?? false,
             scheduleStartSecondsFromMidnight: settings?.scheduleStartSecondsFromMidnight ?? 32_400,
             scheduleEndSecondsFromMidnight: settings?.scheduleEndSecondsFromMidnight ?? 61_200

@@ -689,7 +689,7 @@ struct nudgewhipTests {
     
     @MainActor
     @Test
-    func bootstrapCreatesSingleDefaultSettingsAndPetState() throws {
+    func bootstrapCreatesSingleDefaultSettings() throws {
         let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
         let context = container.mainContext
         
@@ -697,19 +697,13 @@ struct nudgewhipTests {
         try NudgeWhipDataBootstrap.ensureDefaults(in: context)
         
         let settings = try context.fetch(FetchDescriptor<UserSettings>())
-        let petStates = try context.fetch(FetchDescriptor<PetState>())
         
         #expect(settings.count == 1)
-        #expect(settings.first?.petPresentationMode == .sprout)
         #expect(settings.first?.countdownOverlayEnabled == true)
         #expect(settings.first?.countdownOverlayPosition == .topLeft)
         #expect(settings.first?.soundTheme == .whip)
         #expect(settings.first?.preferredLocaleIdentifier == nil)
         #expect(settings.first?.languageDefaultMigrationCompleted == true)
-        #expect(petStates.count == 1)
-        #expect(petStates.first?.hatchStage == .hatched)
-        #expect(petStates.first?.characterType == .devil)
-        #expect(petStates.first?.emotion == .sleep)
     }
 
     @MainActor
@@ -1387,11 +1381,6 @@ struct nudgewhipTests {
         settings.scheduleStartSecondsFromMidnight = 32_400
         settings.scheduleEndSecondsFromMidnight = 61_200
         settings.countdownOverlayPosition = .bottomRight
-        settings.petPresentationMode = .minimal
-        
-        let petState = try #require(try context.fetch(FetchDescriptor<PetState>()).first)
-        petState.hatchStage = .hatched
-        petState.emotion = .happy
         
         context.insert(WhitelistApp(bundleIdentifier: "com.apple.dt.Xcode"))
         context.insert(
@@ -1421,10 +1410,6 @@ struct nudgewhipTests {
         #expect(viewModel.countdownOverlayPosition == .bottomRight)
         #expect(viewModel.whitelistCount == 1)
         #expect(viewModel.todayStats.alertCount == 2)
-        #expect(viewModel.petPresentationMode == .minimal)
-        #expect(viewModel.petHatchStage == .hatched)
-        #expect(viewModel.petCharacter == .devil)
-        #expect(viewModel.petEmotion == .happy)
     }
 
     @MainActor
@@ -1522,12 +1507,6 @@ struct nudgewhipTests {
         #expect(viewModel.countdownOverlayEnabledValue == false)
         #expect(viewModel.countdownOverlayPositionValue == .bottomRight)
         #expect(menuBarViewModel.countdownOverlayPosition == .bottomRight)
-
-        viewModel.updatePetPresentationMode(.minimal)
-
-        #expect(settings.petPresentationMode == .minimal)
-        #expect(viewModel.petPresentationModeValue == .minimal)
-        #expect(menuBarViewModel.petPresentationMode == .minimal)
     }
 
     @MainActor
@@ -2368,7 +2347,6 @@ struct nudgewhipTests {
             launchAtLoginEnabled: true,
             countdownOverlayEnabled: false,
             preferredLanguage: .korean,
-            petPresentationMode: .minimal,
             scheduleEnabled: true,
             scheduleStartSecondsFromMidnight: 32_400,
             scheduleEndSecondsFromMidnight: 61_200
@@ -2415,7 +2393,6 @@ struct nudgewhipTests {
         viewModel.idleThresholdSeconds = 600
         viewModel.countdownOverlayEnabled = false
         viewModel.preferredLanguage = .korean
-        viewModel.petPresentationMode = .minimal
         viewModel.launchAtLoginEnabled = true
         viewModel.continueFromBasicSetup()
         #expect(viewModel.step == .scheduleSetup)
@@ -2434,7 +2411,6 @@ struct nudgewhipTests {
         #expect(settings.first?.idleThresholdSeconds == 600)
         #expect(settings.first?.countdownOverlayEnabled == false)
         #expect(settings.first?.preferredLocaleIdentifier == AppLanguage.korean.rawValue)
-        #expect(settings.first?.petPresentationMode == .minimal)
         #expect(settings.first?.scheduleEnabled == true)
         #expect(settings.first?.scheduleStartSecondsFromMidnight == 32_400)
         #expect(settings.first?.scheduleEndSecondsFromMidnight == 61_200)

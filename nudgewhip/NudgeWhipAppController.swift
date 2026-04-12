@@ -55,9 +55,6 @@ final class NudgeWhipAppController {
             if let whitelistApps = try? modelContext.fetch(FetchDescriptor<WhitelistApp>()) {
                 menuBarViewModel.apply(whitelistApps: whitelistApps)
             }
-            if let petState = try? modelContext.fetch(FetchDescriptor<PetState>()).first {
-                alertManager.update(species: petState.species)
-            }
             menuBarViewModel.startIfNeeded()
             menuBarViewModel.refreshPermission()
         }
@@ -83,12 +80,7 @@ final class NudgeWhipAppController {
         resetOnboardingIfFirstLaunch()
         try? NudgeWhipDataBootstrap.ensureDefaults(in: NudgeWhipModelContainer.shared.mainContext)
         syncPersistedRuntimeState()
-        
-        // 캐릭터 정보 업데이트
-        if let petState = try? NudgeWhipModelContainer.shared.mainContext.fetch(FetchDescriptor<PetState>()).first {
-            alertManager.update(species: petState.species)
-        }
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.startFlow()
             self?.countdownOverlayController?.showIfNeeded()

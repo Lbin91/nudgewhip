@@ -1,7 +1,7 @@
 // NudgeWhipModelContainer.swift
 // SwiftData ModelContainer 팩토리.
 //
-// 모델 스키마(UserSettings, WhitelistApp, FocusSession, PetState, AppUsageSegment)를 등록하고
+// 모델 스키마(UserSettings, WhitelistApp, FocusSession, AppUsageSegment)를 등록하고
 // 실제 저장소(shared)와 메모리 프리뷰(preview) 컨테이너를 제공한다.
 
 import Foundation
@@ -48,8 +48,7 @@ enum NudgeWhipModelContainer {
             UserSettings.self,
             WhitelistApp.self,
             FocusSession.self,
-            AppUsageSegment.self,
-            PetState.self
+            AppUsageSegment.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
         return try ModelContainer(for: schema, configurations: [configuration])

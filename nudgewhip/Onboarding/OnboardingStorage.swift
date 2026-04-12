@@ -24,7 +24,6 @@ final class OnboardingStorage: OnboardingStoring {
         static let launchAtLogin = "onboarding.draft.launch_at_login"
         static let countdownOverlayEnabled = "onboarding.draft.countdown_overlay_enabled"
         static let preferredLanguage = "onboarding.draft.preferred_language"
-        static let petMode = "onboarding.draft.pet_mode"
         static let scheduleEnabled = "onboarding.draft.schedule_enabled"
         static let scheduleStart = "onboarding.draft.schedule_start"
         static let scheduleEnd = "onboarding.draft.schedule_end"
@@ -55,7 +54,6 @@ final class OnboardingStorage: OnboardingStoring {
             launchAtLoginEnabled: defaults.bool(forKey: Keys.launchAtLogin),
             countdownOverlayEnabled: defaults.object(forKey: Keys.countdownOverlayEnabled) as? Bool ?? true,
             preferredLanguage: AppLanguage(rawValue: defaults.string(forKey: Keys.preferredLanguage) ?? "") ?? .english,
-            petPresentationMode: PetPresentationMode(rawValue: defaults.string(forKey: Keys.petMode) ?? "") ?? .sprout,
             scheduleEnabled: defaults.bool(forKey: Keys.scheduleEnabled),
             scheduleStartSecondsFromMidnight: defaults.object(forKey: Keys.scheduleStart) as? Int ?? 32_400,
             scheduleEndSecondsFromMidnight: defaults.object(forKey: Keys.scheduleEnd) as? Int ?? 61_200
@@ -68,7 +66,6 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.set(draft.launchAtLoginEnabled, forKey: Keys.launchAtLogin)
         defaults.set(draft.countdownOverlayEnabled, forKey: Keys.countdownOverlayEnabled)
         defaults.set(draft.preferredLanguage.rawValue, forKey: Keys.preferredLanguage)
-        defaults.set(draft.petPresentationMode.rawValue, forKey: Keys.petMode)
         defaults.set(draft.scheduleEnabled, forKey: Keys.scheduleEnabled)
         defaults.set(draft.scheduleStartSecondsFromMidnight, forKey: Keys.scheduleStart)
         defaults.set(draft.scheduleEndSecondsFromMidnight, forKey: Keys.scheduleEnd)
@@ -96,7 +93,6 @@ final class OnboardingStorage: OnboardingStoring {
         defaults.removeObject(forKey: Keys.launchAtLogin)
         defaults.removeObject(forKey: Keys.countdownOverlayEnabled)
         defaults.removeObject(forKey: Keys.preferredLanguage)
-        defaults.removeObject(forKey: Keys.petMode)
         defaults.removeObject(forKey: Keys.scheduleEnabled)
         defaults.removeObject(forKey: Keys.scheduleStart)
         defaults.removeObject(forKey: Keys.scheduleEnd)

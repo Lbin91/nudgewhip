@@ -15,8 +15,6 @@ final class MenuBarViewModel {
     private let modelContext: ModelContext
     private(set) var hasStarted = false
     private(set) var idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-    private(set) var petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-    private(set) var petPresentationMode = PetPresentationMode.sprout
     private(set) var scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
     private(set) var countdownOverlayEnabled = true
     private(set) var countdownOverlayPosition = CountdownOverlayPosition.topLeft
@@ -24,12 +22,6 @@ final class MenuBarViewModel {
     private(set) var scheduleStartTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(32_400)
     private(set) var scheduleEndTime = Calendar.current.startOfDay(for: .now).addingTimeInterval(61_200)
     private(set) var whitelistCount = 0
-    private(set) var petHatchStage = PetHatchStage.hatched
-    private(set) var petCharacter: PetCharacterType? = .partyMask
-    private(set) var petEmotion = PetEmotion.sleep
-    private(set) var petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
-    private(set) var petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
-    private(set) var petEmotionText = localizedAppString("menu.dropdown.value.none", defaultValue: "None")
     private(set) var todayStats = DailyStats.derive(for: [], on: .now)
     private(set) var statisticsSnapshot = StatisticsSnapshot.derive(for: [], on: .now)
     private(set) var appUsageSnapshot = AppUsageSnapshot.empty
@@ -259,7 +251,6 @@ final class MenuBarViewModel {
     
     func refreshMenuSnapshot(now: Date = .now) {
         let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
-        let petState = try? modelContext.fetch(FetchDescriptor<PetState>()).first
         let whitelistApps = (try? modelContext.fetch(FetchDescriptor<WhitelistApp>())) ?? []
         let focusSessions = (try? modelContext.fetch(FetchDescriptor<FocusSession>())) ?? []
         
@@ -272,7 +263,6 @@ final class MenuBarViewModel {
             idleMonitor.applySettings(settings, at: now)
         }
         applyMenuSettingsSnapshot(settings)
-        applyPetSnapshot(petState)
         idleMonitor.applyWhitelistApps(whitelistApps, at: now)
     }
     
@@ -323,8 +313,6 @@ final class MenuBarViewModel {
     private func applyMenuSettingsSnapshot(_ settings: UserSettings?) {
         guard let settings else {
             idleThresholdText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-            petPresentationText = localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-            petPresentationMode = .sprout
             scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
             countdownOverlayEnabled = true
             countdownOverlayPosition = .topLeft
@@ -333,11 +321,6 @@ final class MenuBarViewModel {
         }
         
         idleThresholdText = formattedDuration(TimeInterval(settings.idleThresholdSeconds))
-        petPresentationMode = settings.petPresentationMode
-        petPresentationText = settings.petPresentationMode == .sprout
-            ? localizedAppString("menu.dropdown.value.pet_mode.sprout", defaultValue: "Sprout")
-            : localizedAppString("menu.dropdown.value.pet_mode.minimal", defaultValue: "Minimal")
-        
         countdownOverlayEnabled = settings.countdownOverlayEnabled
         countdownOverlayPosition = settings.countdownOverlayPosition
         scheduleEnabled = settings.scheduleEnabled
@@ -348,60 +331,6 @@ final class MenuBarViewModel {
             scheduleText = "\(formattedClock(scheduleStartTime)) - \(formattedClock(scheduleEndTime))"
         } else {
             scheduleText = localizedAppString("menu.dropdown.value.schedule.off", defaultValue: "Off")
-        }
-    }
-    
-    private func applyPetSnapshot(_ petState: PetState?) {
-        guard let petState else {
-            petHatchStage = .hatched
-            petCharacter = .partyMask
-            petEmotion = .sleep
-            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Cowboy")
-            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.sleep", defaultValue: "Sleep")
-            return
-        }
-
-        petHatchStage = petState.hatchStage
-        petCharacter = petState.characterType
-        petEmotion = petState.emotion
-        
-        switch petState.hatchStage {
-        case .egg:
-            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.egg", defaultValue: "Egg")
-        case .cracking:
-            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.cracking", defaultValue: "Cracking")
-        case .hatched:
-            petHatchStageText = localizedAppString("menu.dropdown.value.pet_stage.hatched", defaultValue: "Hatched")
-        }
-        switch petState.characterType {
-        case .partyMask:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.party_mask", defaultValue: "Ringmaster")
-        case .cowboy:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.cowboy", defaultValue: "Cowboy")
-        case .devil:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.devil", defaultValue: "Little Devil")
-        case .catwoman:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.catwoman", defaultValue: "Catwoman")
-        case .rat:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rat", defaultValue: "Rat")
-        case .ox:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.ox", defaultValue: "Ox")
-        case .tiger:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.tiger", defaultValue: "Tiger")
-        case .rabbit:
-            petCharacterText = localizedAppString("menu.dropdown.value.pet_character.rabbit", defaultValue: "Rabbit")
-        }
-        
-        switch petState.emotion {
-        case .happy:
-            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.happy", defaultValue: "Happy")
-        case .cheer:
-            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.cheer", defaultValue: "Cheer")
-        case .sleep:
-            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.sleep", defaultValue: "Sleep")
-        case .concern:
-            petEmotionText = localizedAppString("menu.dropdown.value.pet_emotion.concern", defaultValue: "Concern")
         }
     }
     
