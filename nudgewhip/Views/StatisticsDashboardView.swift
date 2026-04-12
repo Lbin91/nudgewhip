@@ -19,6 +19,72 @@ private enum StatisticsDisplayPeriod: String, CaseIterable, Identifiable {
     }
 }
 
+enum StatisticsDashboardMetric: Hashable {
+    case focusDuration
+    case completedSessions
+    case recoveryRate
+    case longestFocusDuration
+    case alertCount
+    case recoveredAlerts
+    case averageRecoveryDuration
+
+    var title: String {
+        switch self {
+        case .focusDuration:
+            return localizedAppString("settings.section.statistics.metric.focus", defaultValue: "Focus")
+        case .completedSessions:
+            return localizedAppString("settings.section.statistics.metric.sessions", defaultValue: "Sessions")
+        case .recoveryRate:
+            return localizedAppString("settings.section.statistics.metric.recovery", defaultValue: "Recovery")
+        case .longestFocusDuration:
+            return localizedAppString("settings.section.statistics.metric.longest", defaultValue: "Longest focus")
+        case .alertCount:
+            return localizedAppString("settings.section.statistics.metric.alerts", defaultValue: "Alerts")
+        case .recoveredAlerts:
+            return localizedAppString("settings.section.statistics.metric.recovered_alerts", defaultValue: "Recovered alerts")
+        case .averageRecoveryDuration:
+            return localizedAppString("settings.section.statistics.metric.avg_recovery", defaultValue: "Avg recovery")
+        }
+    }
+
+    func formattedValue(for summary: StatisticsPeriodSummary) -> String {
+        switch self {
+        case .focusDuration:
+            return localizedDurationString(summary.totalFocusDuration)
+                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+        case .completedSessions:
+            return "\(summary.completedSessionCount)"
+        case .recoveryRate:
+            return localizedPercentString(summary.recoveryRate)
+        case .longestFocusDuration:
+            return localizedDurationString(summary.longestFocusDuration)
+                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
+        case .alertCount:
+            return "\(summary.alertCount)"
+        case .recoveredAlerts:
+            return "\(summary.recoverySampleCount)"
+        case .averageRecoveryDuration:
+            return localizedDurationString(summary.averageRecoveryDuration)
+                ?? localizedAppString("settings.section.statistics.value.no_recovery", defaultValue: "No recoveries yet")
+        }
+    }
+}
+
+enum StatisticsDashboardLayout {
+    static let kpiMetrics: [StatisticsDashboardMetric] = [
+        .focusDuration,
+        .completedSessions,
+        .recoveryRate,
+        .longestFocusDuration
+    ]
+
+    static let recoveryLoopMetrics: [StatisticsDashboardMetric] = [
+        .alertCount,
+        .recoveredAlerts,
+        .averageRecoveryDuration
+    ]
+}
+
 struct StatisticsDashboardView: View {
     let snapshot: StatisticsSnapshot
     let appUsageSnapshot: AppUsageSnapshot
@@ -48,24 +114,12 @@ struct StatisticsDashboardView: View {
             if selectedSummary.hasData || !selectedTopApps.isEmpty {
                 LazyVGrid(columns: summaryColumns, spacing: NudgeWhipSpacing.s2) {
                     if selectedSummary.hasData {
-                        metricCard(
-                            title: localizedAppString("settings.section.statistics.metric.focus", defaultValue: "Focus"),
-                            value: localizedDurationString(selectedSummary.totalFocusDuration)
-                                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-                        )
-                        metricCard(
-                            title: localizedAppString("settings.section.statistics.metric.alerts", defaultValue: "Alerts"),
-                            value: "\(selectedSummary.alertCount)"
-                        )
-                        metricCard(
-                            title: localizedAppString("settings.section.statistics.metric.recovery", defaultValue: "Recovery"),
-                            value: localizedPercentString(selectedSummary.recoveryRate)
-                        )
-                        metricCard(
-                            title: localizedAppString("settings.section.statistics.metric.longest", defaultValue: "Longest focus"),
-                            value: localizedDurationString(selectedSummary.longestFocusDuration)
-                                ?? localizedAppString("menu.dropdown.value.unavailable", defaultValue: "Unavailable")
-                        )
+                        ForEach(StatisticsDashboardLayout.kpiMetrics, id: \.self) { metric in
+                            metricCard(
+                                title: metric.title,
+                                value: metric.formattedValue(for: selectedSummary)
+                            )
+                        }
                     }
                 }
 
@@ -168,19 +222,12 @@ struct StatisticsDashboardView: View {
                 .foregroundStyle(Color.nudgewhipTextMuted)
                 .textCase(.uppercase)
 
-            detailRow(
-                title: localizedAppString("settings.section.statistics.metric.sessions", defaultValue: "Sessions"),
-                value: "\(selectedSummary.completedSessionCount)"
-            )
-            detailRow(
-                title: localizedAppString("settings.section.statistics.metric.avg_recovery", defaultValue: "Avg recovery"),
-                value: localizedDurationString(selectedSummary.averageRecoveryDuration)
-                    ?? localizedAppString("settings.section.statistics.value.no_recovery", defaultValue: "No recoveries yet")
-            )
-            detailRow(
-                title: localizedAppString("settings.section.statistics.metric.recovered_alerts", defaultValue: "Recovered alerts"),
-                value: "\(selectedSummary.recoverySampleCount)"
-            )
+            ForEach(StatisticsDashboardLayout.recoveryLoopMetrics, id: \.self) { metric in
+                detailRow(
+                    title: metric.title,
+                    value: metric.formattedValue(for: selectedSummary)
+                )
+            }
         }
         .frame(maxWidth: 220, alignment: .leading)
         .padding(NudgeWhipSpacing.s4)

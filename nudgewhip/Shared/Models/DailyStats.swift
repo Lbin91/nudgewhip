@@ -64,7 +64,7 @@ struct DailyStats: Equatable, Sendable {
         // AlertingSegment에서 recovery metrics 집계
         let recoveredSegments = sessions.flatMap(\.alertingSegments)
             .filter { segment in
-                guard let recoveredAt = segment.recoveredAt else { return false }
+                guard segment.recoveredAt != nil else { return false }
                 return dayInterval.contains(segment.startedAt)
             }
         let recoveryDurations = recoveredSegments.compactMap(\.duration)

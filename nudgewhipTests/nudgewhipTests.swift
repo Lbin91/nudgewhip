@@ -482,6 +482,26 @@ struct nudgewhipTests {
         #expect(snapshot.last7Days.alertCount == 7)
     }
 
+    @MainActor
+    @Test
+    func statisticsDashboardUsesRecoveryCentricMetricSelection() {
+        #expect(
+            StatisticsDashboardLayout.kpiMetrics == [
+                .focusDuration,
+                .completedSessions,
+                .recoveryRate,
+                .longestFocusDuration
+            ]
+        )
+        #expect(
+            StatisticsDashboardLayout.recoveryLoopMetrics == [
+                .alertCount,
+                .recoveredAlerts,
+                .averageRecoveryDuration
+            ]
+        )
+    }
+
     @Test
     func appUsageSnapshotAggregatesDurationsTransitionsAndFallbackLabels() {
         var calendar = Calendar(identifier: .gregorian)
