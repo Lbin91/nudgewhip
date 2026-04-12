@@ -207,6 +207,7 @@ nudgewhip/
 - [docs/release/v0.2.0.md](docs/release/v0.2.0.md): release notes
 - [docs/release/v0.2.0-rc-checklist.md](docs/release/v0.2.0-rc-checklist.md): release candidate execution checklist
 - [docs/release/release-readiness-checklist.md](docs/release/release-readiness-checklist.md): release gate matrix
+- [docs/app/v0.3-feature-direction.md](docs/app/v0.3-feature-direction.md): next-version feature direction and candidate scope
 - [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md): permission and data disclosure
 
 ## Beta Reality
