@@ -209,6 +209,7 @@
 
 - [ ] 특정 day interval 계산 helper 추가
 - [ ] `FocusSession.focusDuration(overlapping:)` 재사용
+- [ ] `completedSessionCount`는 `focusDuration(overlapping:) > 0` 필터로 계산하지 않도록 명시 구현
 - [ ] `completedSessionCount` 시작일 귀속 규칙 반영
 - [ ] `sessionsOver30mCount` 전체 세션 duration 기준 반영
 - [ ] `hourlyAlertCounts[24]` 계산 로직 추가
@@ -259,6 +260,11 @@
 | session 종료/복구 이벤트에서 write가 너무 자주 발생 | write amplification | local coalescing + same-day overwrite |
 | device identity가 불안정 | record key 흔들림 | stable provider 추가 |
 | CloudKit 구현이 로컬 truth를 침범 | 데이터 정합성 저하 | Cloud writer는 payload consumer로만 유지 |
+
+> ⚠️ `completedSessionCount`는 특히 주의:
+> 기존 `DailyStats.derive()`의 overlap 기준 count를 그대로 복사하면
+> Cloud backup의 시작일 귀속 규칙과 달라진다.
+> builder에서는 반드시 별도 필터로 구현해야 한다.
 
 ## 8. Exit Criteria
 

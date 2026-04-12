@@ -157,22 +157,26 @@
 
 ### 7.4 Recommended Field Types
 
+> CloudKit field naming/type의 canonical source는
+> `../architecture/cloudkit-daily-aggregate-backup.md` §15.3을 따른다.
+> 이 섹션은 iOS 소비 관점의 개념 설명이고, 실제 field 명과 타입은 전략 문서를 우선한다.
+
 - `dayStart`: Date
 - `localDayKey`: String
 - `updatedAt`: Date
 - `timeZoneIdentifier`: String
-- `schemaVersion`: Int
-- `totalFocusDuration`: Double or Int seconds
-- `completedSessionCount`: Int
-- `alertCount`: Int
-- `longestFocusDuration`: Double or Int seconds
-- `recoverySampleCount`: Int
-- `recoveryDurationTotal`: Double or Int seconds
-- `recoveryDurationMax`: Double or Int seconds
-- `sessionsOver30mCount`: Int
-- `hourlyAlertCounts`: [Int] with length 24
-- `remoteEscalationSentCount`: Int
-- `remoteEscalationRecoveredWithinWindowCount`: Int
+- `schemaVersion`: Int64
+- `totalFocusDurationSeconds`: Int64
+- `completedSessionCount`: Int64
+- `alertCount`: Int64
+- `longestFocusDurationSeconds`: Int64
+- `recoverySampleCount`: Int64
+- `recoveryDurationTotalSeconds`: Int64
+- `recoveryDurationMaxSeconds`: Int64
+- `sessionsOver30mCount`: Int64
+- `hourlyAlertCountsJSON`: String
+- `remoteEscalationSentCount`: Int64
+- `remoteEscalationRecoveredWithinWindowCount`: Int64
 
 ### 7.5 `RemoteEscalationEvent` Spec
 

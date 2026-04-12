@@ -151,7 +151,8 @@ builder는 `timeZoneIdentifier` 기준 local day interval을 만들어야 한다
 권장:
 
 - `Calendar(identifier: .gregorian)`
-- `calendar.timeZone = TimeZone(identifier: timeZoneIdentifier) ?? .current`
+- `guard let tz = TimeZone(identifier: timeZoneIdentifier) else { throw ProjectionError.invalidTimeZoneIdentifier(timeZoneIdentifier) }`
+- `calendar.timeZone = tz`
 - `calendar.dateInterval(of: .day, for: referenceDate)`
 
 즉, UI와 달리 `Calendar.current`에만 기대지 않고 **명시적 timezone 주입**이 더 안전하다.
@@ -180,6 +181,7 @@ builder는 `timeZoneIdentifier` 기준 local day interval을 만들어야 한다
 비고:
 
 - 현재 `DailyStats.derive()`는 이 점이 정확히 일치하지 않을 수 있으므로 builder에서 명시적으로 구현하는 편이 안전하다
+- 즉, `focusDuration(overlapping:) > 0`로 세션을 세는 기존 UI 패턴을 backup builder에 그대로 가져오면 안 된다
 
 ## 7.4 Sessions Over 30 Minutes
 
@@ -201,6 +203,11 @@ builder는 `timeZoneIdentifier` 기준 local day interval을 만들어야 한다
 - startedAt가 해당 day에 속한 segment를 기준으로 집계
 - `duration` 합/최대값 계산
 
+참고:
+
+- `AlertingSegment.duration`은 stored field가 아니라 computed property (`recoveredAt - startedAt`)
+- projection 계산 시점 snapshot 값을 사용하므로 backup 집계에는 안전하다
+
 ## 7.6 Hourly Alert Counts
 
 규칙:
@@ -212,12 +219,13 @@ builder는 `timeZoneIdentifier` 기준 local day interval을 만들어야 한다
 권장 구현:
 
 - `[Int](repeating: 0, count: 24)`
-- 세션별 alert 발생 시각들을 순회해 hour index에 누적
+- 세션별 `alertingSegments[].startedAt`을 순회해 hour index에 누적
 
-주의:
+truth source:
 
-- 현재 truth에 alert timestamp가 `lastAlertAt` 하나만으로 충분한지 점검 필요
-- 부족하면 향후 alert event truth 보강 필요
+- `SessionTracker`가 각 alerting episode마다 `AlertingSegment`를 생성하므로,
+  개별 alert timestamp truth는 `AlertingSegment.startedAt`에 이미 존재한다
+- 구현 시 `session.alertCount == alertingSegments.count`를 불변식처럼 검증해 정합성을 확인할 수 있다
 
 ## 8. Trigger Model
 

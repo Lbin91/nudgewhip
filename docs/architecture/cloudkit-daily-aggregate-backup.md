@@ -173,6 +173,18 @@ timezone 변경은 “과거 데이터를 새 timezone으로 다시 재배치할
 - recovery metric
 - 시간대별 패턴
 
+> ⚠️ **UI↔Backup 수치 차이 가능 항목**
+>
+> `completedSessionCount`는 현재 UI용 `DailyStats.derive()`와 Cloud backup builder가
+> 서로 다른 규칙을 사용할 수 있다.
+>
+> - **UI (`DailyStats`)**: `focusDuration(overlapping:) > 0`인 세션 수
+> - **Backup (`DashboardDayProjection`)**: 세션 시작일 귀속 기준
+>
+> 따라서 자정을 넘는 세션은 UI에서는 양쪽 날짜에 모두 잡힐 수 있지만,
+> backup projection에서는 시작일에만 1건으로 귀속된다.
+> 이 차이는 의도적인 deterministic attribution 규칙이다.
+
 까지 대부분 설명 가능하다.
 
 ## 7.2 Recommended v1.1 / Optional Fields
@@ -375,7 +387,7 @@ timezone 변경은 “과거 데이터를 새 timezone으로 다시 재배치할
 | `recoveryDurationTotalSeconds` | Int64 | Yes | recovery 총합 |
 | `recoveryDurationMaxSeconds` | Int64 | Yes | recovery 최댓값 |
 | `sessionsOver30mCount` | Int64 | Yes | 세션 전체 duration 기준 |
-| `hourlyAlertCounts` | String / Bytes | Yes | 24개 int 배열의 직렬화 표현 |
+| `hourlyAlertCountsJSON` | String | Yes | 24개 int 배열의 JSON 직렬화 표현 |
 
 ### 15.4 Optional Fields
 
