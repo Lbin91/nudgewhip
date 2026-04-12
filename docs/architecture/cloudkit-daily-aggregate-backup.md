@@ -324,7 +324,180 @@ timezone 변경은 “과거 데이터를 새 timezone으로 다시 재배치할
 3. app-level summary backup을 완전히 제외할지, top N만 둘지
 4. timezone 변경 후 historical projection을 절대 재작성하지 않을지
 
-## 15. Recommended Decision Summary
+## 15. CloudKit Schema Draft v1
+
+이 섹션은 실제 구현 시 바로 record type / field 이름을 만들 수 있도록 naming을 구체화한 초안이다.
+
+### 15.1 Recommended Record Types
+
+권장 record type:
+
+- `DashboardDayProjection`
+- 후속 optional:
+  - `RemoteEscalationEvent`
+  - `TopAppsDayProjection`
+
+이번 문서의 1차 범위는 **`DashboardDayProjection` 단일 record**다.
+
+### 15.2 `DashboardDayProjection` Identity
+
+- `recordType`: `DashboardDayProjection`
+- `recordName`: `"{macDeviceID}__{localDayKey}"`
+
+예:
+
+- `mac-1234__2026-04-13@Asia/Seoul`
+
+규칙:
+
+- `recordName`은 deterministic 해야 한다
+- 같은 day projection은 append가 아니라 overwrite/upsert 대상이다
+- `localDayKey`는 human-readable string을 유지한다
+
+### 15.3 Required Fields
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `macDeviceID` | String | Yes | Mac 기기 식별자 |
+| `localDayKey` | String | Yes | 예: `2026-04-13@Asia/Seoul` |
+| `dayStart` | Date | Yes | local day start |
+| `timeZoneIdentifier` | String | Yes | 예: `Asia/Seoul` |
+| `updatedAt` | Date | Yes | projection 마지막 계산 시각 |
+| `schemaVersion` | Int64 | Yes | projection schema version |
+| `totalFocusDurationSeconds` | Int64 | Yes | 하루 총 집중 시간(초) |
+| `completedSessionCount` | Int64 | Yes | 세션 시작일 귀속 기준 |
+| `alertCount` | Int64 | Yes | alert 발생 시각 귀속 기준 |
+| `longestFocusDurationSeconds` | Int64 | Yes | 하루 기준 최장 집중 세션 |
+| `recoverySampleCount` | Int64 | Yes | recovery sample 수 |
+| `recoveryDurationTotalSeconds` | Int64 | Yes | recovery 총합 |
+| `recoveryDurationMaxSeconds` | Int64 | Yes | recovery 최댓값 |
+| `sessionsOver30mCount` | Int64 | Yes | 세션 전체 duration 기준 |
+| `hourlyAlertCounts` | String / Bytes | Yes | 24개 int 배열의 직렬화 표현 |
+
+### 15.4 Optional Fields
+
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `sourceWindowUTCStart` | Date | No | aggregation source 시작 UTC |
+| `sourceWindowUTCEnd` | Date | No | aggregation source 종료 UTC |
+| `projectionVersion` | Int64 | No | overwrite/version 추적 |
+| `remoteEscalationSentCount` | Int64 | No | 후속 단계 |
+| `remoteEscalationRecoveredWithinWindowCount` | Int64 | No | 후속 단계 |
+| `focusStartCount` | Int64 | No | 후속 단계 |
+| `pauseManualCount` | Int64 | No | 후속 단계 |
+| `pauseScheduleCount` | Int64 | No | 후속 단계 |
+
+## 16. Field Naming Convention
+
+권장 원칙:
+
+- duration은 전부 `...Seconds`
+- count는 전부 `...Count`
+- bool은 `is...` / `was...`
+- key/identifier는 의미를 직접 드러내는 이름 유지
+
+권장 예:
+
+- `totalFocusDurationSeconds`
+- `recoveryDurationTotalSeconds`
+- `completedSessionCount`
+- `timeZoneIdentifier`
+
+비권장 예:
+
+- `focusDuration` (단위 불명확)
+- `recoveryTotal` (의미 불명확)
+- `tz` (축약 과함)
+
+## 17. Array / Structured Field Encoding
+
+CloudKit 필드는 복잡한 배열/중첩 구조를 다룰 때 구현 편차가 생길 수 있다. 1차 범위에서는 단순하고 forward-compatible 한 encoding을 권장한다.
+
+### Recommended for `hourlyAlertCounts`
+
+옵션:
+
+1. `[Int]`를 그대로 저장
+2. JSON string으로 저장
+3. `Bytes`/asset-like blob으로 저장
+
+### Recommendation
+
+**1차는 JSON string 저장**을 권장한다.
+
+예:
+
+- field name: `hourlyAlertCountsJSON`
+- value: `"[0,1,0,0,2,...]"` (항상 24칸)
+
+이유:
+
+- schema evolution이 단순하다
+- CK field 타입 충돌 리스크가 낮다
+- 디버깅이 쉽다
+
+단, 만약 현재 코드베이스에서 `[Int]` 저장이 이미 일관되게 쓰이고 있고 CloudKit wrapper에서 안정적이면 직접 배열 저장도 가능하다. 이 경우에도 **항상 24칸 고정** 규칙은 유지해야 한다.
+
+## 18. Example Record Draft
+
+예시:
+
+```json
+{
+  "recordType": "DashboardDayProjection",
+  "recordName": "mac-1234__2026-04-13@Asia/Seoul",
+  "fields": {
+    "macDeviceID": "mac-1234",
+    "localDayKey": "2026-04-13@Asia/Seoul",
+    "dayStart": "2026-04-12T15:00:00Z",
+    "timeZoneIdentifier": "Asia/Seoul",
+    "updatedAt": "2026-04-13T14:58:31Z",
+    "schemaVersion": 1,
+    "totalFocusDurationSeconds": 14220,
+    "completedSessionCount": 6,
+    "alertCount": 5,
+    "longestFocusDurationSeconds": 4080,
+    "recoverySampleCount": 4,
+    "recoveryDurationTotalSeconds": 510,
+    "recoveryDurationMaxSeconds": 220,
+    "sessionsOver30mCount": 3,
+    "hourlyAlertCountsJSON": "[0,0,0,0,0,0,1,0,0,1,1,0,0,0,1,0,1,0,0,0,0,0,0,0]",
+    "sourceWindowUTCStart": "2026-04-12T15:00:00Z",
+    "sourceWindowUTCEnd": "2026-04-13T14:59:59Z"
+  }
+}
+```
+
+## 19. Versioning and Migration Rule
+
+권장:
+
+- `schemaVersion = 1`부터 시작
+- 새 필드는 optional-first
+- 기존 필드 rename은 최대한 피하고, 필요하면 새 필드 추가 후 reader fallback 유지
+
+즉:
+
+- additive schema 진화
+- destructive rename/move는 지양
+
+## 20. Implementation-ready Recommendation
+
+실제 구현 1차는 아래 조합이 가장 안전하다.
+
+- `DashboardDayProjection`
+- `recordName = macDeviceID + "__" + localDayKey`
+- duration/count 중심 core field
+- `hourlyAlertCountsJSON`
+- optional UTC source window
+- overwrite/upsert
+
+이렇게 하면:
+
+- 로컬 일간 통계를 그대로 CloudKit backup/read model로 옮길 수 있고
+- iOS/companion에서도 동일 projection을 바로 소비할 수 있다.
+
+## 21. Recommended Decision Summary
 
 ### Final Recommendation
 
@@ -334,7 +507,7 @@ timezone 변경은 “과거 데이터를 새 timezone으로 다시 재배치할
 - **UTC는 보조 추적 필드로만 남긴다**
 - **app-level backup은 1차 범위에서 제외**
 
-## 16. Bottom Line
+## 22. Bottom Line
 
 - 이 제품에서 하루 통계 백업의 기준은 서버 편의보다 **사용자가 경험한 하루**에 맞아야 한다.
 - 따라서 UTC-only보다 `local day + timezone identifier + optional UTC window` 조합이 가장 적절하다.
