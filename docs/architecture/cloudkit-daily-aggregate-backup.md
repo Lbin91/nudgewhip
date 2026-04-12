@@ -5,6 +5,9 @@
 - Status: proposed
 - Owner: product / engineering
 - Scope: macOS local raw/session 데이터를 하루 단위 aggregate로 압축해 iCloud/CloudKit에 백업하는 전략
+- Related:
+  - `cloudkit-daily-aggregate-backup-implementation-todo.md`
+  - `mac-daily-aggregate-service-design.md`
 
 ## 1. Purpose
 
