@@ -92,7 +92,7 @@ struct SettingsRootView: View {
                     set: viewModel.updateCountdownOverlayEnabled
                 )) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(localizedAppString("settings.section.monitoring.overlay", defaultValue: "Show top countdown overlay"))
+                        Text(localizedAppString("settings.section.monitoring.overlay", defaultValue: "Show countdown overlay"))
                             .font(.subheadline.weight(.medium))
                         Text(localizedAppString("settings.section.monitoring.overlay.desc", defaultValue: "Visual countdown when idle threshold is reached."))
                             .font(.caption)
@@ -100,6 +100,28 @@ struct SettingsRootView: View {
                     }
                 }
                 .toggleStyle(.checkbox)
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.overlay_variant", defaultValue: "Countdown overlay style"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Text(localizedAppString("settings.section.monitoring.overlay_variant.desc", defaultValue: "Choose between the detailed standard overlay and the compact mini overlay."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+
+                    Picker("", selection: Binding(
+                        get: { viewModel.countdownOverlayVariantValue },
+                        set: viewModel.updateCountdownOverlayVariant
+                    )) {
+                        Text(localizedAppString("settings.section.monitoring.overlay_variant.standard", defaultValue: "Standard"))
+                            .tag(CountdownOverlayVariant.standard)
+                        Text(localizedAppString("settings.section.monitoring.overlay_variant.mini", defaultValue: "Mini"))
+                            .tag(CountdownOverlayVariant.mini)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
 
                 VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
                     Text(localizedAppString("settings.section.monitoring.overlay_position", defaultValue: "Countdown overlay position"))
@@ -128,6 +150,22 @@ struct SettingsRootView: View {
                             position: .bottomRight
                         )
                     }
+                }
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("settings.section.monitoring.overlay_preview", defaultValue: "Overlay preview"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+
+                    Text(localizedAppString("settings.section.monitoring.overlay_preview.desc", defaultValue: "A lightweight preview of the selected overlay size and corner placement."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+
+                    CountdownOverlayPreviewSwatch(
+                        isEnabled: viewModel.countdownOverlayEnabledValue,
+                        variant: viewModel.countdownOverlayVariantValue,
+                        position: viewModel.countdownOverlayPositionValue
+                    )
                 }
 
             }
@@ -454,6 +492,106 @@ struct SettingsRootView: View {
             return Color.nudgewhipFocus
         case .denied:
             return Color.nudgewhipAlert
+        }
+    }
+}
+
+private struct CountdownOverlayPreviewSwatch: View {
+    let isEnabled: Bool
+    let variant: CountdownOverlayVariant
+    let position: CountdownOverlayPosition
+
+    var body: some View {
+        ZStack(alignment: alignment(for: position)) {
+            RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous)
+                .fill(Color.nudgewhipBgSurfaceAlt.opacity(0.55))
+                .overlay(
+                    RoundedRectangle(cornerRadius: NudgeWhipRadius.card, style: .continuous)
+                        .stroke(Color.nudgewhipStrokeDefault.opacity(0.75), lineWidth: 1)
+                )
+
+            Group {
+                if isEnabled {
+                    overlayChip
+                } else {
+                    disabledChip
+                }
+            }
+            .padding(12)
+        }
+        .frame(height: 120)
+    }
+
+    private var overlayChip: some View {
+        Group {
+            switch variant {
+            case .standard:
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.black.opacity(0.72))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.white.opacity(0.14), lineWidth: 1)
+                    )
+                    .overlay(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("NUDGE")
+                                .font(.system(size: 5, weight: .semibold, design: .rounded))
+                                .foregroundStyle(Color.white.opacity(0.62))
+                            Text("3m")
+                                .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                .foregroundStyle(.white)
+                            Text(localizedAppString("settings.section.monitoring.overlay_preview.standard_hint", defaultValue: "Monitoring input"))
+                                .font(.system(size: 5.5, weight: .medium, design: .rounded))
+                                .foregroundStyle(Color.white.opacity(0.7))
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                    }
+                    .frame(width: 82, height: 46)
+
+            case .mini:
+                Capsule(style: .continuous)
+                    .fill(Color.black.opacity(0.56))
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+                    .overlay {
+                        Text("3m")
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 54, height: 24)
+            }
+        }
+    }
+
+    private var disabledChip: some View {
+        Capsule(style: .continuous)
+            .fill(Color.nudgewhipBgCanvas.opacity(0.95))
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(Color.nudgewhipStrokeDefault.opacity(0.8), lineWidth: 1)
+            )
+            .overlay {
+                Text(localizedAppString("settings.section.monitoring.overlay_preview.off", defaultValue: "Off"))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.nudgewhipTextMuted)
+            }
+            .frame(width: 44, height: 24)
+    }
+
+    private func alignment(for position: CountdownOverlayPosition) -> Alignment {
+        switch position {
+        case .topLeft:
+            return .topLeading
+        case .topRight:
+            return .topTrailing
+        case .bottomLeft:
+            return .bottomLeading
+        case .bottomRight:
+            return .bottomTrailing
         }
     }
 }

@@ -22,7 +22,7 @@ struct CompletionReadyStepView: View {
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.idle_threshold", defaultValue: "Idle threshold"), idleThresholdText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.schedule", defaultValue: "Schedule"), scheduleText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.launch_at_login", defaultValue: "Launch at login"), launchAtLoginText)
-                        summaryRow(localizedAppString("onboarding.completion.ready.summary.overlay", defaultValue: "Top overlay"), overlayText)
+                        summaryRow(localizedAppString("onboarding.completion.ready.summary.overlay", defaultValue: "Countdown overlay"), overlayText)
                         summaryRow(localizedAppString("onboarding.completion.ready.summary.language", defaultValue: "Language"), languageText)
                     }
                 }

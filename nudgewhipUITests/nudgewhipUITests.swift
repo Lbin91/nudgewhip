@@ -57,7 +57,7 @@ final class nudgewhipUITests: XCTestCase {
         continueFromPermission.tap()
 
         XCTAssertTrue(element(in: app, label: "Launch at login").waitForExistence(timeout: 5))
-        XCTAssertTrue(element(in: app, label: "Show top countdown overlay").exists)
+        XCTAssertTrue(element(in: app, label: "Show countdown overlay").exists)
     }
 
     @MainActor

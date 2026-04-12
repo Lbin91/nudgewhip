@@ -34,12 +34,12 @@ struct BasicSetupStepView: View {
             
             OnboardingSectionCard(
                 title: localizedAppString("onboarding.setup.section.behavior", defaultValue: "How NudgeWhip starts"),
-                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether NudgeWhip opens automatically and whether the top countdown overlay stays on.")
+                subtitle: localizedAppString("onboarding.setup.section.behavior.subtitle", defaultValue: "Choose whether NudgeWhip opens automatically and whether the countdown overlay stays on.")
             ) {
                 VStack(alignment: .leading, spacing: 12) {
                     Toggle(localizedAppString("onboarding.setup.launch_at_login.label", defaultValue: "Launch at login"), isOn: $launchAtLoginEnabled)
                         .toggleStyle(.checkbox)
-                    Toggle(localizedAppString("onboarding.setup.overlay.label", defaultValue: "Show top countdown overlay"), isOn: $countdownOverlayEnabled)
+                    Toggle(localizedAppString("onboarding.setup.overlay.label", defaultValue: "Show countdown overlay"), isOn: $countdownOverlayEnabled)
                         .toggleStyle(.checkbox)
                 }
             }

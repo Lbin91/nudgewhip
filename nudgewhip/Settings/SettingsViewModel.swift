@@ -22,6 +22,7 @@ final class SettingsViewModel {
     private(set) var idleThresholdSecondsValue: Int
     private(set) var countdownOverlayEnabledValue: Bool
     private(set) var countdownOverlayPositionValue: CountdownOverlayPosition
+    private(set) var countdownOverlayVariantValue: CountdownOverlayVariant
     private(set) var soundThemeValue: SoundTheme
     private(set) var preferredLanguage: AppLanguage
     private(set) var canCheckForUpdates: Bool
@@ -50,6 +51,7 @@ final class SettingsViewModel {
         self.idleThresholdSecondsValue = currentSettings?.idleThresholdSeconds ?? 180
         self.countdownOverlayEnabledValue = currentSettings?.countdownOverlayEnabled ?? true
         self.countdownOverlayPositionValue = currentSettings?.countdownOverlayPosition ?? .topLeft
+        self.countdownOverlayVariantValue = currentSettings?.countdownOverlayVariant ?? .mini
         self.soundThemeValue = currentSettings?.soundTheme ?? .whip
         self.preferredLanguage = AppLanguage.resolve(currentSettings?.preferredLocaleIdentifier)
         self.canCheckForUpdates = appUpdater.canCheckForUpdates
@@ -155,6 +157,12 @@ final class SettingsViewModel {
         refreshSettingsSnapshot()
     }
 
+    func updateCountdownOverlayVariant(_ variant: CountdownOverlayVariant) {
+        countdownOverlayVariantValue = variant
+        menuBarViewModel.updateCountdownOverlayVariant(variant)
+        refreshSettingsSnapshot()
+    }
+
     func updateSoundTheme(_ theme: SoundTheme) {
         soundThemeValue = theme
         guard let settings else { return }
@@ -215,6 +223,7 @@ final class SettingsViewModel {
         idleThresholdSecondsValue = resolvedSettings?.idleThresholdSeconds ?? idleThresholdSecondsValue
         countdownOverlayEnabledValue = resolvedSettings?.countdownOverlayEnabled ?? countdownOverlayEnabledValue
         countdownOverlayPositionValue = resolvedSettings?.countdownOverlayPosition ?? countdownOverlayPositionValue
+        countdownOverlayVariantValue = resolvedSettings?.countdownOverlayVariant ?? countdownOverlayVariantValue
         soundThemeValue = resolvedSettings?.soundTheme ?? soundThemeValue
         preferredLanguage = AppLanguage.resolve(resolvedSettings?.preferredLocaleIdentifier)
     }

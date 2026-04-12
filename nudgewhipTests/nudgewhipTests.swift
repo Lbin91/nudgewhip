@@ -62,6 +62,34 @@ func localizedDurationStringUsesSelectedAppLanguage() {
 }
 
 @Test
+func countdownOverlayHelpersSupportMiniVariantAndCornerPlacement() {
+    #expect(countdownOverlayPanelSize(for: .standard) == CGSize(width: 146, height: 72))
+    #expect(countdownOverlayPanelSize(for: .mini) == CGSize(width: 96, height: 32))
+    #expect(countdownOverlayIgnoresMouseEvents(for: .standard) == false)
+    #expect(countdownOverlayIgnoresMouseEvents(for: .mini))
+
+    let visibleFrame = CGRect(x: 10, y: 20, width: 200, height: 300)
+    let panelSize = countdownOverlayPanelSize(for: .mini)
+
+    #expect(
+        countdownOverlayOrigin(
+            visibleFrame: visibleFrame,
+            panelSize: panelSize,
+            inset: 14,
+            position: .topLeft
+        ) == CGPoint(x: 24, y: 274)
+    )
+    #expect(
+        countdownOverlayOrigin(
+            visibleFrame: visibleFrame,
+            panelSize: panelSize,
+            inset: 14,
+            position: .bottomRight
+        ) == CGPoint(x: 100, y: 34)
+    )
+}
+
+@Test
 func appLanguageFallsBackToSupportedSystemLanguage() {
     #expect(AppLanguage.resolve(nil, preferredLanguages: ["ko-KR"]) == .korean)
     #expect(AppLanguage.resolve(nil, preferredLanguages: ["en-US"]) == .english)
@@ -1512,6 +1540,7 @@ struct nudgewhipTests {
         viewModel.updateIdleThreshold(600)
         viewModel.updateCountdownOverlayEnabled(false)
         viewModel.updateCountdownOverlayPosition(.bottomRight)
+        viewModel.updateCountdownOverlayVariant(.standard)
         viewModel.updateScheduleEnabled(true)
         viewModel.updateLaunchAtLogin(true)
         viewModel.openOnboarding()
@@ -1520,13 +1549,16 @@ struct nudgewhipTests {
         #expect(settings.idleThresholdSeconds == 600)
         #expect(settings.countdownOverlayEnabled == false)
         #expect(settings.countdownOverlayPosition == .bottomRight)
+        #expect(settings.countdownOverlayVariant == .standard)
         #expect(settings.scheduleEnabled)
         #expect(launchAtLoginManager.isEnabled)
         #expect(opener.callCount == 1)
         #expect(viewModel.idleThresholdSecondsValue == 600)
         #expect(viewModel.countdownOverlayEnabledValue == false)
         #expect(viewModel.countdownOverlayPositionValue == .bottomRight)
+        #expect(viewModel.countdownOverlayVariantValue == .standard)
         #expect(menuBarViewModel.countdownOverlayPosition == .bottomRight)
+        #expect(menuBarViewModel.countdownOverlayVariant == .standard)
     }
 
     @MainActor

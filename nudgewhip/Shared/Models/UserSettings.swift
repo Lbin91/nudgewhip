@@ -19,6 +19,11 @@ enum CountdownOverlayPosition: String, Codable, CaseIterable, Sendable {
     case bottomRight
 }
 
+enum CountdownOverlayVariant: String, Codable, CaseIterable, Sendable {
+    case standard
+    case mini
+}
+
 @Model
 final class UserSettings {
     var idleThresholdSeconds: Int
@@ -32,6 +37,7 @@ final class UserSettings {
     var soundThemeRawValue: String
     var countdownOverlayEnabled: Bool
     var countdownOverlayPositionRawValue: String?
+    var countdownOverlayVariantRawValue: String?
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
     var scheduleEndSecondsFromMidnight: Int
@@ -49,6 +55,11 @@ final class UserSettings {
         get { CountdownOverlayPosition(rawValue: countdownOverlayPositionRawValue ?? "") ?? .topLeft }
         set { countdownOverlayPositionRawValue = newValue.rawValue }
     }
+
+    var countdownOverlayVariant: CountdownOverlayVariant {
+        get { CountdownOverlayVariant(rawValue: countdownOverlayVariantRawValue ?? "") ?? .standard }
+        set { countdownOverlayVariantRawValue = newValue.rawValue }
+    }
     
     /// 모든 설정값의 기본값을 제공하는 이니셜라이저
     init(
@@ -63,6 +74,7 @@ final class UserSettings {
         soundTheme: SoundTheme = .whip,
         countdownOverlayEnabled: Bool = true,
         countdownOverlayPosition: CountdownOverlayPosition = .topLeft,
+        countdownOverlayVariant: CountdownOverlayVariant = .mini,
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,
         scheduleEndSecondsFromMidnight: Int = 61200,
@@ -81,6 +93,7 @@ final class UserSettings {
         self.soundThemeRawValue = soundTheme.rawValue
         self.countdownOverlayEnabled = countdownOverlayEnabled
         self.countdownOverlayPositionRawValue = countdownOverlayPosition.rawValue
+        self.countdownOverlayVariantRawValue = countdownOverlayVariant.rawValue
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight

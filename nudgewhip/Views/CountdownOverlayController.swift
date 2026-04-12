@@ -5,7 +5,6 @@ import SwiftUI
 
 @MainActor
 final class CountdownOverlayController {
-    private static let panelSize = CGSize(width: 146, height: 72)
     private static let panelInset: CGFloat = 14
 
     private let menuBarViewModel: MenuBarViewModel
@@ -42,6 +41,7 @@ final class CountdownOverlayController {
             let isEnabled = menuBarViewModel.countdownOverlayEnabled
             if isEnabled {
                 _ = menuBarViewModel.countdownOverlayPosition
+                _ = menuBarViewModel.countdownOverlayVariant
             }
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
@@ -57,6 +57,9 @@ final class CountdownOverlayController {
             return
         }
 
+        panel.ignoresMouseEvents = countdownOverlayIgnoresMouseEvents(
+            for: menuBarViewModel.countdownOverlayVariant
+        )
         positionPanel()
         panel.orderFrontRegardless()
     }
@@ -80,18 +83,19 @@ final class CountdownOverlayController {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
 
         let visibleFrame = screen.visibleFrame
+        let panelSize = countdownOverlayPanelSize(for: menuBarViewModel.countdownOverlayVariant)
         let origin = countdownOverlayOrigin(
             visibleFrame: visibleFrame,
-            panelSize: Self.panelSize,
+            panelSize: panelSize,
             inset: Self.panelInset,
             position: menuBarViewModel.countdownOverlayPosition
         )
-        panel.setFrame(CGRect(origin: origin, size: Self.panelSize), display: false)
+        panel.setFrame(CGRect(origin: origin, size: panelSize), display: false)
     }
 
     private static func makePanel() -> NSPanel {
         let panel = NSPanel(
-            contentRect: CGRect(origin: .zero, size: panelSize),
+            contentRect: CGRect(origin: .zero, size: countdownOverlayPanelSize(for: .standard)),
             styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -103,6 +107,24 @@ final class CountdownOverlayController {
         panel.ignoresMouseEvents = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         return panel
+    }
+}
+
+func countdownOverlayPanelSize(for variant: CountdownOverlayVariant) -> CGSize {
+    switch variant {
+    case .standard:
+        return CGSize(width: 146, height: 72)
+    case .mini:
+        return CGSize(width: 96, height: 32)
+    }
+}
+
+func countdownOverlayIgnoresMouseEvents(for variant: CountdownOverlayVariant) -> Bool {
+    switch variant {
+    case .standard:
+        return false
+    case .mini:
+        return true
     }
 }
 
@@ -146,6 +168,29 @@ private struct CountdownOverlayView: View {
     private let timer = Timer.publish(every: 1, tolerance: 0.2, on: .main, in: .common).autoconnect()
 
     var body: some View {
+        Group {
+            switch menuBarViewModel.countdownOverlayVariant {
+            case .standard:
+                standardOverlay
+            case .mini:
+                miniOverlay
+            }
+        }
+        .onReceive(timer) { value in
+            now = value
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(overlayAccessibilityLabel)
+    }
+
+    private var overlayConfiguration: CountdownOverlayAccessibilityConfiguration {
+        countdownOverlayAccessibilityConfiguration(
+            increaseContrast: colorSchemeContrast == .increased,
+            reduceTransparency: reduceTransparency
+        )
+    }
+
+    private var standardOverlay: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .top, spacing: 6) {
                 Text("NUDGE")
@@ -164,7 +209,7 @@ private struct CountdownOverlayView: View {
                 .buttonStyle(.plain)
             }
 
-            Text(primaryText)
+            Text(standardPrimaryText)
                 .font(.system(size: 24, weight: .bold, design: .monospaced))
                 .foregroundStyle(.white)
 
@@ -184,19 +229,24 @@ private struct CountdownOverlayView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(Color.white.opacity(overlayConfiguration.strokeOpacity), lineWidth: 1)
         )
-        .onReceive(timer) { value in
-            now = value
-        }
     }
 
-    private var overlayConfiguration: CountdownOverlayAccessibilityConfiguration {
-        countdownOverlayAccessibilityConfiguration(
-            increaseContrast: colorSchemeContrast == .increased,
-            reduceTransparency: reduceTransparency
-        )
+    private var miniOverlay: some View {
+        Text(miniPrimaryText)
+            .font(.system(size: 16, weight: .bold, design: .monospaced))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(Color.black.opacity(miniBackgroundOpacity))
+            )
+            .overlay(
+                Capsule(style: .continuous)
+                    .stroke(Color.white.opacity(miniStrokeOpacity), lineWidth: 1)
+            )
     }
 
-    private var primaryText: String {
+    private var standardPrimaryText: String {
         if let countdown = menuBarViewModel.overlayCountdownText(now: now) {
             return countdown
         }
@@ -215,5 +265,44 @@ private struct CountdownOverlayView: View {
         case .limitedNoAX, .monitoring:
             return menuBarViewModel.configuredIdleThresholdText
         }
+    }
+
+    private var miniPrimaryText: String {
+        if let countdown = menuBarViewModel.overlayCountdownText(now: now) {
+            return countdown
+        }
+
+        switch menuBarViewModel.runtimeState {
+        case .limitedNoAX:
+            return "AX"
+        case .monitoring:
+            return menuBarViewModel.configuredIdleThresholdText
+        case .pausedManual:
+            return "PAUSE"
+        case .pausedWhitelist:
+            return "ALLOW"
+        case .alerting:
+            return "IDLE"
+        case .pausedSchedule:
+            return "SCHED"
+        case .suspendedSleepOrLock:
+            return "SLEEP"
+        }
+    }
+
+    private var miniBackgroundOpacity: Double {
+        max(0.42, overlayConfiguration.backgroundOpacity - 0.14)
+    }
+
+    private var miniStrokeOpacity: Double {
+        max(0.06, overlayConfiguration.strokeOpacity - 0.03)
+    }
+
+    private var overlayAccessibilityLabel: String {
+        if let countdown = menuBarViewModel.overlayCountdownText(now: now) {
+            return "\(menuBarViewModel.overlayRuntimeStateText), \(countdown)"
+        }
+
+        return menuBarViewModel.overlayRuntimeStateText
     }
 }
