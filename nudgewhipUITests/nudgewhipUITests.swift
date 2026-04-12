@@ -83,6 +83,7 @@ final class nudgewhipUITests: XCTestCase {
     private func makeConfiguredApp(accessibility: String) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment["NUDGE_RESET_ON_LAUNCH"] = "1"
+        app.launchEnvironment["NUDGE_RESET_DATA_STORE"] = "1"
         app.launchEnvironment["NUDGE_UI_TEST_ONBOARDING"] = "1"
         app.launchEnvironment["NUDGE_TEST_ACCESSIBILITY"] = accessibility
         app.launchArguments += ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]

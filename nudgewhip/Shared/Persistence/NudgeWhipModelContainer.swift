@@ -11,11 +11,15 @@ enum NudgeWhipModelContainer {
     /// 실제 디스크 저장소용 싱글톤 컨테이너
     /// 마이그레이션 실패 시 기존 저장소를 삭제하고 재생성한다
     static let shared: ModelContainer = {
+        if ProcessInfo.processInfo.environment["NUDGE_RESET_DATA_STORE"] == "1" {
+            Self.deleteStoreFiles()
+        }
+
         do {
             return try makeModelContainer(inMemory: false)
         } catch {
             print("⚠️ Model container creation failed, resetting store: \(error)")
-            Self.deleteStoreFile()
+            Self.deleteStoreFiles()
             do {
                 return try makeModelContainer(inMemory: false)
             } catch {
@@ -24,10 +28,12 @@ enum NudgeWhipModelContainer {
         }
     }()
 
-    /// 저장소 파일 삭제
-    private static func deleteStoreFile() {
+    /// 저장소 파일과 sidecar를 삭제
+    private static func deleteStoreFiles() {
         let url = URL.applicationSupportDirectory.appending(component: "default.store")
         try? FileManager.default.removeItem(at: url)
+        try? FileManager.default.removeItem(at: url.appendingPathExtension("shm"))
+        try? FileManager.default.removeItem(at: url.appendingPathExtension("wal"))
     }
     
     @MainActor
