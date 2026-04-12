@@ -90,6 +90,14 @@ func countdownOverlayHelpersSupportMiniVariantAndCornerPlacement() {
 }
 
 @Test
+func miniOverlayAttentionMappingMarksAccessibilityAndIdleStates() {
+    #expect(miniOverlayAttentionKind(for: .limitedNoAX) == .accessibilityNeeded)
+    #expect(miniOverlayAttentionKind(for: .alerting) == .idleDetected)
+    #expect(miniOverlayAttentionKind(for: .monitoring) == nil)
+    #expect(miniOverlayAttentionKind(for: .pausedManual) == nil)
+}
+
+@Test
 func appLanguageFallsBackToSupportedSystemLanguage() {
     #expect(AppLanguage.resolve(nil, preferredLanguages: ["ko-KR"]) == .korean)
     #expect(AppLanguage.resolve(nil, preferredLanguages: ["en-US"]) == .english)
