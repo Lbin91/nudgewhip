@@ -69,14 +69,6 @@ final class SettingsViewModel {
         menuBarViewModel.runtimeState
     }
 
-    var statisticsSnapshot: StatisticsSnapshot {
-        menuBarViewModel.statisticsSnapshot
-    }
-
-    var appUsageSnapshot: AppUsageSnapshot {
-        menuBarViewModel.appUsageSnapshot
-    }
-    
     var scheduleEnabledValue: Bool {
         menuBarViewModel.scheduleEnabled
     }

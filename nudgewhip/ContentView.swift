@@ -8,6 +8,7 @@ import SwiftUI
 
 struct ContentView: View {
     let menuBarViewModel: MenuBarViewModel
+    let onOpenStatistics: () -> Void
     let onOpenSettings: () -> Void
     let onOpenOnboarding: () -> Void
     let onQuit: () -> Void
@@ -15,6 +16,7 @@ struct ContentView: View {
     var body: some View {
         MenuBarDropdownView(
             menuBarViewModel: menuBarViewModel,
+            onOpenStatistics: onOpenStatistics,
             onOpenSettings: onOpenSettings,
             onOpenOnboarding: onOpenOnboarding,
             onQuit: onQuit
@@ -46,6 +48,7 @@ struct ContentView: View {
 #Preview {
     ContentView(
         menuBarViewModel: MenuBarViewModel(),
+        onOpenStatistics: {},
         onOpenSettings: {},
         onOpenOnboarding: {},
         onQuit: {}

@@ -27,7 +27,6 @@ struct SettingsRootView: View {
                     
                     VStack(spacing: NudgeWhipSpacing.s4) {
                         monitoringSection
-                        statisticsSection
                         scheduleSection
                         accessibilitySection
                         appSection
@@ -197,15 +196,6 @@ struct SettingsRootView: View {
         }
     }
 
-    private var statisticsSection: some View {
-        SettingsSection(title: localizedAppString("settings.section.statistics", defaultValue: "Statistics"), systemImage: "chart.bar.xaxis") {
-            StatisticsDashboardView(
-                snapshot: viewModel.statisticsSnapshot,
-                appUsageSnapshot: viewModel.appUsageSnapshot
-            )
-        }
-    }
-    
     private var accessibilitySection: some View {
         SettingsSection(title: localizedAppString("settings.section.accessibility", defaultValue: "Accessibility"), systemImage: "hand.raised.fill") {
             VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {

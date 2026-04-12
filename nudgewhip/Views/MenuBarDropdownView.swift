@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuBarDropdownView: View {
     let menuBarViewModel: MenuBarViewModel
+    let onOpenStatistics: () -> Void
     let onOpenSettings: () -> Void
     let onOpenOnboarding: () -> Void
     let onQuit: () -> Void
@@ -145,6 +146,15 @@ struct MenuBarDropdownView: View {
     private var utilityActions: some View {
         VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
             VStack(alignment: .leading, spacing: 0) {
+                utilityRowButton(
+                    title: localizedAppString("settings.section.statistics", defaultValue: "Statistics"),
+                    systemImage: "chart.bar.xaxis",
+                    action: onOpenStatistics
+                )
+
+                Divider()
+                    .overlay(Color.nudgewhipStrokeDefault)
+
                 utilityRowButton(
                     title: localizedAppString("menu.action.open_settings", defaultValue: "Settings"),
                     systemImage: "gearshape",

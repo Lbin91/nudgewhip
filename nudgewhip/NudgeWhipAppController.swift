@@ -10,6 +10,7 @@ final class NudgeWhipAppController {
     let appUpdater: AppUpdater
     private let alertManager: AlertManager
     private let onboardingCoordinator: OnboardingCoordinator
+    private let statisticsCoordinator: StatisticsCoordinator
     private let settingsCoordinator: SettingsCoordinator
     private var hasStarted = false
     private let countdownOverlayController: CountdownOverlayController?
@@ -59,7 +60,11 @@ final class NudgeWhipAppController {
             menuBarViewModel.refreshPermission()
         }
         self.onboardingCoordinator = onboardingCoordinator
-        
+
+        self.statisticsCoordinator = StatisticsCoordinator(
+            menuBarViewModel: menuBarViewModel
+        )
+
         self.settingsCoordinator = SettingsCoordinator(
             modelContainer: NudgeWhipModelContainer.shared,
             menuBarViewModel: menuBarViewModel,
@@ -108,6 +113,13 @@ final class NudgeWhipAppController {
     
     func presentSettings() {
         let coordinator = settingsCoordinator
+        DispatchQueue.main.async {
+            coordinator.present()
+        }
+    }
+
+    func presentStatistics() {
+        let coordinator = statisticsCoordinator
         DispatchQueue.main.async {
             coordinator.present()
         }

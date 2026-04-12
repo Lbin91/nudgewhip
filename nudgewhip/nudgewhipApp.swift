@@ -40,6 +40,7 @@ struct NudgeWhipApp: App {
         MenuBarExtra {
             ContentView(
                 menuBarViewModel: menuBarViewModel,
+                onOpenStatistics: { NudgeWhipAppController.shared.presentStatistics() },
                 onOpenSettings: { NudgeWhipAppController.shared.presentSettings() },
                 onOpenOnboarding: { NudgeWhipAppController.shared.presentOnboarding() },
                 onQuit: { NSApplication.shared.terminate(nil) }
