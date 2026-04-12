@@ -16,6 +16,7 @@
 - [ios-dashboard-screen-spec.md](./ios-dashboard-screen-spec.md)
 - [spec.md](./spec.md)
 - [cloudkit-sync-contract.md](../architecture/cloudkit-sync-contract.md)
+- [cloudkit-daily-aggregate-backup.md](../architecture/cloudkit-daily-aggregate-backup.md)
 
 ## 3. Official Alignment Check
 
