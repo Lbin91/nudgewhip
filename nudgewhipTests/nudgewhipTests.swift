@@ -318,6 +318,107 @@ func cloudKitDailyAggregateBackupWriterBuildsDeterministicRecord() throws {
 }
 
 @MainActor
+@Test
+func cloudKitDailyAggregateFetchConsumerDecodesRecordIntoPayload() throws {
+    let recordID = CKRecord.ID(
+        recordName: "mac-test__2026-04-13@Asia/Seoul",
+        zoneID: CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
+    )
+    let record = CKRecord(recordType: "DashboardDayProjection", recordID: recordID)
+    record["macDeviceID"] = "mac-test" as CKRecordValue
+    record["localDayKey"] = "2026-04-13@Asia/Seoul" as CKRecordValue
+    record["dayStart"] = Date(timeIntervalSince1970: 1_776_000_000) as CKRecordValue
+    record["timeZoneIdentifier"] = "Asia/Seoul" as CKRecordValue
+    record["updatedAt"] = Date(timeIntervalSince1970: 1_776_000_100) as CKRecordValue
+    record["schemaVersion"] = Int64(1) as CKRecordValue
+    record["totalFocusDurationSeconds"] = Int64(3600) as CKRecordValue
+    record["completedSessionCount"] = Int64(2) as CKRecordValue
+    record["alertCount"] = Int64(1) as CKRecordValue
+    record["longestFocusDurationSeconds"] = Int64(2400) as CKRecordValue
+    record["recoverySampleCount"] = Int64(1) as CKRecordValue
+    record["recoveryDurationTotalSeconds"] = Int64(120) as CKRecordValue
+    record["recoveryDurationMaxSeconds"] = Int64(120) as CKRecordValue
+    record["sessionsOver30mCount"] = Int64(1) as CKRecordValue
+    record["hourlyAlertCountsJSON"] = "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]" as CKRecordValue
+
+    let consumer = CloudKitDailyAggregateFetchConsumer()
+    let payload = try consumer.payload(from: record)
+
+    #expect(payload.macDeviceID == "mac-test")
+    #expect(payload.localDayKey == "2026-04-13@Asia/Seoul")
+    #expect(payload.totalFocusDurationSeconds == 3600)
+    #expect(payload.hourlyAlertCounts.count == 24)
+}
+
+@MainActor
+@Test
+func cloudKitDailyAggregateFetchConsumerRejectsMalformedHourlyJSON() throws {
+    let recordID = CKRecord.ID(
+        recordName: "mac-test__2026-04-13@Asia/Seoul",
+        zoneID: CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
+    )
+    let record = CKRecord(recordType: "DashboardDayProjection", recordID: recordID)
+    record["macDeviceID"] = "mac-test" as CKRecordValue
+    record["localDayKey"] = "2026-04-13@Asia/Seoul" as CKRecordValue
+    record["dayStart"] = Date(timeIntervalSince1970: 1_776_000_000) as CKRecordValue
+    record["timeZoneIdentifier"] = "Asia/Seoul" as CKRecordValue
+    record["updatedAt"] = Date(timeIntervalSince1970: 1_776_000_100) as CKRecordValue
+    record["schemaVersion"] = Int64(1) as CKRecordValue
+    record["totalFocusDurationSeconds"] = Int64(3600) as CKRecordValue
+    record["completedSessionCount"] = Int64(2) as CKRecordValue
+    record["alertCount"] = Int64(1) as CKRecordValue
+    record["longestFocusDurationSeconds"] = Int64(2400) as CKRecordValue
+    record["recoverySampleCount"] = Int64(1) as CKRecordValue
+    record["recoveryDurationTotalSeconds"] = Int64(120) as CKRecordValue
+    record["recoveryDurationMaxSeconds"] = Int64(120) as CKRecordValue
+    record["sessionsOver30mCount"] = Int64(1) as CKRecordValue
+    record["hourlyAlertCountsJSON"] = "[1,2,broken]" as CKRecordValue
+
+    let consumer = CloudKitDailyAggregateFetchConsumer()
+
+    #expect(throws: CloudKitDailyAggregateFetchConsumerError.self) {
+        try consumer.payload(from: record)
+    }
+}
+
+@MainActor
+@Test
+func cloudKitDailyAggregateFetchConsumerUsesInjectedQueryLoader() async throws {
+    let recordID = CKRecord.ID(
+        recordName: "mac-test__2026-04-13@Asia/Seoul",
+        zoneID: CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
+    )
+    let record = CKRecord(recordType: "DashboardDayProjection", recordID: recordID)
+    record["macDeviceID"] = "mac-test" as CKRecordValue
+    record["localDayKey"] = "2026-04-13@Asia/Seoul" as CKRecordValue
+    record["dayStart"] = Date(timeIntervalSince1970: 1_776_000_000) as CKRecordValue
+    record["timeZoneIdentifier"] = "Asia/Seoul" as CKRecordValue
+    record["updatedAt"] = Date(timeIntervalSince1970: 1_776_000_100) as CKRecordValue
+    record["schemaVersion"] = Int64(1) as CKRecordValue
+    record["totalFocusDurationSeconds"] = Int64(3600) as CKRecordValue
+    record["completedSessionCount"] = Int64(2) as CKRecordValue
+    record["alertCount"] = Int64(1) as CKRecordValue
+    record["longestFocusDurationSeconds"] = Int64(2400) as CKRecordValue
+    record["recoverySampleCount"] = Int64(1) as CKRecordValue
+    record["recoveryDurationTotalSeconds"] = Int64(120) as CKRecordValue
+    record["recoveryDurationMaxSeconds"] = Int64(120) as CKRecordValue
+    record["sessionsOver30mCount"] = Int64(1) as CKRecordValue
+    record["hourlyAlertCountsJSON"] = "[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]" as CKRecordValue
+
+    let consumer = CloudKitDailyAggregateFetchConsumer(
+        queryLoader: { _, _, _ in [record] },
+        recordLoader: { _ in record }
+    )
+
+    let payloads = try await consumer.fetchRecentProjections(macDeviceID: "mac-test", limit: 7)
+    #expect(payloads.count == 1)
+    #expect(payloads[0].localDayKey == "2026-04-13@Asia/Seoul")
+
+    let single = try await consumer.fetchProjection(macDeviceID: "mac-test", localDayKey: "2026-04-13@Asia/Seoul")
+    #expect(single?.macDeviceID == "mac-test")
+}
+
+@MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool
     
