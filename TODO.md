@@ -56,6 +56,7 @@ Current release focus:
 - [x] Keep local projection calculation independent of CloudKit success
 - [x] Coalesce same-day rewrites instead of append
 - [x] Add retry path for transient CloudKit failure
+- [x] Promote retry queue from memory-only to disk-backed outbox
 
 ## 7. Verification
 
@@ -72,3 +73,8 @@ Current release focus:
 - [x] Failure-first tests now pass
 - [ ] No new test regressions introduced
 - [x] TODO reflects only current CloudKit daily backup work
+
+## 9. Shared consumer follow-up
+
+- [x] Add shared `CloudKitDailyAggregateFetchConsumer`
+- [x] Add decode/fetch tests for `DashboardDayProjection` records
