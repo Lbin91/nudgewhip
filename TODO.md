@@ -1,62 +1,72 @@
-# Countdown Overlay Mini Mode TODO
+# CloudKit Daily Aggregate Backup TODO
 
 Source:
-- `docs/app/task-countdown-overlay-mini-and-positioning.md`
-- `docs/app/task-countdown-overlay-mini-and-positioning-review.md`
+- `docs/architecture/cloudkit-daily-aggregate-backup.md`
+- `docs/architecture/cloudkit-daily-aggregate-backup-implementation-todo.md`
+- `docs/architecture/mac-daily-aggregate-service-design.md`
 
 Current release focus:
-- Reduce countdown overlay fatigue without removing quick-glance value.
-- Keep 4-corner positioning as the official product contract.
-- Preserve the menu-presentation guard and do not treat MenuBarExtra hover/depth-menu tracking as activity.
-- Track the mini hover close affordance as an active follow-up experiment.
+- Keep local SwiftData as source of truth.
+- Compute daily aggregates by **local timezone midnight**.
+- Back up only daily aggregate projection to CloudKit private DB.
+- Do not upload raw input timeline, window title, URL, or typed contents.
 
-## 1. Product and copy alignment
+## 1. Test-first guardrails
 
-- [x] Reflect review decisions in the planning doc:
-  - dynamic panel size by variant
-  - `limitedNoAX`: mini shows `AX`, standard keeps threshold text
-  - lightweight settings preview only
-  - variant-based mouse event handling
-  - no transition animation in this scope
-- [x] Replace `top countdown overlay` / `Top overlay` copy with position-neutral `countdown overlay`
-- [x] Update affected UI tests for the new copy
+- [ ] Add payload/builder tests before implementation
+- [ ] Add at least one failure-first test for cross-midnight attribution
+- [ ] Add at least one failure-first test for hourly alert bucketing
+- [ ] Add Cloud writer mapping tests before writer implementation
 
-## 2. Overlay model and runtime wiring
+## 2. Projection model foundation
 
-- [x] Add `CountdownOverlayVariant` persistence to `UserSettings`
-- [x] Expose overlay variant through `MenuBarViewModel` and `SettingsViewModel`
-- [x] Observe `countdownOverlayVariant` in `CountdownOverlayController`
-- [x] Switch panel size dynamically between standard and mini
-- [x] Ship the baseline variant wiring and record the hover-affordance deviation separately
+- [ ] Add `DashboardDayProjectionPayload`
+- [ ] Add deterministic `localDayKey` generation
+- [ ] Normalize duration/count fields to integer seconds / integer counts
+- [ ] Add schema version field and optional UTC source window fields
 
-## 3. Overlay UI implementation
+## 3. Mac-side aggregation builder
 
-- [x] Keep the current standard overlay behavior intact
-- [x] Implement mini overlay layout (`96x32` target) with reduced chrome
-- [x] Show countdown-only or compact state tokens in mini mode
-- [x] Keep standard `limitedNoAX` behavior and use `AX` only in mini mode
+- [ ] Add `DailyAggregateProjectionBuilder`
+- [ ] Build local-day interval from explicit timezone identifier
+- [ ] Reuse `FocusSession.focusDuration(overlapping:)` for duration math
+- [ ] Implement `completedSessionCount` as **session start-day attribution**
+- [ ] Implement `sessionsOver30mCount` from full session duration
+- [ ] Implement recovery metrics from `AlertingSegment`
+- [ ] Implement `hourlyAlertCounts` from `AlertingSegment.startedAt`
 
-## 4. Settings and onboarding surfaces
+## 4. CloudKit writer
 
-- [x] Add `Standard | Mini` selector to Settings
-- [x] Add a lightweight settings preview swatch for variant + position
-- [x] Keep onboarding overlay control limited to on/off
-- [x] Update completion summary wording to `Countdown overlay`
+- [ ] Add `CloudKitDailyAggregateBackupWriter`
+- [ ] Map payload to `DashboardDayProjection` record
+- [ ] Use deterministic `recordName = macDeviceID + \"__\" + localDayKey`
+- [ ] Target private DB + `NudgeWhipSync` zone
+- [ ] Serialize `hourlyAlertCounts` as `hourlyAlertCountsJSON`
 
-## 5. Verification
+## 5. Trigger wiring
 
-- [x] Add/update unit tests for dynamic panel sizing and corner positioning behavior where practical
-- [x] Verify KR/EN copy after the rename
-- [x] Run `xcodebuild build -scheme nudgewhip -destination 'platform=macOS'`
-- [x] Run `xcodebuild test -scheme nudgewhip -destination 'platform=macOS'`
+- [ ] Add stable `macDeviceID` provider
+- [ ] Recompute/write on session updates
+- [ ] Recompute/write on recovery completion
+- [ ] Recompute/finalize at local midnight boundary
+- [ ] Recompute on launch / foreground recovery path
 
-## 6. Completion gate
+## 6. Failure handling
 
-- [x] All items above complete
-- [x] TODO stays aligned with the shipped overlay scope only
+- [ ] Keep local projection calculation independent of CloudKit success
+- [ ] Coalesce same-day rewrites instead of append
+- [ ] Add retry path for transient CloudKit failure
 
-## 7. Follow-up completed after ship decision
+## 7. Verification
 
-- [x] Add Dock magnify / multi-monitor visual QA matrix
-- [x] Add mini hover affordance experiment and keep it documented as an experiment
-- [x] Add fresh-install mini-default checklist
+- [ ] Confirm failure-first tests fail for the right reason before implementation
+- [ ] Run targeted unit tests during implementation
+- [ ] Run `xcodebuild build -scheme nudgewhip -destination 'platform=macOS'`
+- [ ] Run `xcodebuild test -scheme nudgewhip -destination 'platform=macOS'`
+
+## 8. Completion gate
+
+- [ ] Payload/builder/writer/trigger wiring all implemented
+- [ ] Failure-first tests now pass
+- [ ] No new test regressions introduced
+- [ ] TODO reflects only current CloudKit daily backup work
