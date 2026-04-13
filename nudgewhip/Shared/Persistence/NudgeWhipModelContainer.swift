@@ -54,6 +54,7 @@ enum NudgeWhipModelContainer {
             UserSettings.self,
             WhitelistApp.self,
             FocusSession.self,
+            AlertingSegment.self,
             AppUsageSegment.self
         ])
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)

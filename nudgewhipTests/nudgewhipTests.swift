@@ -206,7 +206,7 @@ func dailyAggregateProjectionBuilderCountsCompletedSessionsByStartDay() throws {
     let context = container.mainContext
     try NudgeWhipDataBootstrap.ensureDefaults(in: context)
 
-    let start = Date(timeIntervalSince1970: 1_776_091_800) // 2026-04-13 23:30:00 UTC
+    let start = Date(timeIntervalSince1970: 1_776_123_000) // 2026-04-13 23:30:00 UTC
     let end = start.addingTimeInterval(3_600) // cross-midnight
     let session = FocusSession(
         startedAt: start,
@@ -246,21 +246,21 @@ func dailyAggregateProjectionBuilderBucketsHourlyAlertsFromAlertingSegments() th
     try NudgeWhipDataBootstrap.ensureDefaults(in: context)
 
     let session = FocusSession(
-        startedAt: Date(timeIntervalSince1970: 1_776_024_000), // 2026-04-13 12:00:00 UTC
-        endedAt: Date(timeIntervalSince1970: 1_776_027_600),
+        startedAt: Date(timeIntervalSince1970: 1_776_081_600), // 2026-04-13 12:00:00 UTC
+        endedAt: Date(timeIntervalSince1970: 1_776_085_200),
         monitoringActive: true,
         breakMode: false,
         whitelistedPause: false,
         alertCount: 2
     )
     let firstAlert = AlertingSegment(
-        startedAt: Date(timeIntervalSince1970: 1_776_024_300), // 12:05 UTC
-        recoveredAt: Date(timeIntervalSince1970: 1_776_024_420),
+        startedAt: Date(timeIntervalSince1970: 1_776_081_900), // 12:05 UTC
+        recoveredAt: Date(timeIntervalSince1970: 1_776_082_020),
         focusSession: session
     )
     let secondAlert = AlertingSegment(
-        startedAt: Date(timeIntervalSince1970: 1_776_028_200), // 13:10 UTC
-        recoveredAt: Date(timeIntervalSince1970: 1_776_028_260),
+        startedAt: Date(timeIntervalSince1970: 1_776_085_800), // 13:10 UTC
+        recoveredAt: Date(timeIntervalSince1970: 1_776_085_860),
         focusSession: session
     )
     session.alertingSegments = [firstAlert, secondAlert]
@@ -272,9 +272,9 @@ func dailyAggregateProjectionBuilderBucketsHourlyAlertsFromAlertingSegments() th
     let builder = DailyAggregateProjectionBuilder(modelContext: context)
     let payload = try builder.buildDayProjection(
         macDeviceID: "mac-test",
-        referenceDate: Date(timeIntervalSince1970: 1_776_024_000),
+        referenceDate: Date(timeIntervalSince1970: 1_776_081_600),
         timeZoneIdentifier: "UTC",
-        updatedAt: Date(timeIntervalSince1970: 1_776_028_260)
+        updatedAt: Date(timeIntervalSince1970: 1_776_085_860)
     )
 
     #expect(payload.alertCount == 2)

@@ -26,16 +26,18 @@ final class DailyAggregateProjectionBuilder {
         let sessions = (try? modelContext.fetch(FetchDescriptor<FocusSession>())) ?? []
         let relevantSessions = sessions.filter { session in
             session.focusDuration(overlapping: dayInterval) > 0 ||
-            session.alertingSegments.contains(where: { dayInterval.contains($0.startedAt) }) ||
             calendar.isDate(session.startedAt, inSameDayAs: referenceDate)
         }
+
+        let allSegments = (try? modelContext.fetch(FetchDescriptor<AlertingSegment>())) ?? []
+        let daySegments = allSegments.filter { dayInterval.contains($0.startedAt) }
 
         let totalFocusDuration = relevantSessions.reduce(0.0) { partial, session in
             partial + session.focusDuration(overlapping: dayInterval)
         }
         let completedSessionCount = relevantSessions.reduce(0) { partial, session in
             guard session.contributesToFocusTotals,
-                  calendar.isDate(session.startedAt, inSameDayAs: referenceDate) else {
+                  dayInterval.contains(session.startedAt) else {
                 return partial
             }
             return partial + 1
@@ -46,16 +48,12 @@ final class DailyAggregateProjectionBuilder {
         }
         let sessionsOver30mCount = relevantSessions.reduce(0) { partial, session in
             guard session.contributesToFocusTotals,
-                  calendar.isDate(session.startedAt, inSameDayAs: referenceDate),
+                  dayInterval.contains(session.startedAt),
                   session.duration > 1_800 else {
                 return partial
             }
             return partial + 1
         }
-
-        let daySegments = relevantSessions
-            .flatMap(\.alertingSegments)
-            .filter { dayInterval.contains($0.startedAt) }
         let recoveredSegments = daySegments.filter { $0.recoveredAt != nil }
         let recoveryDurations = recoveredSegments.compactMap(\.duration)
 

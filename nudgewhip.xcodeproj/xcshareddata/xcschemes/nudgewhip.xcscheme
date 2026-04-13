@@ -77,7 +77,7 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "NUDGE_RESET_ON_LAUNCH"
-            value = "1"
+            value = "0"
             isEnabled = "NO">
          </EnvironmentVariable>
       </EnvironmentVariables>

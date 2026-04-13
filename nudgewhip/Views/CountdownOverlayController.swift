@@ -365,9 +365,9 @@ private struct CountdownOverlayView: View {
             Text(visualRole.text)
                 .font(.system(size: 16, weight: .bold, design: .monospaced))
                 .foregroundStyle(miniForegroundColor(for: visualRole))
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                .padding(.leading, 10)
-                .padding(.trailing, visualRole.attentionKind == nil ? 10 : 28)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, miniTextHorizontalInset(for: visualRole))
 
             if let attentionKind = visualRole.attentionKind {
                 Button(action: { onInfoTap(attentionKind) }) {
@@ -460,6 +460,18 @@ private struct CountdownOverlayView: View {
         case nil:
             return .white
         }
+    }
+
+    private func miniTextHorizontalInset(for visualRole: MiniOverlayVisualRole) -> CGFloat {
+        if visualRole.attentionKind != nil {
+            return 28
+        }
+
+        if isHoveringMini {
+            return 22
+        }
+
+        return 10
     }
 
     private var miniBackgroundOpacity: Double {
