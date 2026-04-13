@@ -12,6 +12,7 @@ final class NudgeWhipAppController {
     private let onboardingCoordinator: OnboardingCoordinator
     private let statisticsCoordinator: StatisticsCoordinator
     private let settingsCoordinator: SettingsCoordinator
+    private let dailyAggregateProjectionCoordinator: DailyAggregateProjectionCoordinator?
     private var hasStarted = false
     private let countdownOverlayController: CountdownOverlayController?
     
@@ -24,6 +25,7 @@ final class NudgeWhipAppController {
         let modelContext = NudgeWhipModelContainer.shared.mainContext
         let sessionTracker = SessionTracker(modelContext: modelContext)
         let appUsageTracker = AppUsageTracker(modelContext: modelContext)
+        let dailyAggregateProjectionCoordinator: DailyAggregateProjectionCoordinator?
         let idleMonitor = IdleMonitor(
             permissionManager: permissionManager,
             alertManager: alertManager,
@@ -31,13 +33,24 @@ final class NudgeWhipAppController {
             appUsageTracker: appUsageTracker
         )
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
-        sessionTracker.onSessionUpdated = { [weak menuBarViewModel] in
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            dailyAggregateProjectionCoordinator = DailyAggregateProjectionCoordinator(
+                builder: DailyAggregateProjectionBuilder(modelContext: modelContext),
+                writer: CloudKitDailyAggregateBackupWriter(),
+                deviceIdentityProvider: DeviceIdentityProvider()
+            )
+        } else {
+            dailyAggregateProjectionCoordinator = nil
+        }
+        sessionTracker.onSessionUpdated = { [weak menuBarViewModel, weak dailyAggregateProjectionCoordinator] in
             menuBarViewModel?.refreshMenuSnapshot()
+            dailyAggregateProjectionCoordinator?.handleSessionUpdated()
         }
         appUsageTracker.onUsageUpdated = { [weak menuBarViewModel] in
             menuBarViewModel?.refreshMenuSnapshot()
         }
         self.menuBarViewModel = menuBarViewModel
+        self.dailyAggregateProjectionCoordinator = dailyAggregateProjectionCoordinator
         if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
             self.countdownOverlayController = CountdownOverlayController(menuBarViewModel: menuBarViewModel)
         } else {
@@ -88,6 +101,7 @@ final class NudgeWhipAppController {
 
         DispatchQueue.main.async { [weak self] in
             self?.startFlow()
+            self?.dailyAggregateProjectionCoordinator?.start()
             self?.countdownOverlayController?.showIfNeeded()
         }
     }

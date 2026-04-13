@@ -7,6 +7,7 @@
 
 import Foundation
 import AppKit
+import CloudKit
 import SwiftData
 import Testing
 @testable import nudgewhip
@@ -174,6 +175,146 @@ func countdownOverlayOriginPlacesPanelAtRequestedCorner() {
     #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .topRight) == CGPoint(x: 1380, y: 864))
     #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .bottomLeft) == CGPoint(x: 114, y: 64))
     #expect(countdownOverlayOrigin(visibleFrame: visibleFrame, panelSize: panelSize, inset: inset, position: .bottomRight) == CGPoint(x: 1380, y: 64))
+}
+
+@MainActor
+@Test
+func dailyAggregateProjectionBuilderUsesProvidedTimezoneForLocalDayKey() throws {
+    let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+    let context = container.mainContext
+    try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+    let builder = DailyAggregateProjectionBuilder(modelContext: context)
+    let referenceDate = Date(timeIntervalSince1970: 1_776_012_600) // 2026-04-13T01:30:00Z
+
+    let payload = try builder.buildDayProjection(
+        macDeviceID: "mac-test",
+        referenceDate: referenceDate,
+        timeZoneIdentifier: "Asia/Seoul",
+        updatedAt: referenceDate
+    )
+
+    #expect(payload.macDeviceID == "mac-test")
+    #expect(payload.localDayKey == "2026-04-13@Asia/Seoul")
+    #expect(payload.timeZoneIdentifier == "Asia/Seoul")
+}
+
+@MainActor
+@Test
+func dailyAggregateProjectionBuilderCountsCompletedSessionsByStartDay() throws {
+    let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+    let context = container.mainContext
+    try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+    let start = Date(timeIntervalSince1970: 1_776_091_800) // 2026-04-13 23:30:00 UTC
+    let end = start.addingTimeInterval(3_600) // cross-midnight
+    let session = FocusSession(
+        startedAt: start,
+        endedAt: end,
+        monitoringActive: true,
+        breakMode: false,
+        whitelistedPause: false
+    )
+    context.insert(session)
+    try context.save()
+
+    let builder = DailyAggregateProjectionBuilder(modelContext: context)
+    let startDayPayload = try builder.buildDayProjection(
+        macDeviceID: "mac-test",
+        referenceDate: start,
+        timeZoneIdentifier: "UTC",
+        updatedAt: end
+    )
+    let nextDayPayload = try builder.buildDayProjection(
+        macDeviceID: "mac-test",
+        referenceDate: end,
+        timeZoneIdentifier: "UTC",
+        updatedAt: end
+    )
+
+    #expect(startDayPayload.completedSessionCount == 1)
+    #expect(nextDayPayload.completedSessionCount == 0)
+    #expect(startDayPayload.totalFocusDurationSeconds == 1_800)
+    #expect(nextDayPayload.totalFocusDurationSeconds == 1_800)
+}
+
+@MainActor
+@Test
+func dailyAggregateProjectionBuilderBucketsHourlyAlertsFromAlertingSegments() throws {
+    let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+    let context = container.mainContext
+    try NudgeWhipDataBootstrap.ensureDefaults(in: context)
+
+    let session = FocusSession(
+        startedAt: Date(timeIntervalSince1970: 1_776_024_000), // 2026-04-13 12:00:00 UTC
+        endedAt: Date(timeIntervalSince1970: 1_776_027_600),
+        monitoringActive: true,
+        breakMode: false,
+        whitelistedPause: false,
+        alertCount: 2
+    )
+    let firstAlert = AlertingSegment(
+        startedAt: Date(timeIntervalSince1970: 1_776_024_300), // 12:05 UTC
+        recoveredAt: Date(timeIntervalSince1970: 1_776_024_420),
+        focusSession: session
+    )
+    let secondAlert = AlertingSegment(
+        startedAt: Date(timeIntervalSince1970: 1_776_028_200), // 13:10 UTC
+        recoveredAt: Date(timeIntervalSince1970: 1_776_028_260),
+        focusSession: session
+    )
+    session.alertingSegments = [firstAlert, secondAlert]
+    context.insert(session)
+    context.insert(firstAlert)
+    context.insert(secondAlert)
+    try context.save()
+
+    let builder = DailyAggregateProjectionBuilder(modelContext: context)
+    let payload = try builder.buildDayProjection(
+        macDeviceID: "mac-test",
+        referenceDate: Date(timeIntervalSince1970: 1_776_024_000),
+        timeZoneIdentifier: "UTC",
+        updatedAt: Date(timeIntervalSince1970: 1_776_028_260)
+    )
+
+    #expect(payload.alertCount == 2)
+    #expect(payload.hourlyAlertCounts.count == 24)
+    #expect(payload.hourlyAlertCounts[12] == 1)
+    #expect(payload.hourlyAlertCounts[13] == 1)
+}
+
+@MainActor
+@Test
+func cloudKitDailyAggregateBackupWriterBuildsDeterministicRecord() throws {
+    let payload = DashboardDayProjectionPayload(
+        macDeviceID: "mac-test",
+        localDayKey: "2026-04-13@Asia/Seoul",
+        dayStart: Date(timeIntervalSince1970: 1_776_000_000),
+        timeZoneIdentifier: "Asia/Seoul",
+        updatedAt: Date(timeIntervalSince1970: 1_776_000_100),
+        schemaVersion: 1,
+        totalFocusDurationSeconds: 3_600,
+        completedSessionCount: 2,
+        alertCount: 1,
+        longestFocusDurationSeconds: 2_400,
+        recoverySampleCount: 1,
+        recoveryDurationTotalSeconds: 120,
+        recoveryDurationMaxSeconds: 120,
+        sessionsOver30mCount: 1,
+        hourlyAlertCounts: Array(repeating: 0, count: 24),
+        sourceWindowUTCStart: nil,
+        sourceWindowUTCEnd: nil
+    )
+
+    let writer = CloudKitDailyAggregateBackupWriter()
+    let record = writer.record(for: payload)
+
+    #expect(record.recordType == "DashboardDayProjection")
+    #expect(record.recordID.recordName == "mac-test__2026-04-13@Asia/Seoul")
+    #expect(record["macDeviceID"] as? String == "mac-test")
+    #expect(record["localDayKey"] as? String == "2026-04-13@Asia/Seoul")
+    #expect(record["totalFocusDurationSeconds"] as? Int64 == 3_600)
+    #expect(record["hourlyAlertCountsJSON"] as? String == String(data: try JSONEncoder().encode(Array(repeating: 0, count: 24)), encoding: .utf8))
 }
 
 @MainActor
