@@ -1,6 +1,6 @@
 import Foundation
 
-struct DashboardDayProjectionPayload: Equatable, Sendable {
+struct DashboardDayProjectionPayload: Equatable, Sendable, Codable {
     let macDeviceID: String
     let localDayKey: String
     let dayStart: Date

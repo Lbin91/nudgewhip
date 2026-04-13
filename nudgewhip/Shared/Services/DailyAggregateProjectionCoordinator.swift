@@ -4,21 +4,23 @@ import Foundation
 final class DailyAggregateProjectionCoordinator {
     private let builder: DailyAggregateProjectionBuilder
     private let writer: CloudKitDailyAggregateBackupWriter
+    private let outbox: CloudKitDailyAggregateOutbox
     private let deviceIdentityProvider: DeviceIdentityProvider
     private let timeZoneProvider: @MainActor () -> String
     private let nowProvider: @MainActor () -> Date
     private var dayBoundaryWorkItem: DispatchWorkItem?
-    private var pendingRetryDates: Set<Date> = []
 
     init(
         builder: DailyAggregateProjectionBuilder,
         writer: CloudKitDailyAggregateBackupWriter,
+        outbox: CloudKitDailyAggregateOutbox? = nil,
         deviceIdentityProvider: DeviceIdentityProvider,
         timeZoneProvider: @escaping @MainActor () -> String = { TimeZone.current.identifier },
         nowProvider: @escaping @MainActor () -> Date = { .now }
     ) {
         self.builder = builder
         self.writer = writer
+        self.outbox = outbox ?? CloudKitDailyAggregateOutbox()
         self.deviceIdentityProvider = deviceIdentityProvider
         self.timeZoneProvider = timeZoneProvider
         self.nowProvider = nowProvider
@@ -27,6 +29,9 @@ final class DailyAggregateProjectionCoordinator {
     func start(at date: Date? = nil) {
         let resolvedDate = date ?? nowProvider()
         scheduleDayBoundary(from: resolvedDate)
+        Task { @MainActor in
+            await flushOutbox()
+        }
         enqueueBackup(for: resolvedDate)
     }
 
@@ -37,14 +42,14 @@ final class DailyAggregateProjectionCoordinator {
 
     private func enqueueBackup(for referenceDate: Date) {
         Task { @MainActor in
-            await flush(referenceDates: Array(pendingRetryDates) + [referenceDate])
+            await rebuildAndQueue(referenceDates: [referenceDate])
+            await flushOutbox()
         }
     }
 
-    private func flush(referenceDates: [Date]) async {
+    private func rebuildAndQueue(referenceDates: [Date]) async {
         let macDeviceID = deviceIdentityProvider.macDeviceID()
         let timeZoneIdentifier = timeZoneProvider()
-        pendingRetryDates.removeAll()
 
         for referenceDate in dedupedDayStarts(for: referenceDates, timeZoneIdentifier: timeZoneIdentifier) {
             do {
@@ -54,9 +59,21 @@ final class DailyAggregateProjectionCoordinator {
                     timeZoneIdentifier: timeZoneIdentifier,
                     updatedAt: nowProvider()
                 )
-                try await writer.save(payload)
+                try outbox.upsert(payload)
             } catch {
-                pendingRetryDates.insert(referenceDate)
+                continue
+            }
+        }
+    }
+
+    private func flushOutbox() async {
+        let payloads = (try? outbox.pendingPayloads()) ?? []
+        for payload in payloads {
+            do {
+                try await writer.save(payload)
+                try outbox.remove(macDeviceID: payload.macDeviceID, localDayKey: payload.localDayKey)
+            } catch {
+                continue
             }
         }
     }

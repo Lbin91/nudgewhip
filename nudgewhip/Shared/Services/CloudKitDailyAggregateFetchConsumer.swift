@@ -20,7 +20,7 @@ final class CloudKitDailyAggregateFetchConsumer {
     init(
         container: CKContainer = .default(),
         database: CKDatabase? = nil,
-        zoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: CloudKitDailyAggregateBackupWriter.zoneName, ownerName: CKCurrentUserDefaultName),
+        zoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName),
         queryLoader: DashboardDayProjectionQueryLoader? = nil,
         recordLoader: DashboardDayProjectionRecordLoader? = nil
     ) {

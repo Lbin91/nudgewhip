@@ -419,6 +419,103 @@ func cloudKitDailyAggregateFetchConsumerUsesInjectedQueryLoader() async throws {
 }
 
 @MainActor
+@Test
+func cloudKitDailyAggregateOutboxUpsertsAndPersistsLatestPayload() throws {
+    let fileURL = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString)
+        .appendingPathExtension("json")
+    defer { try? FileManager.default.removeItem(at: fileURL) }
+
+    let outbox = CloudKitDailyAggregateOutbox(fileURL: fileURL)
+    let older = DashboardDayProjectionPayload(
+        macDeviceID: "mac-test",
+        localDayKey: "2026-04-13@Asia/Seoul",
+        dayStart: Date(timeIntervalSince1970: 1_776_000_000),
+        timeZoneIdentifier: "Asia/Seoul",
+        updatedAt: Date(timeIntervalSince1970: 1_776_000_100),
+        schemaVersion: 1,
+        totalFocusDurationSeconds: 600,
+        completedSessionCount: 1,
+        alertCount: 1,
+        longestFocusDurationSeconds: 600,
+        recoverySampleCount: 0,
+        recoveryDurationTotalSeconds: 0,
+        recoveryDurationMaxSeconds: 0,
+        sessionsOver30mCount: 0,
+        hourlyAlertCounts: Array(repeating: 0, count: 24),
+        sourceWindowUTCStart: nil,
+        sourceWindowUTCEnd: nil
+    )
+    let newer = DashboardDayProjectionPayload(
+        macDeviceID: "mac-test",
+        localDayKey: "2026-04-13@Asia/Seoul",
+        dayStart: Date(timeIntervalSince1970: 1_776_000_000),
+        timeZoneIdentifier: "Asia/Seoul",
+        updatedAt: Date(timeIntervalSince1970: 1_776_000_200),
+        schemaVersion: 1,
+        totalFocusDurationSeconds: 1200,
+        completedSessionCount: 2,
+        alertCount: 2,
+        longestFocusDurationSeconds: 900,
+        recoverySampleCount: 1,
+        recoveryDurationTotalSeconds: 60,
+        recoveryDurationMaxSeconds: 60,
+        sessionsOver30mCount: 1,
+        hourlyAlertCounts: Array(repeating: 1, count: 24),
+        sourceWindowUTCStart: nil,
+        sourceWindowUTCEnd: nil
+    )
+
+    try outbox.upsert(older)
+    try outbox.upsert(newer)
+
+    let loaded = try outbox.pendingPayloads()
+    #expect(loaded.count == 1)
+    #expect(loaded[0].updatedAt == newer.updatedAt)
+    #expect(loaded[0].totalFocusDurationSeconds == 1200)
+
+    let reloadedOutbox = CloudKitDailyAggregateOutbox(fileURL: fileURL)
+    let reloaded = try reloadedOutbox.pendingPayloads()
+    #expect(reloaded.count == 1)
+    #expect(reloaded[0].completedSessionCount == 2)
+}
+
+@MainActor
+@Test
+func cloudKitDailyAggregateOutboxRemovesPayloadAfterSuccess() throws {
+    let fileURL = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString)
+        .appendingPathExtension("json")
+    defer { try? FileManager.default.removeItem(at: fileURL) }
+
+    let outbox = CloudKitDailyAggregateOutbox(fileURL: fileURL)
+    let payload = DashboardDayProjectionPayload(
+        macDeviceID: "mac-test",
+        localDayKey: "2026-04-13@Asia/Seoul",
+        dayStart: Date(timeIntervalSince1970: 1_776_000_000),
+        timeZoneIdentifier: "Asia/Seoul",
+        updatedAt: Date(timeIntervalSince1970: 1_776_000_100),
+        schemaVersion: 1,
+        totalFocusDurationSeconds: 600,
+        completedSessionCount: 1,
+        alertCount: 1,
+        longestFocusDurationSeconds: 600,
+        recoverySampleCount: 0,
+        recoveryDurationTotalSeconds: 0,
+        recoveryDurationMaxSeconds: 0,
+        sessionsOver30mCount: 0,
+        hourlyAlertCounts: Array(repeating: 0, count: 24),
+        sourceWindowUTCStart: nil,
+        sourceWindowUTCEnd: nil
+    )
+
+    try outbox.upsert(payload)
+    try outbox.remove(macDeviceID: "mac-test", localDayKey: "2026-04-13@Asia/Seoul")
+
+    #expect(try outbox.pendingPayloads().isEmpty)
+}
+
+@MainActor
 private final class TestLaunchAtLoginManager: LaunchAtLoginManaging {
     private(set) var isEnabled: Bool
     
