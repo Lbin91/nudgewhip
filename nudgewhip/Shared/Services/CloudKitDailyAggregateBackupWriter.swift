@@ -1,21 +1,25 @@
 import CloudKit
 import Foundation
 
+enum CloudKitDailyAggregateBackupWriterError: Error, Equatable {
+    case notConfigured
+}
+
 @MainActor
 final class CloudKitDailyAggregateBackupWriter {
     static let recordType = "DashboardDayProjection"
     static let zoneName = "NudgeWhipSync"
 
-    private let database: CKDatabase
+    private let database: CKDatabase?
     private let zoneID: CKRecordZone.ID
     private var hasEnsuredZone = false
 
     init(
-        container: CKContainer = .default(),
+        container: CKContainer? = nil,
         database: CKDatabase? = nil,
         zoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
     ) {
-        self.database = database ?? container.privateCloudDatabase
+        self.database = database ?? container?.privateCloudDatabase
         self.zoneID = zoneID
     }
 
@@ -60,6 +64,9 @@ final class CloudKitDailyAggregateBackupWriter {
     }
 
     private func ensureZoneExistsIfNeeded() async throws {
+        guard let database else {
+            throw CloudKitDailyAggregateBackupWriterError.notConfigured
+        }
         guard !hasEnsuredZone else { return }
 
         let zone = CKRecordZone(zoneID: zoneID)
@@ -72,15 +79,18 @@ final class CloudKitDailyAggregateBackupWriter {
                     continuation.resume(returning: ())
                 }
             }
-            self.database.add(operation)
+            database.add(operation)
         }
 
         hasEnsuredZone = true
     }
 
     private func save(record: CKRecord) async throws {
+        guard let database else {
+            throw CloudKitDailyAggregateBackupWriterError.notConfigured
+        }
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            self.database.save(record) { _, error in
+            database.save(record) { _, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else {

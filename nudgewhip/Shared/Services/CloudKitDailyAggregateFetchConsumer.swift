@@ -2,6 +2,7 @@ import CloudKit
 import Foundation
 
 enum CloudKitDailyAggregateFetchConsumerError: Error, Equatable {
+    case notConfigured
     case missingField(String)
     case invalidField(String)
     case invalidHourlyAlertCountsJSON
@@ -12,23 +13,26 @@ typealias DashboardDayProjectionRecordLoader = @MainActor @Sendable (_ recordID:
 
 @MainActor
 final class CloudKitDailyAggregateFetchConsumer {
-    private let database: CKDatabase
+    private let database: CKDatabase?
     private let zoneID: CKRecordZone.ID
     private let queryLoader: DashboardDayProjectionQueryLoader
     private let recordLoader: DashboardDayProjectionRecordLoader
 
     init(
-        container: CKContainer = .default(),
+        container: CKContainer? = nil,
         database: CKDatabase? = nil,
         zoneID: CKRecordZone.ID = CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName),
         queryLoader: DashboardDayProjectionQueryLoader? = nil,
         recordLoader: DashboardDayProjectionRecordLoader? = nil
     ) {
-        let resolvedDatabase = database ?? container.privateCloudDatabase
+        let resolvedDatabase = database ?? container?.privateCloudDatabase
         self.database = resolvedDatabase
         self.zoneID = zoneID
         self.queryLoader = queryLoader ?? { query, zoneID, limit in
-            try await CloudKitDailyAggregateFetchConsumer.defaultQueryLoader(
+            guard let resolvedDatabase else {
+                throw CloudKitDailyAggregateFetchConsumerError.notConfigured
+            }
+            return try await CloudKitDailyAggregateFetchConsumer.defaultQueryLoader(
                 database: resolvedDatabase,
                 query: query,
                 zoneID: zoneID,
@@ -36,7 +40,10 @@ final class CloudKitDailyAggregateFetchConsumer {
             )
         }
         self.recordLoader = recordLoader ?? { recordID in
-            try await CloudKitDailyAggregateFetchConsumer.defaultRecordLoader(
+            guard let resolvedDatabase else {
+                throw CloudKitDailyAggregateFetchConsumerError.notConfigured
+            }
+            return try await CloudKitDailyAggregateFetchConsumer.defaultRecordLoader(
                 database: resolvedDatabase,
                 recordID: recordID
             )

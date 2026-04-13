@@ -33,10 +33,11 @@ final class NudgeWhipAppController {
             appUsageTracker: appUsageTracker
         )
         let menuBarViewModel = MenuBarViewModel(idleMonitor: idleMonitor)
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil,
+           let cloudKitContainer = CloudKitConfiguration.makeContainer() {
             dailyAggregateProjectionCoordinator = DailyAggregateProjectionCoordinator(
                 builder: DailyAggregateProjectionBuilder(modelContext: modelContext),
-                writer: CloudKitDailyAggregateBackupWriter(),
+                writer: CloudKitDailyAggregateBackupWriter(container: cloudKitContainer),
                 deviceIdentityProvider: DeviceIdentityProvider()
             )
         } else {
