@@ -414,15 +414,15 @@ private struct CountdownOverlayView: View {
 
         switch menuBarViewModel.runtimeState {
         case .alerting:
-            return "IDLE"
+            return localizedAppString("overlay.chip.idle", defaultValue: "IDLE")
         case .pausedManual:
-            return "PAUSE"
+            return localizedAppString("overlay.chip.pause", defaultValue: "PAUSE")
         case .pausedWhitelist:
-            return "ALLOW"
+            return localizedAppString("overlay.chip.allow", defaultValue: "ALLOW")
         case .pausedSchedule:
-            return "SCHED"
+            return localizedAppString("overlay.chip.sched", defaultValue: "SCHED")
         case .suspendedSleepOrLock:
-            return "SLEEP"
+            return localizedAppString("overlay.chip.sleep", defaultValue: "SLEEP")
         case .limitedNoAX, .monitoring:
             return menuBarViewModel.configuredIdleThresholdText
         }
@@ -435,19 +435,19 @@ private struct CountdownOverlayView: View {
 
         switch menuBarViewModel.runtimeState {
         case .limitedNoAX:
-            return .attention(text: "AX", kind: .accessibilityNeeded)
+            return .attention(text: localizedAppString("overlay.chip.ax", defaultValue: "AX"), kind: .accessibilityNeeded)
         case .monitoring:
             return .neutral(text: menuBarViewModel.configuredIdleThresholdText)
         case .pausedManual:
-            return .neutral(text: "PAUSE")
+            return .neutral(text: localizedAppString("overlay.chip.pause", defaultValue: "PAUSE"))
         case .pausedWhitelist:
-            return .neutral(text: "ALLOW")
+            return .neutral(text: localizedAppString("overlay.chip.allow", defaultValue: "ALLOW"))
         case .alerting:
-            return .attention(text: "IDLE", kind: .idleDetected)
+            return .attention(text: localizedAppString("overlay.chip.idle", defaultValue: "IDLE"), kind: .idleDetected)
         case .pausedSchedule:
-            return .neutral(text: "SCHED")
+            return .neutral(text: localizedAppString("overlay.chip.sched", defaultValue: "SCHED"))
         case .suspendedSleepOrLock:
-            return .neutral(text: "SLEEP")
+            return .neutral(text: localizedAppString("overlay.chip.sleep", defaultValue: "SLEEP"))
         }
     }
 

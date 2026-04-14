@@ -56,19 +56,19 @@ final class MenuBarViewModel {
     var overlayRuntimeStateText: String {
         switch runtimeState {
         case .limitedNoAX:
-            return "Accessibility required"
+            return localizedAppString("overlay.runtime_state.limited_no_ax", defaultValue: "Accessibility required")
         case .monitoring:
-            return "Monitoring input"
+            return localizedAppString("overlay.runtime_state.monitoring", defaultValue: "Monitoring input")
         case .pausedManual:
-            return "Paused manually"
+            return localizedAppString("overlay.runtime_state.paused_manual", defaultValue: "Paused manually")
         case .pausedWhitelist:
-            return "Whitelisted app"
+            return localizedAppString("overlay.runtime_state.paused_whitelist", defaultValue: "Whitelisted app")
         case .alerting:
-            return "Idle detected"
+            return localizedAppString("overlay.runtime_state.alerting", defaultValue: "Idle detected")
         case .pausedSchedule:
-            return "Outside schedule"
+            return localizedAppString("overlay.runtime_state.paused_schedule", defaultValue: "Outside schedule")
         case .suspendedSleepOrLock:
-            return "System suspended"
+            return localizedAppString("overlay.runtime_state.suspended", defaultValue: "System suspended")
         }
     }
 

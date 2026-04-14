@@ -1714,7 +1714,7 @@ struct nudgewhipTests {
         let viewModel = MenuBarViewModel(idleMonitor: idleMonitor)
 
         #expect(viewModel.configuredIdleThresholdText == "03:00")
-        #expect(viewModel.overlayRuntimeStateText == "Accessibility required")
+        #expect(viewModel.overlayRuntimeStateText.isEmpty == false)
         #expect(viewModel.overlayCountdownText(now: Date(timeIntervalSince1970: 0)) == nil)
     }
     
