@@ -625,6 +625,8 @@ private final class TestSessionTracker: SessionTracking {
     func recordRecovery(at date: Date) {
         recoveryCount += 1
     }
+
+    func setPetProgressionService(_ service: PetProgressionService) {}
 }
 
 @MainActor

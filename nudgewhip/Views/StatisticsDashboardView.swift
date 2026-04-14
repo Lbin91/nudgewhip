@@ -103,6 +103,23 @@ struct StatisticsDashboardView: View {
                     .foregroundStyle(Color.nudgewhipTextMuted)
             }
 
+            Button {
+            } label: {
+                HStack(spacing: NudgeWhipSpacing.s2) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.caption.weight(.semibold))
+                    Text(localizedAppString("recovery.review.open_button", defaultValue: "View Recovery Review"))
+                        .font(.caption.weight(.semibold))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.semibold))
+                }
+                .foregroundStyle(Color.nudgewhipFocus)
+                .padding(NudgeWhipSpacing.s3)
+                .background(Color.nudgewhipFocus.opacity(0.08), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.default))
+            }
+            .buttonStyle(.plain)
+
             Picker("", selection: $selectedPeriod) {
                 ForEach(StatisticsDisplayPeriod.allCases) { period in
                     Text(period.title).tag(period)

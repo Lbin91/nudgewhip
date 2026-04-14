@@ -41,6 +41,8 @@ final class UserSettings {
     var scheduleEnabled: Bool
     var scheduleStartSecondsFromMidnight: Int
     var scheduleEndSecondsFromMidnight: Int
+    var activePresetID: UUID?
+    var lastPausePresetDurationMinutes: Int?
     var languageDefaultMigrationCompleted: Bool
     var createdAt: Date
     var updatedAt: Date
@@ -78,6 +80,8 @@ final class UserSettings {
         scheduleEnabled: Bool = false,
         scheduleStartSecondsFromMidnight: Int = 32400,
         scheduleEndSecondsFromMidnight: Int = 61200,
+        activePresetID: UUID? = nil,
+        lastPausePresetDurationMinutes: Int? = nil,
         languageDefaultMigrationCompleted: Bool = true,
         createdAt: Date = .now,
         updatedAt: Date = .now
@@ -97,6 +101,8 @@ final class UserSettings {
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStartSecondsFromMidnight = scheduleStartSecondsFromMidnight
         self.scheduleEndSecondsFromMidnight = scheduleEndSecondsFromMidnight
+        self.activePresetID = activePresetID
+        self.lastPausePresetDurationMinutes = lastPausePresetDurationMinutes
         self.languageDefaultMigrationCompleted = languageDefaultMigrationCompleted
         self.createdAt = createdAt
         self.updatedAt = updatedAt

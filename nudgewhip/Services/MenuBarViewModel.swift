@@ -26,6 +26,10 @@ final class MenuBarViewModel {
     private(set) var todayStats = DailyStats.derive(for: [], on: .now)
     private(set) var statisticsSnapshot = StatisticsSnapshot.derive(for: [], on: .now)
     private(set) var appUsageSnapshot = AppUsageSnapshot.empty
+    private(set) var activePresetName: String = ""
+    private(set) var schedulePresets: [SchedulePreset] = []
+    private(set) var petState: PetState?
+    private var petProgressionService: PetProgressionService?
     
     init(idleMonitor: IdleMonitor? = nil) {
         self.idleMonitor = idleMonitor ?? IdleMonitor()
@@ -145,6 +149,10 @@ final class MenuBarViewModel {
         if runtimeState == .monitoring, idleMonitor.lastInputAt == nil {
             idleMonitor.recordInput(at: date)
         }
+
+        seedPresetsIfNeeded()
+        loadSchedulePresets()
+        initializePetService()
     }
     
     /// 권한 새로고침 후 필요 시 모니터링 시작
@@ -375,5 +383,90 @@ final class MenuBarViewModel {
         }
 
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    func loadSchedulePresets() {
+        let descriptor = FetchDescriptor<SchedulePreset>(sortBy: [SortDescriptor(\.sortOrder)])
+        schedulePresets = (try? modelContext.fetch(descriptor)) ?? []
+
+        let activePreset = schedulePresets.first { $0.isActivePreset }
+        activePresetName = activePreset?.name
+            ?? localizedAppString("preset.schedule.custom", defaultValue: "Custom schedule")
+    }
+
+    func activatePreset(_ preset: SchedulePreset, at date: Date = .now) {
+        for p in schedulePresets {
+            p.isActivePreset = false
+        }
+        preset.isActivePreset = true
+        preset.updatedAt = date
+
+        guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+        settings.activePresetID = preset.id
+        settings.scheduleStartSecondsFromMidnight = preset.startSecondsFromMidnight
+        settings.scheduleEndSecondsFromMidnight = preset.endSecondsFromMidnight
+        settings.scheduleEnabled = true
+        settings.updatedAt = date
+        try? modelContext.save()
+
+        loadSchedulePresets()
+        apply(settings: settings, at: date)
+    }
+
+    func createCustomPreset(name: String, start: Int, end: Int, weekdayOnly: Bool, at date: Date = .now) {
+        let newPreset = SchedulePreset(
+            name: name,
+            startSecondsFromMidnight: start,
+            endSecondsFromMidnight: end,
+            isWeekdayOnly: weekdayOnly,
+            isBuiltIn: false,
+            sortOrder: schedulePresets.count
+        )
+        modelContext.insert(newPreset)
+        try? modelContext.save()
+        loadSchedulePresets()
+    }
+
+    func deletePreset(_ preset: SchedulePreset, at date: Date = .now) {
+        guard !preset.isBuiltIn else { return }
+
+        if preset.isActivePreset {
+            guard let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first else { return }
+            settings.activePresetID = nil
+            settings.updatedAt = date
+            try? modelContext.save()
+        }
+
+        modelContext.delete(preset)
+        try? modelContext.save()
+        loadSchedulePresets()
+    }
+
+    private func seedPresetsIfNeeded() {
+        let descriptor = FetchDescriptor<SchedulePreset>(predicate: #Predicate { $0.isBuiltIn })
+        let builtIns = (try? modelContext.fetch(descriptor)) ?? []
+        guard builtIns.isEmpty else { return }
+
+        let settings = try? modelContext.fetch(FetchDescriptor<UserSettings>()).first
+        let existingEnabled = settings?.scheduleEnabled ?? false
+        let existingStart = settings?.scheduleStartSecondsFromMidnight ?? 32400
+        let existingEnd = settings?.scheduleEndSecondsFromMidnight ?? 61200
+
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: modelContext,
+            existingSchedule: (existingEnabled, existingStart, existingEnd)
+        )
+    }
+
+    private func initializePetService() {
+        let petService = PetProgressionService(modelContext: modelContext)
+        self.petProgressionService = petService
+        self.petState = petService.fetchPetState()
+        petService.onStageUp = { [weak self] _ in
+            self?.petState = petService.fetchPetState()
+        }
+        idleMonitor.sessionTracker?.setPetProgressionService(petService)
+        petService.checkDailyActiveBonus()
+        self.petState = petService.fetchPetState()
     }
 }

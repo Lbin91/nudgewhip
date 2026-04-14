@@ -9,6 +9,7 @@ protocol SessionTracking: AnyObject {
     func recordAlertStarted(at date: Date)
     func recordAlertEscalation(step: Int, at date: Date)
     func recordRecovery(at date: Date)
+    func setPetProgressionService(_ service: PetProgressionService)
 }
 
 @MainActor
@@ -16,12 +17,17 @@ final class SessionTracker: SessionTracking {
     private let modelContext: ModelContext
     private var activeSession: FocusSession?
     private var activeAlertingSegment: AlertingSegment?
+    private var petProgressionService: PetProgressionService?
     var onSessionUpdated: (@MainActor () -> Void)?
 
     var isTracking: Bool { activeSession != nil }
 
     init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext ?? NudgeWhipModelContainer.shared.mainContext
+    }
+
+    func setPetProgressionService(_ service: PetProgressionService) {
+        self.petProgressionService = service
     }
 
     func beginSession(at date: Date) {
@@ -43,6 +49,9 @@ final class SessionTracker: SessionTracking {
         try? modelContext.save()
         activeSession = nil
         onSessionUpdated?()
+        if session.contributesToFocusTotals, session.duration >= PetProgressionConstants.sessionDurationThresholdSeconds {
+            petProgressionService?.awardSessionXP(duration: session.duration)
+        }
     }
 
     func recordAlertStarted(at date: Date) {
@@ -71,6 +80,7 @@ final class SessionTracker: SessionTracking {
         }
         try? modelContext.save()
         onSessionUpdated?()
+        petProgressionService?.awardRecoveryXP()
     }
 
     private func closeOpenAlertingSegment(at date: Date) {

@@ -4,9 +4,31 @@ struct QuickControlsView: View {
     let menuBarViewModel: MenuBarViewModel
     let idleThresholdText: String
     let scheduleText: String
+    let activePresetName: String
     var scheduleEnabled: Binding<Bool>
     var scheduleStartTime: Binding<Date>
     var scheduleEndTime: Binding<Date>
+    var onPresetSelected: ((SchedulePreset) -> Void)?
+
+    init(
+        menuBarViewModel: MenuBarViewModel,
+        idleThresholdText: String,
+        scheduleText: String,
+        activePresetName: String = "",
+        scheduleEnabled: Binding<Bool>,
+        scheduleStartTime: Binding<Date>,
+        scheduleEndTime: Binding<Date>,
+        onPresetSelected: ((SchedulePreset) -> Void)? = nil
+    ) {
+        self.menuBarViewModel = menuBarViewModel
+        self.idleThresholdText = idleThresholdText
+        self.scheduleText = scheduleText
+        self.activePresetName = activePresetName
+        self.scheduleEnabled = scheduleEnabled
+        self.scheduleStartTime = scheduleStartTime
+        self.scheduleEndTime = scheduleEndTime
+        self.onPresetSelected = onPresetSelected
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: NudgeWhipSpacing.s3) {
@@ -23,6 +45,10 @@ struct QuickControlsView: View {
                 }
 
                 settingsRows
+
+                Divider().overlay(Color.nudgewhipStrokeDefault)
+
+                presetRow
 
                 Divider().overlay(Color.nudgewhipStrokeDefault)
 
@@ -87,6 +113,17 @@ struct QuickControlsView: View {
                 Text(scheduleText)
                     .foregroundStyle(Color.nudgewhipTextPrimary)
             }
+        }
+        .font(.subheadline)
+    }
+
+    private var presetRow: some View {
+        HStack {
+            Text(localizedAppString("preset.schedule.active", defaultValue: "Schedule preset"))
+                .foregroundStyle(Color.nudgewhipTextSecondary)
+            Spacer()
+            Text(activePresetName)
+                .foregroundStyle(Color.nudgewhipTextPrimary)
         }
         .font(.subheadline)
     }

@@ -17,6 +17,10 @@ struct MenuBarDropdownView: View {
             DailySummaryView(
                 todayStats: menuBarViewModel.todayStats
             )
+            if let petState = menuBarViewModel.petState {
+                PetSummaryCard(petState: petState) {
+                }
+            }
             utilityActions
         }
         .frame(maxWidth: .infinity, alignment: .leading)

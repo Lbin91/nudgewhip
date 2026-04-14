@@ -28,6 +28,8 @@ struct SettingsRootView: View {
                     VStack(spacing: NudgeWhipSpacing.s4) {
                         monitoringSection
                         scheduleSection
+                        recoveryReviewSection
+                        petSection
                         accessibilitySection
                         appSection
                     }
@@ -230,6 +232,62 @@ struct SettingsRootView: View {
                     .padding(NudgeWhipSpacing.s3)
                     .background(Color.nudgewhipBgSurfaceAlt.opacity(0.5), in: RoundedRectangle(cornerRadius: NudgeWhipRadius.button))
                 }
+
+                Divider().overlay(Color.nudgewhipStrokeDefault.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: NudgeWhipSpacing.s2) {
+                    Text(localizedAppString("preset.schedule.manage", defaultValue: "Schedule Presets"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+                    Text(localizedAppString("preset.schedule.manage.desc", defaultValue: "Create and switch between monitoring schedules."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+                }
+
+                secondaryButton(localizedAppString("preset.schedule.manage.button", defaultValue: "Manage Presets"), action: {
+                    // Will be wired to open SchedulePresetListView in a sheet
+                    // For now, placeholder
+                })
+            }
+        }
+    }
+
+    private var recoveryReviewSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.recovery", defaultValue: "Recovery Review"), systemImage: "clock.arrow.circlepath") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(localizedAppString("settings.section.recovery.desc_title", defaultValue: "Understand your distraction patterns"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+                    Text(localizedAppString("settings.section.recovery.desc", defaultValue: "See how quickly you recover from distractions and when they happen most."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+                }
+
+                secondaryButton(localizedAppString("recovery.review.open_button", defaultValue: "View Recovery Review"), action: {
+                    // Will be wired to open RecoveryReviewView
+                    // For now, placeholder
+                })
+            }
+        }
+    }
+
+    private var petSection: some View {
+        SettingsSection(title: localizedAppString("settings.section.pet", defaultValue: "Pet"), systemImage: "pawprint.fill") {
+            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(localizedAppString("settings.section.pet.desc_title", defaultValue: "Your focus companion"))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.nudgewhipTextPrimary)
+                    Text(localizedAppString("settings.section.pet.desc", defaultValue: "A virtual pet that grows as you maintain focus. It never punishes — only rewards consistency."))
+                        .font(.caption)
+                        .foregroundStyle(Color.nudgewhipTextMuted)
+                }
+
+                secondaryButton(localizedAppString("settings.section.pet.open", defaultValue: "View Pet Status"), action: {
+                    // Will be wired to open PetDetailView
+                    // For now, placeholder
+                })
             }
         }
     }
