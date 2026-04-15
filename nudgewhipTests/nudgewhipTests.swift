@@ -3660,4 +3660,435 @@ struct nudgewhipTests {
         #expect(sorted[2].sortOrder == 2)
     }
 
+    // MARK: - MacStatePayload Tests
+
+    @Test
+    func macStatePayloadInitSetsAllFields() {
+        let changedAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let breakEnd = Date(timeIntervalSince1970: 1_700_003_600)
+        let alertAt = Date(timeIntervalSince1970: 1_700_002_000)
+
+        let payload = MacStatePayload(
+            macDeviceID: "mac-001",
+            state: "monitoring",
+            stateChangedAt: changedAt,
+            sequence: 42,
+            breakUntil: breakEnd,
+            lastAlertAt: alertAt,
+            schemaVersion: 1
+        )
+
+        #expect(payload.macDeviceID == "mac-001")
+        #expect(payload.state == "monitoring")
+        #expect(payload.stateChangedAt == changedAt)
+        #expect(payload.sequence == 42)
+        #expect(payload.breakUntil == breakEnd)
+        #expect(payload.lastAlertAt == alertAt)
+        #expect(payload.schemaVersion == 1)
+    }
+
+    @Test
+    func macStatePayloadEncodeDecodeRoundTrip() throws {
+        let changedAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let breakEnd = Date(timeIntervalSince1970: 1_700_003_600)
+
+        let original = MacStatePayload(
+            macDeviceID: "mac-002",
+            state: "alerting",
+            stateChangedAt: changedAt,
+            sequence: 7,
+            breakUntil: breakEnd,
+            lastAlertAt: nil,
+            schemaVersion: 2
+        )
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(original)
+
+        let decoder = JSONDecoder()
+        let decoded = try decoder.decode(MacStatePayload.self, from: data)
+
+        #expect(decoded == original)
+    }
+
+    @Test
+    func macStatePayloadEquality() {
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+
+        let a = MacStatePayload(
+            macDeviceID: "mac-003",
+            state: "pausedManual",
+            stateChangedAt: date,
+            sequence: 10,
+            schemaVersion: 1
+        )
+        let b = MacStatePayload(
+            macDeviceID: "mac-003",
+            state: "pausedManual",
+            stateChangedAt: date,
+            sequence: 10,
+            schemaVersion: 1
+        )
+
+        #expect(a == b)
+    }
+
+    @Test
+    func macStatePayloadOptionalFieldsNilByDefault() {
+        let payload = MacStatePayload(
+            macDeviceID: "mac-004",
+            state: "monitoring",
+            stateChangedAt: .now,
+            sequence: 1
+        )
+
+        #expect(payload.breakUntil == nil)
+        #expect(payload.lastAlertAt == nil)
+        #expect(payload.schemaVersion == 1)
+    }
+
+    @Test
+    func macStatePayloadDecodeWithMissingOptionals() throws {
+        let json = """
+        {
+            "macDeviceID": "mac-005",
+            "state": "suspendedSleepOrLock",
+            "stateChangedAt": 1700000000.0,
+            "sequence": 99,
+            "schemaVersion": 1
+        }
+        """.data(using: .utf8)!
+
+        let decoder = JSONDecoder()
+        let payload = try decoder.decode(MacStatePayload.self, from: json)
+
+        #expect(payload.macDeviceID == "mac-005")
+        #expect(payload.state == "suspendedSleepOrLock")
+        #expect(payload.sequence == 99)
+        #expect(payload.breakUntil == nil)
+        #expect(payload.lastAlertAt == nil)
+    }
+
+    // MARK: - RemoteEscalationEventPayload Tests
+
+    @Test
+    func remoteEscalationPayloadInitSetsAllFields() {
+        let occurredAt = Date(timeIntervalSince1970: 1_700_001_000)
+        let recoveredAt = Date(timeIntervalSince1970: 1_700_001_100)
+
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-100",
+            occurredAt: occurredAt,
+            escalationStep: 2,
+            contentStateRawValue: "StrongNudge",
+            wasRecoveredWithinWindow: true,
+            recoveredAt: recoveredAt,
+            schemaVersion: 1
+        )
+
+        #expect(payload.macDeviceID == "mac-100")
+        #expect(payload.occurredAt == occurredAt)
+        #expect(payload.escalationStep == 2)
+        #expect(payload.contentStateRawValue == "StrongNudge")
+        #expect(payload.wasRecoveredWithinWindow == true)
+        #expect(payload.recoveredAt == recoveredAt)
+        #expect(payload.schemaVersion == 1)
+    }
+
+    @Test
+    func remoteEscalationPayloadEncodeDecodeRoundTrip() throws {
+        let occurredAt = Date(timeIntervalSince1970: 1_700_005_000)
+
+        let original = RemoteEscalationEventPayload(
+            macDeviceID: "mac-200",
+            occurredAt: occurredAt,
+            escalationStep: 3,
+            contentStateRawValue: "GentleNudge",
+            wasRecoveredWithinWindow: nil,
+            recoveredAt: nil,
+            schemaVersion: 2
+        )
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(original)
+
+        let decoder = JSONDecoder()
+        let decoded = try decoder.decode(RemoteEscalationEventPayload.self, from: data)
+
+        #expect(decoded == original)
+    }
+
+    @Test
+    func remoteEscalationPayloadEquality() {
+        let date = Date(timeIntervalSince1970: 1_700_010_000)
+
+        let a = RemoteEscalationEventPayload(
+            macDeviceID: "mac-300",
+            occurredAt: date,
+            escalationStep: 1,
+            contentStateRawValue: "IdleDetected",
+            schemaVersion: 1
+        )
+        let b = RemoteEscalationEventPayload(
+            macDeviceID: "mac-300",
+            occurredAt: date,
+            escalationStep: 1,
+            contentStateRawValue: "IdleDetected",
+            schemaVersion: 1
+        )
+
+        #expect(a == b)
+    }
+
+    @Test
+    func remoteEscalationPayloadRecoveryState() {
+        let occurredAt = Date(timeIntervalSince1970: 1_700_020_000)
+        let recoveredAt = Date(timeIntervalSince1970: 1_700_020_045)
+
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-400",
+            occurredAt: occurredAt,
+            escalationStep: 2,
+            contentStateRawValue: "StrongNudge",
+            wasRecoveredWithinWindow: true,
+            recoveredAt: recoveredAt
+        )
+
+        #expect(payload.wasRecoveredWithinWindow == true)
+        #expect(payload.recoveredAt == recoveredAt)
+    }
+
+    @Test
+    func remoteEscalationPayloadUnrecoveredState() {
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-500",
+            occurredAt: .now,
+            escalationStep: 3,
+            contentStateRawValue: "StrongNudge",
+            wasRecoveredWithinWindow: false,
+            recoveredAt: nil
+        )
+
+        #expect(payload.wasRecoveredWithinWindow == false)
+        #expect(payload.recoveredAt == nil)
+    }
+
+    // MARK: - MacStateCloudKitWriter Tests
+
+    @MainActor @Test
+    func macStateWriterRecordMapsAllFields() {
+        let writer = MacStateCloudKitWriter(database: nil)
+        let payload = MacStatePayload(
+            macDeviceID: "test-mac",
+            state: "monitoring",
+            stateChangedAt: Date(timeIntervalSince1970: 1_776_000_000),
+            sequence: 42,
+            schemaVersion: 1
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["macDeviceID"] as? String == "test-mac")
+        #expect(record["state"] as? String == "monitoring")
+        #expect(record["stateChangedAt"] as? Date == Date(timeIntervalSince1970: 1_776_000_000))
+        #expect(record["sequence"] as? Int64 == 42)
+        #expect(record["schemaVersion"] as? Int64 == 1)
+    }
+
+    @MainActor @Test
+    func macStateWriterRecordUsesMacDeviceIDAsName() {
+        let writer = MacStateCloudKitWriter(database: nil)
+        let payload = MacStatePayload(
+            macDeviceID: "device-abc",
+            state: "idle",
+            stateChangedAt: .now,
+            sequence: 1
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record.recordID.recordName == "device-abc")
+    }
+
+    @MainActor @Test
+    func macStateWriterRecordOptionalFieldsOmittedWhenNil() {
+        let writer = MacStateCloudKitWriter(database: nil)
+        let payload = MacStatePayload(
+            macDeviceID: "test-mac",
+            state: "monitoring",
+            stateChangedAt: .now,
+            sequence: 1,
+            breakUntil: nil,
+            lastAlertAt: nil
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["breakUntil"] == nil)
+        #expect(record["lastAlertAt"] == nil)
+    }
+
+    @MainActor @Test
+    func macStateWriterRecordSetsOptionalFieldsWhenPresent() {
+        let writer = MacStateCloudKitWriter(database: nil)
+        let breakDate = Date(timeIntervalSince1970: 1_776_001_000)
+        let alertDate = Date(timeIntervalSince1970: 1_776_002_000)
+        let payload = MacStatePayload(
+            macDeviceID: "test-mac",
+            state: "break",
+            stateChangedAt: .now,
+            sequence: 5,
+            breakUntil: breakDate,
+            lastAlertAt: alertDate
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["breakUntil"] as? Date == breakDate)
+        #expect(record["lastAlertAt"] as? Date == alertDate)
+    }
+
+    @MainActor @Test
+    func macStateWriterSaveThrowsNotConfigured() async {
+        let writer = MacStateCloudKitWriter(database: nil)
+        let payload = MacStatePayload(
+            macDeviceID: "test-mac",
+            state: "monitoring",
+            stateChangedAt: .now,
+            sequence: 1
+        )
+
+        do {
+            try await writer.save(payload)
+            Issue.record("Expected throw but save succeeded")
+        } catch {
+            #expect(error is MacStateCloudKitWriterError)
+        }
+    }
+
+    @MainActor @Test
+    func macStateWriterUsesCorrectZoneID() {
+        let zoneID = CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
+        let writer = MacStateCloudKitWriter(database: nil, zoneID: zoneID)
+        let payload = MacStatePayload(
+            macDeviceID: "zone-test",
+            state: "active",
+            stateChangedAt: .now,
+            sequence: 1
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record.recordID.zoneID.zoneName == "NudgeWhipSync")
+    }
+
+    @Test
+    func macStateWriterRecordTypeIsCorrect() {
+        #expect(MacStateCloudKitWriter.recordType == "MacState")
+    }
+
+    // MARK: - RemoteEscalationEventWriter Tests
+
+    @MainActor @Test
+    func remoteEscalationWriterRecordMapsAllFields() {
+        let writer = RemoteEscalationEventWriter(database: nil)
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-001",
+            occurredAt: Date(timeIntervalSince1970: 1_776_000_000),
+            escalationStep: 2,
+            contentStateRawValue: "StrongNudge",
+            schemaVersion: 1
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["macDeviceID"] as? String == "mac-001")
+        #expect(record["occurredAt"] as? Date == Date(timeIntervalSince1970: 1_776_000_000))
+        #expect(record["escalationStep"] as? Int == 2)
+        #expect(record["contentStateRawValue"] as? String == "StrongNudge")
+        #expect(record["schemaVersion"] as? Int == 1)
+    }
+
+    @MainActor @Test
+    func remoteEscalationWriterRecordNameIncludesDeviceIDAndTimestamp() {
+        let writer = RemoteEscalationEventWriter(database: nil)
+        let timestamp: TimeInterval = 1_776_000_000
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-xyz",
+            occurredAt: Date(timeIntervalSince1970: timestamp),
+            escalationStep: 1,
+            contentStateRawValue: "GentleNudge"
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record.recordID.recordName == "mac-xyz__1776000000")
+    }
+
+    @MainActor @Test
+    func remoteEscalationWriterRecordOptionalFieldsOmittedWhenNil() {
+        let writer = RemoteEscalationEventWriter(database: nil)
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-001",
+            occurredAt: .now,
+            escalationStep: 1,
+            contentStateRawValue: "GentleNudge",
+            wasRecoveredWithinWindow: nil,
+            recoveredAt: nil
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["wasRecoveredWithinWindow"] == nil)
+        #expect(record["recoveredAt"] == nil)
+    }
+
+    @MainActor @Test
+    func remoteEscalationWriterRecordSetsRecoveryFieldsWhenPresent() {
+        let writer = RemoteEscalationEventWriter(database: nil)
+        let recoveredDate = Date(timeIntervalSince1970: 1_776_003_000)
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-001",
+            occurredAt: Date(timeIntervalSince1970: 1_776_000_000),
+            escalationStep: 3,
+            contentStateRawValue: "StrongNudge",
+            wasRecoveredWithinWindow: true,
+            recoveredAt: recoveredDate
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record["wasRecoveredWithinWindow"] as? Bool == true)
+        #expect(record["recoveredAt"] as? Date == recoveredDate)
+    }
+
+    @MainActor @Test
+    func remoteEscalationWriterSaveThrowsNotConfigured() async {
+        let writer = RemoteEscalationEventWriter(database: nil)
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "mac-001",
+            occurredAt: .now,
+            escalationStep: 1,
+            contentStateRawValue: "GentleNudge"
+        )
+
+        do {
+            try await writer.save(payload)
+            Issue.record("Expected throw but save succeeded")
+        } catch {
+            #expect(error is RemoteEscalationEventWriterError)
+        }
+    }
+
+    @MainActor @Test
+    func remoteEscalationWriterUsesCorrectZoneID() {
+        let zoneID = CKRecordZone.ID(zoneName: "NudgeWhipSync", ownerName: CKCurrentUserDefaultName)
+        let writer = RemoteEscalationEventWriter(database: nil, zoneID: zoneID)
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: "zone-test",
+            occurredAt: .now,
+            escalationStep: 1,
+            contentStateRawValue: "GentleNudge"
+        )
+        let record = writer.record(for: payload)
+
+        #expect(record.recordID.zoneID.zoneName == "NudgeWhipSync")
+    }
+
+    @Test
+    func remoteEscalationWriterRecordTypeIsCorrect() {
+        #expect(RemoteEscalationEventWriter.recordType == "RemoteEscalationEvent")
+    }
+
 }
