@@ -4091,4 +4091,68 @@ struct nudgewhipTests {
         #expect(RemoteEscalationEventWriter.recordType == "RemoteEscalationEvent")
     }
 
+    // MARK: - CloudKitSubscriptionRegistrar Tests
+
+    @MainActor @Test
+    func subscriptionRegistrarThrowsNotConfiguredWhenDatabaseNil() async {
+        let registrar = CloudKitSubscriptionRegistrar(database: nil)
+
+        do {
+            try await registrar.registerAll()
+            Issue.record("Expected throw but registerAll succeeded")
+        } catch let error as CloudKitSubscriptionRegistrarError {
+            #expect(error == .notConfigured)
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+    }
+
+    @Test
+    func subscriptionRegistrarUsesCorrectZoneName() {
+        #expect(CloudKitSubscriptionRegistrar.zoneName == "NudgeWhipSync")
+    }
+
+    @Test
+    func subscriptionRegistrarHasStaticSubscriptionIDs() {
+        #expect(!CloudKitSubscriptionRegistrar.macStateSubscriptionID.isEmpty)
+        #expect(!CloudKitSubscriptionRegistrar.zoneSubscriptionID.isEmpty)
+        #expect(CloudKitSubscriptionRegistrar.macStateSubscriptionID == "macstate-changes")
+        #expect(CloudKitSubscriptionRegistrar.zoneSubscriptionID == "zone-changes")
+    }
+
+    @MainActor @Test
+    func subscriptionRegistrarEnsureZoneThrowsNotConfigured() async {
+        let registrar = CloudKitSubscriptionRegistrar(database: nil)
+
+        do {
+            try await registrar.ensureZoneExists()
+            Issue.record("Expected throw but ensureZoneExists succeeded")
+        } catch let error as CloudKitSubscriptionRegistrarError {
+            #expect(error == .notConfigured)
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+    }
+
+    @MainActor @Test
+    func subscriptionRegistrarResetAllowsReRegistration() async {
+        let registrar = CloudKitSubscriptionRegistrar(database: nil)
+
+        do {
+            try await registrar.registerAll()
+        } catch {
+        }
+
+        registrar.resetRegistrationState()
+
+        do {
+            try await registrar.registerAll()
+            Issue.record("Expected throw after reset but registerAll succeeded")
+        } catch let error as CloudKitSubscriptionRegistrarError {
+            #expect(error == .notConfigured)
+        } catch {
+            Issue.record("Unexpected error type: \(error)")
+        }
+    }
+
 }
