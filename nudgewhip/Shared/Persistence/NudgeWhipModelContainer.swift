@@ -59,7 +59,7 @@ enum NudgeWhipModelContainer {
             SchedulePreset.self,
             PetState.self
         ])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory)
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: inMemory, cloudKitDatabase: .none)
         return try ModelContainer(for: schema, configurations: [configuration])
     }
 }
