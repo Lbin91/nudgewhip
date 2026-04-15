@@ -3624,6 +3624,23 @@
         }
       }
     },
+    "pet.detail.next_stage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next: Hatchling"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음: 새끼"
+          }
+        }
+      }
+    },
     "pet.detail.reset": {
       "extractionState": "manual",
       "localizations": {
@@ -3671,6 +3688,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "초기화"
+          }
+        }
+      }
+    },
+    "pet.detail.reset_confirm.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This will reset your pet to the beginning. All progress will be lost."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펫이 처음으로 초기화됩니다. 모든 진행 상황이 사라집니다."
           }
         }
       }
@@ -3858,6 +3892,57 @@
           "stringUnit": {
             "state": "translated",
             "value": "어린이"
+          }
+        }
+      }
+    },
+    "pet.summary.subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egg · 0 XP"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알 · 0 XP"
+          }
+        }
+      }
+    },
+    "pet.notification.level_up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ reached %@!"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@이(가) %@에 도달했습니다!"
+          }
+        }
+      }
+    },
+    "pet.notification.level_up.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Level Up!"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "레벨 업!"
           }
         }
       }

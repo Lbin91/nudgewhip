@@ -2954,4 +2954,710 @@ struct nudgewhipTests {
         #expect(grantedViewModel.preferredContentHeight == 560)
     }
 
+    // MARK: - F1 RecoveryReviewService Tests
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchEventsReturnsEmptyForNoSegments() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = RecoveryReviewService(modelContext: context)
+
+        let events = service.fetchEvents(for: .today)
+        #expect(events.isEmpty)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchEventsMapsSegmentsToEvents() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-600)
+
+        let session = FocusSession(startedAt: baseDate, endedAt: baseDate.addingTimeInterval(7200), monitoringActive: true)
+        context.insert(session)
+
+        let seg1 = AlertingSegment(startedAt: baseDate, recoveredAt: baseDate.addingTimeInterval(300), maxEscalationStep: 1, focusSession: session)
+        let seg2 = AlertingSegment(startedAt: baseDate.addingTimeInterval(500), recoveredAt: baseDate.addingTimeInterval(900), maxEscalationStep: 3, focusSession: session)
+        let seg3 = AlertingSegment(startedAt: baseDate.addingTimeInterval(1000), recoveredAt: nil, maxEscalationStep: 2, focusSession: session)
+        context.insert(seg1)
+        context.insert(seg2)
+        context.insert(seg3)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let events = service.fetchEvents(for: .today)
+
+        #expect(events.count == 3)
+
+        let recoveredEvents = events.filter { $0.recoveredAt != nil }
+        let unrecoveredEvents = events.filter { $0.recoveredAt == nil }
+        #expect(recoveredEvents.count == 2)
+        #expect(unrecoveredEvents.count == 1)
+
+        for event in recoveredEvents {
+            #expect(event.recoveryDuration != nil)
+            #expect(event.sessionStart == baseDate)
+            #expect(event.sessionEnd == baseDate.addingTimeInterval(7200))
+        }
+
+        let event1 = events.first { $0.escalationStep == 1 }
+        #expect(event1 != nil)
+        #expect(event1?.escalationStep == 1)
+
+        let event3 = events.first { $0.escalationStep == 2 && $0.recoveredAt == nil }
+        #expect(event3 != nil)
+        #expect(event3?.recoveryDuration == nil)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchEventsSortsByAlertStartedAtDescending() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-3600)
+
+        let seg1 = AlertingSegment(startedAt: baseDate, recoveredAt: baseDate.addingTimeInterval(100))
+        let seg2 = AlertingSegment(startedAt: baseDate.addingTimeInterval(600), recoveredAt: baseDate.addingTimeInterval(700))
+        let seg3 = AlertingSegment(startedAt: baseDate.addingTimeInterval(1200), recoveredAt: baseDate.addingTimeInterval(1300))
+        context.insert(seg1)
+        context.insert(seg2)
+        context.insert(seg3)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let events = service.fetchEvents(for: .today)
+
+        #expect(events.count == 3)
+        #expect(events[0].alertStartedAt > events[1].alertStartedAt)
+        #expect(events[1].alertStartedAt > events[2].alertStartedAt)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchSummaryCalculatesFastestRecovery() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-3600)
+
+        let seg1 = AlertingSegment(startedAt: baseDate, recoveredAt: baseDate.addingTimeInterval(60))
+        let seg2 = AlertingSegment(startedAt: baseDate.addingTimeInterval(200), recoveredAt: baseDate.addingTimeInterval(500))
+        let seg3 = AlertingSegment(startedAt: baseDate.addingTimeInterval(600), recoveredAt: baseDate.addingTimeInterval(615))
+        context.insert(seg1)
+        context.insert(seg2)
+        context.insert(seg3)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let summary = service.fetchSummary(for: .today)
+
+        #expect(summary.fastestRecovery != nil)
+        #expect(summary.fastestRecovery! == 15.0)
+        #expect(summary.totalEvents == 3)
+        #expect(summary.recoveredCount == 3)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchSummaryCalculatesLongestDistraction() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-300)
+
+        let recovered = AlertingSegment(startedAt: baseDate, recoveredAt: baseDate.addingTimeInterval(120))
+        let unrecovered = AlertingSegment(startedAt: baseDate.addingTimeInterval(200), recoveredAt: nil)
+        context.insert(recovered)
+        context.insert(unrecovered)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let summary = service.fetchSummary(for: .today)
+
+        #expect(summary.longestDistraction != nil)
+        #expect(summary.longestDistraction! >= 100.0)
+        #expect(summary.unrecoveredCount == 1)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchSummaryIdentifiesMostDistractedHour() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let now = Date.now
+        let calendar = Calendar.current
+        let todayStart = calendar.startOfDay(for: now)
+        let hour10 = todayStart.addingTimeInterval(10 * 3600)
+        let hour14 = todayStart.addingTimeInterval(14 * 3600)
+
+        for i in 0..<3 {
+            let seg = AlertingSegment(startedAt: hour10.addingTimeInterval(Double(i) * 60), recoveredAt: hour10.addingTimeInterval(Double(i) * 60 + 30))
+            context.insert(seg)
+        }
+        let seg14 = AlertingSegment(startedAt: hour14, recoveredAt: hour14.addingTimeInterval(30))
+        context.insert(seg14)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let summary = service.fetchSummary(for: .today)
+
+        #expect(summary.mostDistractedHour == 10)
+        #expect(summary.totalEvents == 4)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchSummaryReturnsNilForEmptyData() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let service = RecoveryReviewService(modelContext: context)
+        let summary = service.fetchSummary(for: .today)
+
+        #expect(summary.fastestRecovery == nil)
+        #expect(summary.longestDistraction == nil)
+        #expect(summary.mostDistractedHour == nil)
+        #expect(summary.totalEvents == 0)
+        #expect(summary.recoveredCount == 0)
+        #expect(summary.unrecoveredCount == 0)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchSummaryCountsRecoveredAndUnrecovered() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-1800)
+
+        for i in 0..<3 {
+            let seg = AlertingSegment(startedAt: baseDate.addingTimeInterval(Double(i) * 100), recoveredAt: baseDate.addingTimeInterval(Double(i) * 100 + 50))
+            context.insert(seg)
+        }
+        for i in 0..<2 {
+            let seg = AlertingSegment(startedAt: baseDate.addingTimeInterval(Double(i) * 100 + 500), recoveredAt: nil)
+            context.insert(seg)
+        }
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let summary = service.fetchSummary(for: .today)
+
+        #expect(summary.recoveredCount == 3)
+        #expect(summary.unrecoveredCount == 2)
+        #expect(summary.totalEvents == 5)
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchHourlyCountsReturns24ElementArray() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let service = RecoveryReviewService(modelContext: context)
+        let counts = service.fetchHourlyCounts(for: .today)
+
+        #expect(counts.count == 24)
+        #expect(counts.allSatisfy { $0 == 0 })
+    }
+
+    @MainActor
+    @Test
+    func recoveryReviewFetchEventsUsesSessionDatesWhenAvailable() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let baseDate = Date.now.addingTimeInterval(-600)
+
+        let session = FocusSession(startedAt: baseDate, endedAt: baseDate.addingTimeInterval(7200), monitoringActive: true)
+        context.insert(session)
+
+        let segment = AlertingSegment(startedAt: baseDate.addingTimeInterval(600), recoveredAt: baseDate.addingTimeInterval(900), maxEscalationStep: 2, focusSession: session)
+        context.insert(segment)
+        try context.save()
+
+        let service = RecoveryReviewService(modelContext: context)
+        let events = service.fetchEvents(for: .today)
+
+        #expect(events.count == 1)
+        let event = events[0]
+        #expect(event.sessionStart == baseDate)
+        #expect(event.sessionEnd == baseDate.addingTimeInterval(7200))
+        #expect(event.alertStartedAt == baseDate.addingTimeInterval(600))
+        #expect(event.recoveredAt == baseDate.addingTimeInterval(900))
+        #expect(event.recoveryDuration == 300.0)
+    }
+
+    // MARK: - F3 PetProgressionService Tests
+
+    @MainActor
+    @Test
+    func petProgressionFetchPetStateCreatesDefaultWhenNoneExists() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let pet = service.fetchPetState()
+        #expect(pet.name == "Whip")
+        #expect(pet.currentStage == .egg)
+        #expect(pet.experiencePoints == 0)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionFetchPetStateReturnsExisting() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let existing = PetState(name: "CustomPet", currentStage: .hatchling, experiencePoints: 100)
+        context.insert(existing)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        let pet = service.fetchPetState()
+
+        #expect(pet.name == "CustomPet")
+        #expect(pet.currentStage == .hatchling)
+        #expect(pet.experiencePoints == 100)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionAwardRecoveryXPAdds5Points() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let _ = service.fetchPetState()
+        let xp = service.awardRecoveryXP()
+
+        #expect(xp == PetProgressionConstants.xpPerRecovery)
+        let pet = service.fetchPetState()
+        #expect(pet.experiencePoints == PetProgressionConstants.xpPerRecovery)
+        #expect(pet.totalRecoveryContributions == 1)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionAwardSessionXPAdds10For30MinSession() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let _ = service.fetchPetState()
+        let xp = service.awardSessionXP(duration: 1800)
+
+        #expect(xp == PetProgressionConstants.xpPerSession30Min)
+        let pet = service.fetchPetState()
+        #expect(pet.experiencePoints == PetProgressionConstants.xpPerSession30Min)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionAwardSessionXPIgnoresShortSessions() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let _ = service.fetchPetState()
+        let result = service.awardSessionXP(duration: 1799)
+
+        #expect(result == 0)
+        let pet = service.fetchPetState()
+        #expect(pet.experiencePoints == 0)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionCheckDailyActiveBonusAwards2PlusStreak() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let _ = service.fetchPetState()
+        let bonus = service.checkDailyActiveBonus()
+
+        let expectedBase = PetProgressionConstants.xpPerDailyActive
+        let expectedStreak = min(1, PetProgressionConstants.maxStreakBonus)
+        let expectedTotal = expectedBase + expectedStreak
+        #expect(bonus == expectedTotal)
+
+        let pet = service.fetchPetState()
+        #expect(pet.experiencePoints == expectedTotal)
+        #expect(pet.consecutiveDaysActive == 1)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionCheckDailyActiveBonusIncreasesStreakOnConsecutiveDay() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let pet = PetState()
+        pet.lastActiveDate = Calendar.current.date(byAdding: .day, value: -1, to: Calendar.current.startOfDay(for: .now))?.addingTimeInterval(3600)
+        pet.consecutiveDaysActive = 1
+        context.insert(pet)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        let _ = service.checkDailyActiveBonus()
+
+        let updated = service.fetchPetState()
+        #expect(updated.consecutiveDaysActive == 2)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionCheckDailyActiveBonusResetsStreakAfterGap() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let pet = PetState()
+        pet.lastActiveDate = Calendar.current.date(byAdding: .day, value: -3, to: Calendar.current.startOfDay(for: .now))?.addingTimeInterval(3600)
+        pet.consecutiveDaysActive = 5
+        context.insert(pet)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        let _ = service.checkDailyActiveBonus()
+
+        let updated = service.fetchPetState()
+        #expect(updated.consecutiveDaysActive == 1)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionCheckStageTransitionTriggersOnThreshold() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let pet = PetState(currentStage: .egg, experiencePoints: 49)
+        context.insert(pet)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        var stageUpCalled = false
+        var newStage: PetGrowthStage?
+        service.onStageUp = { stage in
+            stageUpCalled = true
+            newStage = stage
+        }
+
+        let _ = service.awardRecoveryXP()
+
+        #expect(stageUpCalled)
+        #expect(newStage == .hatchling)
+        #expect(service.fetchPetState().currentStage == .hatchling)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionCheckStageTransitionNoCallbackWhenUnchanged() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let pet = PetState(currentStage: .egg, experiencePoints: 10)
+        context.insert(pet)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        var stageUpCalled = false
+        service.onStageUp = { _ in
+            stageUpCalled = true
+        }
+
+        let _ = service.awardRecoveryXP()
+
+        #expect(!stageUpCalled)
+        #expect(service.fetchPetState().currentStage == .egg)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionResetPetRestoresToEggWithZeroXP() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let pet = PetState(currentStage: .adult, experiencePoints: 400, totalRecoveryContributions: 30)
+        pet.consecutiveDaysActive = 7
+        pet.companionDayCount = 15
+        pet.lastActiveDate = .now
+        context.insert(pet)
+        try context.save()
+
+        let service = PetProgressionService(modelContext: context)
+        service.resetPet()
+
+        let reset = service.fetchPetState()
+        #expect(reset.currentStage == .egg)
+        #expect(reset.experiencePoints == 0)
+        #expect(reset.totalRecoveryContributions == 0)
+        #expect(reset.consecutiveDaysActive == 0)
+        #expect(reset.companionDayCount == 0)
+    }
+
+    @MainActor
+    @Test
+    func petProgressionXPNeverDecreasesInvariant() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = PetProgressionService(modelContext: context)
+
+        let _ = service.fetchPetState()
+
+        service.awardRecoveryXP()
+        service.awardSessionXP(duration: 1800)
+        let peakXP = service.fetchPetState().experiencePoints
+        #expect(peakXP > 0)
+
+        service.awardSessionXP(duration: 100)
+        #expect(service.fetchPetState().experiencePoints == peakXP)
+
+        service.resetPet()
+        #expect(service.fetchPetState().experiencePoints == 0)
+
+        service.awardRecoveryXP()
+        let afterResetXP = service.fetchPetState().experiencePoints
+        #expect(afterResetXP == PetProgressionConstants.xpPerRecovery)
+
+        service.awardRecoveryXP()
+        #expect(service.fetchPetState().experiencePoints > afterResetXP)
+    }
+
+    // MARK: - SchedulePreset Tests
+
+    @MainActor
+    @Test
+    func schedulePresetSeedBuiltInPresetsCreatesThreeDefaults() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: context,
+            existingSchedule: (enabled: false, start: 0, end: 0)
+        )
+
+        let descriptor = FetchDescriptor<SchedulePreset>(
+            predicate: #Predicate { $0.isBuiltIn }
+        )
+        let presets = try context.fetch(descriptor)
+        #expect(presets.count == 3)
+
+        let sorted = presets.sorted { $0.sortOrder < $1.sortOrder }
+
+        #expect(sorted[0].iconName == "sun.max")
+        #expect(sorted[0].isWeekdayOnly == true)
+        #expect(sorted[0].startSecondsFromMidnight == 32400)
+        #expect(sorted[0].endSecondsFromMidnight == 61200)
+        #expect(sorted[0].isBuiltIn == true)
+
+        #expect(sorted[1].iconName == "moon.fill")
+        #expect(sorted[1].isWeekdayOnly == false)
+        #expect(sorted[1].startSecondsFromMidnight == 79200)
+        #expect(sorted[1].endSecondsFromMidnight == 21600)
+
+        #expect(sorted[2].iconName == "clock.fill")
+        #expect(sorted[2].isWeekdayOnly == false)
+        #expect(sorted[2].startSecondsFromMidnight == 0)
+        #expect(sorted[2].endSecondsFromMidnight == 86340)
+
+        #expect(sorted[0].sortOrder == 0)
+        #expect(sorted[1].sortOrder == 1)
+        #expect(sorted[2].sortOrder == 2)
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetSeedBuiltInPresetsDoesNotDuplicateOnSecondCall() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: context,
+            existingSchedule: (enabled: false, start: 0, end: 0)
+        )
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: context,
+            existingSchedule: (enabled: false, start: 0, end: 0)
+        )
+
+        let descriptor = FetchDescriptor<SchedulePreset>(
+            predicate: #Predicate { $0.isBuiltIn }
+        )
+        let presets = try context.fetch(descriptor)
+        #expect(presets.count == 3)
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetSeedBuiltInPresetsMigratesExistingSchedule() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: context,
+            existingSchedule: (enabled: true, start: 28800, end: 64800)
+        )
+
+        let descriptor = FetchDescriptor<SchedulePreset>(
+            predicate: #Predicate { $0.isBuiltIn }
+        )
+        let presets = try context.fetch(descriptor)
+
+        let firstPreset = presets.first { $0.sortOrder == 0 }
+        #expect(firstPreset != nil)
+        #expect(firstPreset?.isActivePreset == true)
+        #expect(firstPreset?.startSecondsFromMidnight == 28800)
+        #expect(firstPreset?.endSecondsFromMidnight == 64800)
+
+        let secondPreset = presets.first { $0.sortOrder == 1 }
+        #expect(secondPreset?.startSecondsFromMidnight == 28800)
+        #expect(secondPreset?.endSecondsFromMidnight == 64800)
+        #expect(secondPreset?.isActivePreset == false)
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetSeedBuiltInPresetsSetsInactiveWhenScheduleDisabled() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        SchedulePreset.seedBuiltInPresets(
+            modelContext: context,
+            existingSchedule: (enabled: false, start: 28800, end: 64800)
+        )
+
+        let descriptor = FetchDescriptor<SchedulePreset>(
+            predicate: #Predicate { $0.isBuiltIn }
+        )
+        let presets = try context.fetch(descriptor)
+
+        for preset in presets {
+            #expect(preset.isActivePreset == false)
+        }
+
+        let weekdayPreset = presets.first { $0.iconName == "sun.max" }
+        #expect(weekdayPreset?.startSecondsFromMidnight == 32400)
+        #expect(weekdayPreset?.endSecondsFromMidnight == 61200)
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetTimeFormattingReturnsCorrectStrings() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let preset = SchedulePreset(
+            name: "Test",
+            startSecondsFromMidnight: 32400,
+            endSecondsFromMidnight: 61200
+        )
+        context.insert(preset)
+        try context.save()
+
+        #expect(preset.startTimeFormatted == "09:00")
+        #expect(preset.endTimeFormatted == "17:00")
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetTimeFormattingHandlesMidnight() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let preset = SchedulePreset(
+            name: "Midnight Test",
+            startSecondsFromMidnight: 0,
+            endSecondsFromMidnight: 86340
+        )
+        context.insert(preset)
+        try context.save()
+
+        #expect(preset.startTimeFormatted == "00:00")
+        #expect(preset.endTimeFormatted == "23:59")
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetCustomPresetCRUD() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let preset = SchedulePreset(
+            name: "My Custom",
+            iconName: "star",
+            startSecondsFromMidnight: 36000,
+            endSecondsFromMidnight: 72000,
+            isWeekdayOnly: true,
+            isBuiltIn: false,
+            sortOrder: 5,
+            isActivePreset: false
+        )
+        context.insert(preset)
+        try context.save()
+
+        let descriptor = FetchDescriptor<SchedulePreset>(
+            predicate: #Predicate { !$0.isBuiltIn }
+        )
+        let presets = try context.fetch(descriptor)
+        #expect(presets.count == 1)
+
+        let fetched = presets[0]
+        #expect(fetched.name == "My Custom")
+        #expect(fetched.iconName == "star")
+        #expect(fetched.startSecondsFromMidnight == 36000)
+        #expect(fetched.endSecondsFromMidnight == 72000)
+        #expect(fetched.isWeekdayOnly == true)
+        #expect(fetched.isBuiltIn == false)
+        #expect(fetched.sortOrder == 5)
+        #expect(fetched.isActivePreset == false)
+
+        context.delete(fetched)
+        try context.save()
+
+        let afterDelete = try context.fetch(FetchDescriptor<SchedulePreset>())
+        #expect(afterDelete.isEmpty)
+    }
+
+    @MainActor
+    @Test
+    func schedulePresetCustomPresetSortOrder() throws {
+        let container = try NudgeWhipModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let preset0 = SchedulePreset(
+            name: "Third",
+            startSecondsFromMidnight: 0,
+            endSecondsFromMidnight: 100,
+            sortOrder: 2
+        )
+        let preset1 = SchedulePreset(
+            name: "First",
+            startSecondsFromMidnight: 0,
+            endSecondsFromMidnight: 100,
+            sortOrder: 0
+        )
+        let preset2 = SchedulePreset(
+            name: "Second",
+            startSecondsFromMidnight: 0,
+            endSecondsFromMidnight: 100,
+            sortOrder: 1
+        )
+
+        context.insert(preset0)
+        context.insert(preset1)
+        context.insert(preset2)
+        try context.save()
+
+        var descriptor = FetchDescriptor<SchedulePreset>()
+        descriptor.sortBy = [SortDescriptor(\.sortOrder)]
+        let sorted = try context.fetch(descriptor)
+
+        #expect(sorted.count == 3)
+        #expect(sorted[0].name == "First")
+        #expect(sorted[0].sortOrder == 0)
+        #expect(sorted[1].name == "Second")
+        #expect(sorted[1].sortOrder == 1)
+        #expect(sorted[2].name == "Third")
+        #expect(sorted[2].sortOrder == 2)
+    }
+
 }

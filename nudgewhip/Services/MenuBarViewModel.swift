@@ -7,6 +7,7 @@
 import Foundation
 import Observation
 import SwiftData
+import UserNotifications
 
 @MainActor
 @Observable
@@ -462,8 +463,28 @@ final class MenuBarViewModel {
         let petService = PetProgressionService(modelContext: modelContext)
         self.petProgressionService = petService
         self.petState = petService.fetchPetState()
-        petService.onStageUp = { [weak self] _ in
+        petService.onStageUp = { [weak self] newStage in
             self?.petState = petService.fetchPetState()
+
+            let petName = self?.petState?.name ?? "Whip"
+            let stageName = newStage.displayName
+            let content = UNMutableNotificationContent()
+            content.title = localizedAppString(
+                "pet.notification.level_up.title",
+                defaultValue: "Level Up!"
+            )
+            content.body = localizedAppString(
+                "pet.notification.level_up",
+                defaultValue: "\(petName) reached \(stageName)!"
+            )
+            content.sound = .default
+
+            let request = UNNotificationRequest(
+                identifier: "pet.levelup.\(newStage.rawValue)",
+                content: content,
+                trigger: nil
+            )
+            UNUserNotificationCenter.current().add(request)
         }
         idleMonitor.sessionTracker?.setPetProgressionService(petService)
         petService.checkDailyActiveBonus()
