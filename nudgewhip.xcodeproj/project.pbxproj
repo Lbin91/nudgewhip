@@ -25,13 +25,42 @@
 			remoteGlobalIDString = E8D43A412F7E559D00C95F50;
 			remoteInfo = NudgeWhip;
 		};
+		E8E7E6472F90153B002E58E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D43A3A2F7E559D00C95F50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8E7E6392F90153A002E58E6;
+			remoteInfo = nudgewhipios;
+		};
+		E8E7E6512F90153B002E58E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D43A3A2F7E559D00C95F50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8E7E6392F90153A002E58E6;
+			remoteInfo = nudgewhipios;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		E8D43A422F7E559D00C95F50 /* NudgeWhip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NudgeWhip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D43A512F7E559F00C95F50 /* nudgewhipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgewhipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D43A5B2F7E559F00C95F50 /* nudgewhipUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgewhipUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8E7E63A2F90153A002E58E6 /* nudgewhipios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nudgewhipios.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8E7E6462F90153B002E58E6 /* nudgewhipiosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgewhipiosTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8E7E6502F90153B002E58E6 /* nudgewhipiosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgewhipiosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8E7E6612F9015DD002E58E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = NudgeWhip/Info.plist; sourceTree = "<group>"; };
+		E8E7E6662F901676002E58E6 /* NudgeWhip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NudgeWhip.entitlements; path = NudgeWhip/NudgeWhip.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E8E7E6652F901637002E58E6 /* Exceptions for "nudgewhipios" folder in "nudgewhipios" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E8E7E6392F90153A002E58E6 /* nudgewhipios */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E8D43A442F7E559D00C95F50 /* nudgewhip */ = {
@@ -47,6 +76,24 @@
 		E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = nudgewhipUITests;
+			sourceTree = "<group>";
+		};
+		E8E7E63B2F90153A002E58E6 /* nudgewhipios */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E8E7E6652F901637002E58E6 /* Exceptions for "nudgewhipios" folder in "nudgewhipios" target */,
+			);
+			path = nudgewhipios;
+			sourceTree = "<group>";
+		};
+		E8E7E6492F90153B002E58E6 /* nudgewhipiosTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = nudgewhipiosTests;
+			sourceTree = "<group>";
+		};
+		E8E7E6532F90153B002E58E6 /* nudgewhipiosUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = nudgewhipiosUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -74,15 +121,41 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8E7E6372F90153A002E58E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E6432F90153B002E58E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E64D2F90153B002E58E6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		E8D43A392F7E559D00C95F50 = {
 			isa = PBXGroup;
 			children = (
+				E8E7E6662F901676002E58E6 /* NudgeWhip.entitlements */,
+				E8E7E6612F9015DD002E58E6 /* Info.plist */,
 				E8D43A442F7E559D00C95F50 /* nudgewhip */,
 				E8D43A542F7E559F00C95F50 /* nudgewhipTests */,
 				E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */,
+				E8E7E63B2F90153A002E58E6 /* nudgewhipios */,
+				E8E7E6492F90153B002E58E6 /* nudgewhipiosTests */,
+				E8E7E6532F90153B002E58E6 /* nudgewhipiosUITests */,
 				E8D43A432F7E559D00C95F50 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,6 +166,9 @@
 				E8D43A422F7E559D00C95F50 /* NudgeWhip.app */,
 				E8D43A512F7E559F00C95F50 /* nudgewhipTests.xctest */,
 				E8D43A5B2F7E559F00C95F50 /* nudgewhipUITests.xctest */,
+				E8E7E63A2F90153A002E58E6 /* nudgewhipios.app */,
+				E8E7E6462F90153B002E58E6 /* nudgewhipiosTests.xctest */,
+				E8E7E6502F90153B002E58E6 /* nudgewhipiosUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -165,6 +241,74 @@
 			productReference = E8D43A5B2F7E559F00C95F50 /* nudgewhipUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		E8E7E6392F90153A002E58E6 /* nudgewhipios */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8E7E65E2F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipios" */;
+			buildPhases = (
+				E8E7E6362F90153A002E58E6 /* Sources */,
+				E8E7E6372F90153A002E58E6 /* Frameworks */,
+				E8E7E6382F90153A002E58E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E8E7E63B2F90153A002E58E6 /* nudgewhipios */,
+			);
+			name = nudgewhipios;
+			packageProductDependencies = (
+			);
+			productName = nudgewhipios;
+			productReference = E8E7E63A2F90153A002E58E6 /* nudgewhipios.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8E7E6452F90153B002E58E6 /* nudgewhipiosTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8E7E65F2F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipiosTests" */;
+			buildPhases = (
+				E8E7E6422F90153B002E58E6 /* Sources */,
+				E8E7E6432F90153B002E58E6 /* Frameworks */,
+				E8E7E6442F90153B002E58E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8E7E6482F90153B002E58E6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E8E7E6492F90153B002E58E6 /* nudgewhipiosTests */,
+			);
+			name = nudgewhipiosTests;
+			packageProductDependencies = (
+			);
+			productName = nudgewhipiosTests;
+			productReference = E8E7E6462F90153B002E58E6 /* nudgewhipiosTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E8E7E64F2F90153B002E58E6 /* nudgewhipiosUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8E7E6602F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipiosUITests" */;
+			buildPhases = (
+				E8E7E64C2F90153B002E58E6 /* Sources */,
+				E8E7E64D2F90153B002E58E6 /* Frameworks */,
+				E8E7E64E2F90153B002E58E6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8E7E6522F90153B002E58E6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E8E7E6532F90153B002E58E6 /* nudgewhipiosUITests */,
+			);
+			name = nudgewhipiosUITests;
+			packageProductDependencies = (
+			);
+			productName = nudgewhipiosUITests;
+			productReference = E8E7E6502F90153B002E58E6 /* nudgewhipiosUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -185,6 +329,17 @@
 					E8D43A5A2F7E559F00C95F50 = {
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = E8D43A412F7E559D00C95F50;
+					};
+					E8E7E6392F90153A002E58E6 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					E8E7E6452F90153B002E58E6 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = E8E7E6392F90153A002E58E6;
+					};
+					E8E7E64F2F90153B002E58E6 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = E8E7E6392F90153A002E58E6;
 					};
 				};
 			};
@@ -208,6 +363,9 @@
 				E8D43A412F7E559D00C95F50 /* NudgeWhip */,
 				E8D43A502F7E559F00C95F50 /* nudgewhipTests */,
 				E8D43A5A2F7E559F00C95F50 /* nudgewhipUITests */,
+				E8E7E6392F90153A002E58E6 /* nudgewhipios */,
+				E8E7E6452F90153B002E58E6 /* nudgewhipiosTests */,
+				E8E7E64F2F90153B002E58E6 /* nudgewhipiosUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -228,6 +386,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E8D43A592F7E559F00C95F50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E6382F90153A002E58E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E6442F90153B002E58E6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E64E2F90153B002E58E6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,6 +437,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8E7E6362F90153A002E58E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E6422F90153B002E58E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8E7E64C2F90153B002E58E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -270,6 +470,16 @@
 			isa = PBXTargetDependency;
 			target = E8D43A412F7E559D00C95F50 /* NudgeWhip */;
 			targetProxy = E8D43A5C2F7E559F00C95F50 /* PBXContainerItemProxy */;
+		};
+		E8E7E6482F90153B002E58E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8E7E6392F90153A002E58E6 /* nudgewhipios */;
+			targetProxy = E8E7E6472F90153B002E58E6 /* PBXContainerItemProxy */;
+		};
+		E8E7E6522F90153B002E58E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8E7E6392F90153A002E58E6 /* nudgewhipios */;
+			targetProxy = E8E7E6512F90153B002E58E6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -401,6 +611,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NudgeWhip/NudgeWhip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3;
@@ -410,6 +621,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NudgeWhip/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NudgeWhip;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -441,6 +653,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NudgeWhip/NudgeWhip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3;
@@ -450,6 +663,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NudgeWhip/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = NudgeWhip;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -556,6 +770,169 @@
 			};
 			name = Release;
 		};
+		E8E7E6582F90153B002E58E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = nudgewhipios/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E8E7E6592F90153B002E58E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = nudgewhipios/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E8E7E65A2F90153B002E58E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipiosTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nudgewhipios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/nudgewhipios";
+			};
+			name = Debug;
+		};
+		E8E7E65B2F90153B002E58E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipiosTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/nudgewhipios.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/nudgewhipios";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E8E7E65C2F90153B002E58E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipiosUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = nudgewhipios;
+			};
+			name = Debug;
+		};
+		E8E7E65D2F90153B002E58E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KCS6FN2MJD;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bongjinlee.nudgewhipiosUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = nudgewhipios;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -591,6 +968,33 @@
 			buildConfigurations = (
 				E8D43A6C2F7E559F00C95F50 /* Debug */,
 				E8D43A6D2F7E559F00C95F50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8E7E65E2F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipios" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8E7E6582F90153B002E58E6 /* Debug */,
+				E8E7E6592F90153B002E58E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8E7E65F2F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipiosTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8E7E65A2F90153B002E58E6 /* Debug */,
+				E8E7E65B2F90153B002E58E6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8E7E6602F90153B002E58E6 /* Build configuration list for PBXNativeTarget "nudgewhipiosUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8E7E65C2F90153B002E58E6 /* Debug */,
+				E8E7E65D2F90153B002E58E6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
