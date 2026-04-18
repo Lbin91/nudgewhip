@@ -7,18 +7,32 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct CompanionTabView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            HomeView()
+                .tabItem {
+                    Label("홈", systemImage: "house")
+                }
+
+            StatsView()
+                .tabItem {
+                    Label("통계", systemImage: "chart.bar")
+                }
+
+            AlertsView()
+                .tabItem {
+                    Label("알림", systemImage: "bell")
+                }
+
+            SettingsView()
+                .tabItem {
+                    Label("설정", systemImage: "gearshape")
+                }
         }
-        .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    CompanionTabView()
 }

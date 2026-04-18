@@ -11,7 +11,7 @@ import SwiftUI
 struct nudgewhipiosApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CompanionTabView()
         }
     }
 }
