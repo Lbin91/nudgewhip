@@ -70,6 +70,11 @@
 			path = nudgewhip;
 			sourceTree = "<group>";
 		};
+		E8E7E6802F90180000E58E6 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = nudgewhip/Shared;
+			sourceTree = "<group>";
+		};
 		E8D43A542F7E559F00C95F50 /* nudgewhipTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = nudgewhipTests;
@@ -153,6 +158,7 @@
 				E8E7E6662F901676002E58E6 /* NudgeWhip.entitlements */,
 				E8E7E6612F9015DD002E58E6 /* Info.plist */,
 				E8D43A442F7E559D00C95F50 /* nudgewhip */,
+				E8E7E6802F90180000E58E6 /* Shared */,
 				E8D43A542F7E559F00C95F50 /* nudgewhipTests */,
 				E8D43A5E2F7E559F00C95F50 /* nudgewhipUITests */,
 				E8E7E63B2F90153A002E58E6 /* nudgewhipios */,
@@ -257,6 +263,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				E8E7E63B2F90153A002E58E6 /* nudgewhipios */,
+				E8E7E6802F90180000E58E6 /* Shared */,
 			);
 			name = nudgewhipios;
 			packageProductDependencies = (

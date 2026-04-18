@@ -1,8 +1,6 @@
-// DesignTokens.swift
-// design-system.md v0.1 기준 컬러·스페이싱·반경·모션 토큰.
-
 import SwiftUI
 
+#if os(macOS)
 extension NSColor {
     convenience init(hex: String) {
         let cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -16,16 +14,40 @@ extension NSColor {
         self.init(red: r, green: g, blue: b, alpha: 1)
     }
 }
+#else
+extension UIColor {
+    convenience init(hex: String) {
+        let cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "#", with: "")
+        var rgb: UInt64 = 0
+        Scanner(string: cleaned).scanHexInt64(&rgb)
+
+        let r = CGFloat((rgb >> 16) & 0xFF) / 255
+        let g = CGFloat((rgb >> 8) & 0xFF) / 255
+        let b = CGFloat(rgb & 0xFF) / 255
+        self.init(red: r, green: g, blue: b, alpha: 1)
+    }
+}
+#endif
 
 // MARK: - Color Tokens
 
 extension Color {
+    #if os(macOS)
     private static func adaptive(light: String, dark: String) -> Color {
         Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
- let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
             return NSColor(hex: isDark ? dark : light)
         }))
     }
+    #else
+    private static func adaptive(light: String, dark: String) -> Color {
+        Color(uiColor: UIColor { traitCollection in
+            let isDark = traitCollection.userInterfaceStyle == .dark
+            return UIColor(hex: isDark ? dark : light)
+        })
+    }
+    #endif
 
     static let nudgewhipBgCanvas = adaptive(light: "#F7F3EC", dark: "#0F1318")
     static let nudgewhipBgSurface = adaptive(light: "#FFFDF9", dark: "#161C23")
