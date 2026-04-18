@@ -50,6 +50,7 @@
 		E8E7E6502F90153B002E58E6 /* nudgewhipiosUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = nudgewhipiosUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8E7E6612F9015DD002E58E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = NudgeWhip/Info.plist; sourceTree = "<group>"; };
 		E8E7E6662F901676002E58E6 /* NudgeWhip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NudgeWhip.entitlements; path = NudgeWhip/NudgeWhip.entitlements; sourceTree = "<group>"; };
+		E8E7E6702F90170000E58E6 /* nudgewhipios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = nudgewhipios.entitlements; path = nudgewhipios/nudgewhipios.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -57,6 +58,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				nudgewhipios.entitlements,
 			);
 			target = E8E7E6392F90153A002E58E6 /* nudgewhipios */;
 		};
@@ -775,6 +777,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = nudgewhipios/nudgewhipios.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KCS6FN2MJD;
@@ -810,6 +813,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = nudgewhipios/nudgewhipios.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = KCS6FN2MJD;
