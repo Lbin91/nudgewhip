@@ -21,6 +21,8 @@ docs/*
 docs/assets/*
 !docs/assets/readme/
 !docs/assets/readme/**
+!docs/content/
+!docs/content/**
 !docs/privacy/
 !docs/privacy/**
 !docs/qa/
