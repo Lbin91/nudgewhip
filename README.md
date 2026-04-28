@@ -6,8 +6,8 @@
   <a href="LICENSE">
     <img alt="MIT License" src="https://img.shields.io/badge/license-MIT-3DA639?style=for-the-badge&logo=license">
   </a>
-  <a href="docs/release/v0.2.0.md">
-    <img alt="v0.2.0 Stabilization" src="https://img.shields.io/badge/release-v0.2.0%20stabilization-E35D3D?style=for-the-badge">
+  <a href="docs/release/v0.4.0.md">
+    <img alt="v0.4.0" src="https://img.shields.io/badge/release-v0.4.0-E35D3D?style=for-the-badge">
   </a>
   <img alt="macOS 15+" src="https://img.shields.io/badge/platform-macOS%2015%2B-111827?style=for-the-badge&logo=apple">
   <img alt="SwiftUI + AppKit" src="https://img.shields.io/badge/stack-SwiftUI%20%2B%20AppKit-F97316?style=for-the-badge&logo=swift&logoColor=white">
@@ -33,14 +33,12 @@
 
 NudgeWhip is distributed through the notarized DMG attached to the GitHub release.
 
-- GitHub Release: [v0.2.0](https://github.com/Lbin91/nudgewhip/releases/tag/v0.2.0)
-- Asset: `NudgeWhip-0.2.0-1.dmg`
+- GitHub Release: [v0.4.0](https://github.com/Lbin91/nudgewhip/releases/tag/v0.4.0)
+- Asset: `NudgeWhip-0.4.0-1.dmg`
 - Platform: macOS 15 or later
 
 <p align="center">
-  <a href="docs/release/v0.2.0.md"><strong>Release Notes</strong></a>
-  ·
-  <a href="docs/release/v0.2.0-rc-checklist.md"><strong>RC Checklist</strong></a>
+  <a href="docs/release/v0.4.0.md"><strong>Release Notes</strong></a>
   ·
   <a href="docs/privacy/accessibility-and-data-disclosure.md"><strong>Privacy</strong></a>
   ·
@@ -66,38 +64,38 @@ It is an `attention recall tool`: a local intervention layer for people whose wo
 
 ## Release Status
 
-`v0.2.0` is the first stabilization update for the macOS core loop.
+`v0.4.0` adds the iOS companion app and CloudKit real-time sync.
 
 Current release lane:
 
-- `macOS-only`
+- `macOS + iOS companion`
 - `source-first GitHub release`
 - `Free core loop only`
 
-Not in scope for `v0.2.0`:
+Not in scope for `v0.4.0`:
 
-- iPhone companion app
-- CloudKit sync
-- Pro packaging
-- richer exception handling and advanced whitelist workflows
-- expanded progression systems
+- Push notifications (CKQuerySubscription + APNs)
+- Pet mood system implementation
+- StoreKit / Pro packaging
+- Recovery Review dashboard
+- Schedule presets
 
-## What Ships In `v0.2.0`
+## What Ships In `v0.4.0`
 
-This beta already includes a real working loop:
-
+- **iOS companion app** with live CloudKit sync for Mac focus state
+- **CloudKit real-time pipeline** — MacState and RemoteEscalationEvent written to iCloud Private Database on every state change
+- **Multi-Mac isolation** — correctly handles multiple Macs sharing one iCloud account
+- **Full Korean (한국어) localization** for both macOS and iOS
 - menu bar app with `LSUIElement` behavior and no Dock icon
 - Accessibility permission onboarding with visible limited-mode fallback
 - global idle detection from keyboard and mouse activity
 - one-shot idle deadlines instead of noisy polling
-- local visual nudges
-- system notification escalation
+- local visual nudges with system notification escalation
 - runtime status and countdown in the dropdown
-- manual pause controls in the dropdown
-- schedule controls
-- local daily summary stats
+- manual pause controls and schedule controls
+- local daily summary stats with trend charts
 - settings window and launch-at-login toggle
-- Korean and English localization
+- CloudKit daily aggregate backup for cross-device data continuity
 
 ## Onboarding
 
@@ -119,7 +117,7 @@ This beta already includes a real working loop:
 
 ### Local-first
 
-NudgeWhip is designed around the Mac itself, not around a cloud dashboard.
+NudgeWhip is designed around the Mac itself, not around a cloud dashboard. CloudKit is a backup layer, not the source of truth.
 
 ### Privacy-first
 
@@ -138,6 +136,7 @@ NudgeWhip draws a hard line:
 - it does not store raw input logs
 - it stores summary data locally
 - it keeps local app state in `SwiftData`
+- CloudKit sync uses Private Database only — data stays in the user's iCloud
 
 Full disclosure: [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md)
 
@@ -175,7 +174,6 @@ xcodebuild test -scheme nudgewhip -destination 'platform=macOS' -only-testing:nu
 Note:
 
 - menu bar agent UI tests are more timing-sensitive than standard foreground app UI tests
-- release verification steps are tracked in [docs/release/v0.2.0-rc-checklist.md](docs/release/v0.2.0-rc-checklist.md)
 
 ## Technical Shape
 
@@ -184,6 +182,7 @@ Core stack:
 - `SwiftUI` for menu bar, onboarding, and settings UI
 - `AppKit` for global event monitoring and alert/panel coordination
 - `SwiftData` for local persistence
+- `CloudKit` for cross-device state sync (Private Database only)
 
 At a high level:
 
@@ -191,23 +190,25 @@ At a high level:
 2. It schedules a one-shot idle deadline.
 3. When the deadline is reached, it starts a local nudge flow.
 4. When activity returns, it resets the timer and records local summary data.
+5. State changes are written to CloudKit for the iOS companion to read.
 
 ## Repository Layout
 
 ```text
 nudgewhip/
-├── nudgewhip/              # app source
-├── nudgewhipTests/             # unit and runtime tests
-├── nudgewhipUITests/           # UI tests
+├── nudgewhip/              # macOS app source
+├── nudgewhipios/           # iOS companion app source
+├── nudgewhipTests/         # unit and runtime tests
+├── nudgewhipUITests/       # UI tests
 └── docs/                   # product, architecture, privacy, QA, and release docs
 ```
 
 ## Documentation Map
 
-- [docs/release/v0.2.0.md](docs/release/v0.2.0.md): release notes
-- [docs/release/v0.2.0-rc-checklist.md](docs/release/v0.2.0-rc-checklist.md): release candidate execution checklist
-- [docs/release/release-readiness-checklist.md](docs/release/release-readiness-checklist.md): release gate matrix
-- [docs/app/v0.3-feature-direction.md](docs/app/v0.3-feature-direction.md): next-version feature direction and candidate scope
+- [docs/release/v0.4.0.md](docs/release/v0.4.0.md): v0.4.0 release notes
+- [docs/release/v0.3.0.md](docs/release/v0.3.0.md): v0.3.0 release notes
+- [docs/release/v0.2.0.md](docs/release/v0.2.0.md): v0.2.0 release notes
+- [docs/app/v0.3-feature-direction.md](docs/app/v0.3-feature-direction.md): next-version feature direction
 - [docs/privacy/accessibility-and-data-disclosure.md](docs/privacy/accessibility-and-data-disclosure.md): permission and data disclosure
 
 ## Beta Reality
