@@ -2,6 +2,9 @@ import SwiftUI
 
 #if os(iOS)
 struct SettingsView: View {
+    @State private var viewModel = SettingsViewModel()
+    @Environment(SyncOrchestrator.self) var sync
+
     var body: some View {
         NavigationStack {
             List {
@@ -10,14 +13,31 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle(String(localized: "ios.tab.settings"))
+            .refreshable {
+                await sync.refresh()
+                viewModel.reloadData(lastSyncAt: sync.lastSyncAt)
+            }
+        }
+        .task {
+            viewModel.reloadData(lastSyncAt: sync.lastSyncAt)
+        }
+        .onChange(of: sync.lastSyncAt) {
+            viewModel.reloadData(lastSyncAt: sync.lastSyncAt)
         }
     }
 
     private var connectionSection: some View {
         Section {
-            settingsRow(icon: "icloud", title: String(localized: "ios.settings.connection.icloud"), detail: String(localized: "ios.settings.connection.icloud.detail"), status: .warning)
-            settingsRow(icon: "desktopcomputer", title: String(localized: "ios.settings.connection.mac"), detail: String(localized: "ios.settings.connection.mac.none"))
-            settingsRow(icon: "arrow.triangle.2.circlepath", title: String(localized: "ios.settings.connection.last_sync"), detail: "--")
+            settingsRow(icon: "icloud",
+                        title: String(localized: "ios.settings.connection.icloud"),
+                        detail: viewModel.iCloudDetailText,
+                        status: viewModel.iCloudStatus)
+            settingsRow(icon: "desktopcomputer",
+                        title: String(localized: "ios.settings.connection.mac"),
+                        detail: viewModel.connectedMacText)
+            settingsRow(icon: "arrow.triangle.2.circlepath",
+                        title: String(localized: "ios.settings.connection.last_sync"),
+                        detail: viewModel.lastSyncText)
         } header: {
             Text(String(localized: "ios.settings.section.connection"))
         }

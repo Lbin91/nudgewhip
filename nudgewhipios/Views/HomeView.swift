@@ -1,7 +1,11 @@
+import SwiftData
 import SwiftUI
 
 #if os(iOS)
 struct HomeView: View {
+    @State private var viewModel = HomeViewModel()
+    @Environment(SyncOrchestrator.self) var sync
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -12,23 +16,47 @@ struct HomeView: View {
                 }
                 .padding()
             }
+            .refreshable {
+                await sync.refresh()
+                viewModel.reloadData()
+            }
             .navigationTitle(String(localized: "ios.home.nav_title"))
+            .task {
+                viewModel.reloadData()
+            }
+            .onChange(of: sync.lastSyncAt) {
+                viewModel.reloadData()
+            }
         }
     }
 
     private var heroStatusCard: some View {
         VStack(spacing: 8) {
-            Image(systemName: "desktopcomputer")
-                .font(.system(size: 36))
-                .foregroundStyle(.secondary)
+            if viewModel.macState != nil {
+                Image(systemName: viewModel.macStateIcon)
+                    .font(.system(size: 36))
+                    .foregroundStyle(.secondary)
 
-            Text(String(localized: "ios.home.status_unavailable"))
-                .font(.headline)
+                Text(viewModel.macStateText)
+                    .font(.headline)
 
-            Text(String(localized: "ios.home.status_hint"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+                Text(viewModel.macState!.stateChangedAt, style: .relative)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            } else {
+                Image(systemName: "desktopcomputer")
+                    .font(.system(size: 36))
+                    .foregroundStyle(.secondary)
+
+                Text(String(localized: "ios.home.status_unavailable"))
+                    .font(.headline)
+
+                Text(String(localized: "ios.home.status_hint"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24)
@@ -38,20 +66,34 @@ struct HomeView: View {
 
     private var todaySummaryGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            SummaryCard(title: String(localized: "ios.home.kpi.focus_time"), value: "--", icon: "clock")
-            SummaryCard(title: String(localized: "ios.home.kpi.nudge_count"), value: "--", icon: "bell")
-            SummaryCard(title: String(localized: "ios.home.kpi.completed_sessions"), value: "--", icon: "checkmark.circle")
-            SummaryCard(title: String(localized: "ios.home.kpi.longest_focus"), value: "--", icon: "flame")
+            SummaryCard(title: String(localized: "ios.home.kpi.focus_time"), value: viewModel.focusTimeText, icon: "clock")
+            SummaryCard(title: String(localized: "ios.home.kpi.nudge_count"), value: viewModel.nudgeCountText, icon: "bell")
+            SummaryCard(title: String(localized: "ios.home.kpi.completed_sessions"), value: viewModel.completedSessionsText, icon: "checkmark.circle")
+            SummaryCard(title: String(localized: "ios.home.kpi.longest_focus"), value: viewModel.longestFocusText, icon: "flame")
         }
     }
 
     private var syncHealthCard: some View {
         HStack {
-            Image(systemName: "icloud.slash")
-                .foregroundStyle(.secondary)
-            Text(String(localized: "ios.home.sync_disconnected"))
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if sync.isSyncing {
+                Image(systemName: "icloud.and.arrow.down")
+                    .foregroundStyle(.secondary)
+                Text(String(localized: "ios.sync.status.syncing"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else if sync.lastSyncAt != nil {
+                Image(systemName: "icloud.circle")
+                    .foregroundStyle(.secondary)
+                Text(String(localized: "ios.sync.status.connected"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                Image(systemName: "icloud.slash")
+                    .foregroundStyle(.secondary)
+                Text(String(localized: "ios.home.sync_disconnected"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
             Spacer()
         }
         .padding()
@@ -86,4 +128,6 @@ private struct SummaryCard: View {
 
 #Preview {
     HomeView()
+        .modelContainer(iOSModelContainer.preview)
+        .environment(SyncOrchestrator())
 }
