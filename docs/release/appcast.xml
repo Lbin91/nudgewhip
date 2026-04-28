@@ -24,5 +24,14 @@
             <sparkle:releaseNotesLink>NudgeWhip-0.2.0-1.md</sparkle:releaseNotesLink>
             <enclosure url="https://github.com/Lbin91/nudgewhip/releases/download/v0.2.0/NudgeWhip-0.2.0-1.dmg" length="4532420" type="application/octet-stream"/>
         </item>
+        <item>
+            <title>0.4.0</title>
+            <pubDate>Tue, 28 Apr 2026 23:16:44 +0900</pubDate>
+            <link>https://github.com/Lbin91/nudgewhip/releases</link>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/Lbin91/nudgewhip/releases/download/v0.4.0/NudgeWhip-0.4.0-1.dmg" length="4784548" type="application/octet-stream"/>
+        </item>
     </channel>
 </rss>
