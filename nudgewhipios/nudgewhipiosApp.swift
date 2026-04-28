@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct NudgeWhipCompanionApp: App {
+    @State private var syncOrchestrator = SyncOrchestrator()
+
     var body: some Scene {
         WindowGroup {
             CompanionTabView()
+                .environment(syncOrchestrator)
         }
+        .modelContainer(iOSModelContainer.shared)
     }
 }
