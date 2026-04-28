@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(iOS)
 struct AlertsView: View {
     var body: some View {
         NavigationStack {
@@ -10,10 +11,10 @@ struct AlertsView: View {
                     .font(.system(size: 40))
                     .foregroundStyle(.secondary)
 
-                Text("원격 알림이 없습니다")
+                Text(String(localized: "ios.alerts.empty_title"))
                     .font(.headline)
 
-                Text("Mac에서 장기 미복귀 시 iOS로 알림이 표시됩니다")
+                Text(String(localized: "ios.alerts.empty_subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -21,10 +22,11 @@ struct AlertsView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("알림")
+            .navigationTitle(String(localized: "ios.tab.alerts"))
         }
     }
 }
+#endif
 
 #Preview {
     AlertsView()

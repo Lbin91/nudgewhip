@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(iOS)
 struct HomeView: View {
     var body: some View {
         NavigationStack {
@@ -11,7 +12,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            .navigationTitle("NudgeWhip")
+            .navigationTitle(String(localized: "ios.home.nav_title"))
         }
     }
 
@@ -21,10 +22,10 @@ struct HomeView: View {
                 .font(.system(size: 36))
                 .foregroundStyle(.secondary)
 
-            Text("Mac 상태를 확인할 수 없습니다")
+            Text(String(localized: "ios.home.status_unavailable"))
                 .font(.headline)
 
-            Text("Mac에서 NudgeWhip을 실행하면 여기에 상태가 표시됩니다")
+            Text(String(localized: "ios.home.status_hint"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -37,10 +38,10 @@ struct HomeView: View {
 
     private var todaySummaryGrid: some View {
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-            SummaryCard(title: "집중 시간", value: "--", icon: "clock")
-            SummaryCard(title: "알림 횟수", value: "--", icon: "bell")
-            SummaryCard(title: "완료 세션", value: "--", icon: "checkmark.circle")
-            SummaryCard(title: "최장 집중", value: "--", icon: "flame")
+            SummaryCard(title: String(localized: "ios.home.kpi.focus_time"), value: "--", icon: "clock")
+            SummaryCard(title: String(localized: "ios.home.kpi.nudge_count"), value: "--", icon: "bell")
+            SummaryCard(title: String(localized: "ios.home.kpi.completed_sessions"), value: "--", icon: "checkmark.circle")
+            SummaryCard(title: String(localized: "ios.home.kpi.longest_focus"), value: "--", icon: "flame")
         }
     }
 
@@ -48,7 +49,7 @@ struct HomeView: View {
         HStack {
             Image(systemName: "icloud.slash")
                 .foregroundStyle(.secondary)
-            Text("Mac과 연결되지 않음")
+            Text(String(localized: "ios.home.sync_disconnected"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Spacer()
@@ -81,6 +82,7 @@ private struct SummaryCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
+#endif
 
 #Preview {
     HomeView()

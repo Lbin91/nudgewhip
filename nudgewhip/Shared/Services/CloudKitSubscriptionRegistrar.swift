@@ -27,14 +27,7 @@ final class CloudKitSubscriptionRegistrar {
     func ensureZoneExists() async throws {
         guard let database else { throw CloudKitSubscriptionRegistrarError.notConfigured }
         let zone = CKRecordZone(zoneID: zoneID)
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let operation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
-            operation.modifyRecordZonesCompletionBlock = { _, _, error in
-                if let error { continuation.resume(throwing: error) }
-                else { continuation.resume(returning: ()) }
-            }
-            database.add(operation)
-        }
+        _ = try await database.save(zone)
     }
 
     /// Register all required subscriptions (idempotent).
@@ -63,17 +56,7 @@ final class CloudKitSubscriptionRegistrar {
         dbSubscription.notificationInfo = dbNotificationInfo
         subscriptions.append(dbSubscription)
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let operation = CKModifySubscriptionsOperation(
-                subscriptionsToSave: subscriptions,
-                subscriptionIDsToDelete: nil
-            )
-            operation.modifySubscriptionsCompletionBlock = { _, _, error in
-                if let error { continuation.resume(throwing: error) }
-                else { continuation.resume(returning: ()) }
-            }
-            database.add(operation)
-        }
+        _ = try await database.modifySubscriptions(saving: subscriptions, deleting: [])
 
         hasRegistered = true
     }

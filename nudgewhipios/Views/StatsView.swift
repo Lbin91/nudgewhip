@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(iOS)
 struct StatsView: View {
     var body: some View {
         NavigationStack {
@@ -12,29 +13,29 @@ struct StatsView: View {
                 }
                 .padding()
             }
-            .navigationTitle("통계")
+            .navigationTitle(String(localized: "ios.tab.stats"))
         }
     }
 
     private var rangePicker: some View {
-        Picker("기간", selection: .constant(0)) {
-            Text("오늘").tag(0)
-            Text("최근 7일").tag(1)
+        Picker(String(localized: "ios.stats.range_picker_label"), selection: .constant(0)) {
+            Text(String(localized: "ios.stats.range.today")).tag(0)
+            Text(String(localized: "ios.stats.range.7days")).tag(1)
         }
         .pickerStyle(.segmented)
     }
 
     private var kpiStrip: some View {
         HStack(spacing: 12) {
-            KPIMiniCard(label: "총 집중", value: "--")
-            KPIMiniCard(label: "평균 복귀", value: "--")
-            KPIMiniCard(label: "최장 집중", value: "--")
+            KPIMiniCard(label: String(localized: "ios.stats.kpi.total_focus"), value: "--")
+            KPIMiniCard(label: String(localized: "ios.stats.kpi.avg_return"), value: "--")
+            KPIMiniCard(label: String(localized: "ios.stats.kpi.longest_focus"), value: "--")
         }
     }
 
     private var placeholderChart: some View {
         VStack(spacing: 8) {
-            Text("집중 시간 추이")
+            Text(String(localized: "ios.stats.chart.focus_trend"))
                 .font(.subheadline.weight(.medium))
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -46,7 +47,7 @@ struct StatsView: View {
                         Image(systemName: "chart.bar")
                             .font(.title2)
                             .foregroundStyle(.secondary)
-                        Text("Mac 연결 후 데이터가 표시됩니다")
+                        Text(String(localized: "ios.stats.chart.placeholder"))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -55,7 +56,7 @@ struct StatsView: View {
     }
 
     private var footnote: some View {
-        Text("이 데이터는 Mac에서 계산된 요약치입니다.")
+        Text(String(localized: "ios.stats.footnote"))
             .font(.caption2)
             .foregroundStyle(.tertiary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -80,6 +81,7 @@ private struct KPIMiniCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
+#endif
 
 #Preview {
     StatsView()

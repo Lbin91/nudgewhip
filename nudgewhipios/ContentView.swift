@@ -7,31 +7,33 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct CompanionTabView: View {
     var body: some View {
         TabView {
             HomeView()
                 .tabItem {
-                    Label("홈", systemImage: "house")
+                    Label(String(localized: "ios.tab.home"), systemImage: "house")
                 }
 
             StatsView()
                 .tabItem {
-                    Label("통계", systemImage: "chart.bar")
+                    Label(String(localized: "ios.tab.stats"), systemImage: "chart.bar")
                 }
 
             AlertsView()
                 .tabItem {
-                    Label("알림", systemImage: "bell")
+                    Label(String(localized: "ios.tab.alerts"), systemImage: "bell")
                 }
 
             SettingsView()
                 .tabItem {
-                    Label("설정", systemImage: "gearshape")
+                    Label(String(localized: "ios.tab.settings"), systemImage: "gearshape")
                 }
         }
     }
 }
+#endif
 
 #Preview {
     CompanionTabView()

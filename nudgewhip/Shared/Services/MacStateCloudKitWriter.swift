@@ -55,17 +55,7 @@ final class MacStateCloudKitWriter {
         guard !hasEnsuredZone else { return }
 
         let zone = CKRecordZone(zoneID: zoneID)
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            let operation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
-            operation.modifyRecordZonesCompletionBlock = { _, _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: ())
-                }
-            }
-            database.add(operation)
-        }
+        _ = try await database.save(zone)
 
         hasEnsuredZone = true
     }
@@ -74,14 +64,6 @@ final class MacStateCloudKitWriter {
         guard let database else {
             throw MacStateCloudKitWriterError.notConfigured
         }
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            database.save(record) { _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume(returning: ())
-                }
-            }
-        }
+        _ = try await database.save(record)
     }
 }

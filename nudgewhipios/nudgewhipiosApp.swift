@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct nudgewhipiosApp: App {
+struct NudgeWhipCompanionApp: App {
     var body: some Scene {
         WindowGroup {
             CompanionTabView()

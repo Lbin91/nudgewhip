@@ -1,5 +1,6 @@
 import SwiftUI
 
+#if os(iOS)
 struct SettingsView: View {
     var body: some View {
         NavigationStack {
@@ -8,17 +9,17 @@ struct SettingsView: View {
                 proSection
                 aboutSection
             }
-            .navigationTitle("설정")
+            .navigationTitle(String(localized: "ios.tab.settings"))
         }
     }
 
     private var connectionSection: some View {
         Section {
-            settingsRow(icon: "icloud", title: "iCloud", detail: "연결 필요", status: .warning)
-            settingsRow(icon: "desktopcomputer", title: "연결된 Mac", detail: "없음")
-            settingsRow(icon: "arrow.triangle.2.circlepath", title: "마지막 동기화", detail: "--")
+            settingsRow(icon: "icloud", title: String(localized: "ios.settings.connection.icloud"), detail: String(localized: "ios.settings.connection.icloud.detail"), status: .warning)
+            settingsRow(icon: "desktopcomputer", title: String(localized: "ios.settings.connection.mac"), detail: String(localized: "ios.settings.connection.mac.none"))
+            settingsRow(icon: "arrow.triangle.2.circlepath", title: String(localized: "ios.settings.connection.last_sync"), detail: "--")
         } header: {
-            Text("연결 상태")
+            Text(String(localized: "ios.settings.section.connection"))
         }
     }
 
@@ -27,33 +28,33 @@ struct SettingsView: View {
             HStack {
                 Image(systemName: "star")
                     .foregroundStyle(.yellow)
-                Text("Pro 기능")
+                Text(String(localized: "ios.settings.pro.features"))
                 Spacer()
-                Text("비활성")
+                Text(String(localized: "ios.settings.pro.inactive"))
                     .foregroundStyle(.secondary)
             }
         } header: {
-            Text("구독")
+            Text(String(localized: "ios.settings.section.subscription"))
         }
     }
 
     private var aboutSection: some View {
         Section {
             HStack {
-                Text("버전")
+                Text(String(localized: "ios.settings.about.version"))
                 Spacer()
                 Text("0.1.0")
                     .foregroundStyle(.secondary)
             }
             HStack {
-                Text("개인정보 처리방침")
+                Text(String(localized: "ios.settings.about.privacy_policy"))
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         } header: {
-            Text("정보")
+            Text(String(localized: "ios.settings.section.about"))
         }
     }
 
@@ -68,10 +69,7 @@ struct SettingsView: View {
         }
     }
 }
-
-private enum StatusKind {
-    case normal, warning
-}
+#endif
 
 #Preview {
     SettingsView()
