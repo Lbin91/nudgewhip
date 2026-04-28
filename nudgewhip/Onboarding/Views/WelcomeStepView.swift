@@ -49,7 +49,7 @@ struct WelcomeStepView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 84, height: 84)
-                    .accessibilityLabel("Whip devil character")
+                    .accessibilityLabel(String(localized: "accessibility.whip_devil_character"))
             }
             .padding(12)
             .background(Color(nsColor: .windowBackgroundColor).opacity(0.72), in: RoundedRectangle(cornerRadius: 14, style: .continuous))

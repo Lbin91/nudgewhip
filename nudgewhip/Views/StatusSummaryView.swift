@@ -78,7 +78,7 @@ struct StatusSummaryView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 84, height: 84)
-                .accessibilityLabel("Whip devil character")
+                .accessibilityLabel(String(localized: "accessibility.whip_devil_character"))
             
             Text(localizedAppString("menu.dropdown.value.pet_character.devil", defaultValue: "Little Devil"))
                 .font(.caption.weight(.semibold))

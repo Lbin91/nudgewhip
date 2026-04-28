@@ -81,7 +81,7 @@ struct PetDetailView: View {
             ProgressView(value: petState.progressToNextStage)
                 .tint(Color.nudgewhipFocus)
 
-            Text("\(petState.experiencePoints) XP")
+            Text(String(format: String(localized: "%lld XP"), petState.experiencePoints))
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(Color.nudgewhipTextMuted)
         }
@@ -120,11 +120,11 @@ struct PetDetailView: View {
             Spacer()
 
             if stage == .elder {
-                Text("\(stage.xpThreshold)+")
+                    Text(String(format: String(localized: "%lld+"), stage.xpThreshold))
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(Color.nudgewhipTextMuted)
             } else {
-                Text("\(stage.xpThreshold)–\(nextThreshold)")
+                Text(String(format: String(localized: "%lld–%lld"), stage.xpThreshold, nextThreshold))
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(Color.nudgewhipTextMuted)
             }

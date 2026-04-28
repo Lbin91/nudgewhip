@@ -39,6 +39,8 @@ final class IdleMonitor {
     private(set) var scheduleEnd: TimeInterval
     private(set) var whitelistedBundleIdentifiers: Set<String> = []
     private(set) var breakSuggestionEnabled: Bool
+    private let remoteEscalationEventWriter: RemoteEscalationEventWriter?
+    private let deviceIdentityProvider: DeviceIdentityProvider
     
     private var idleDeadlineWorkItem: DispatchWorkItem?
     private var alertEscalationWorkItem: DispatchWorkItem?
@@ -67,7 +69,9 @@ final class IdleMonitor {
         breakSuggestionEnabled: Bool = true,
         scheduleEnabled: Bool = false,
         scheduleStart: TimeInterval = 32400,
-        scheduleEnd: TimeInterval = 61200
+        scheduleEnd: TimeInterval = 61200,
+        remoteEscalationEventWriter: RemoteEscalationEventWriter? = nil,
+        deviceIdentityProvider: DeviceIdentityProvider? = nil
     ) {
         self.permissionManager = permissionManager ?? PermissionManager()
         self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
@@ -86,6 +90,8 @@ final class IdleMonitor {
         self.scheduleEnabled = scheduleEnabled
         self.scheduleStart = scheduleStart
         self.scheduleEnd = scheduleEnd
+        self.remoteEscalationEventWriter = remoteEscalationEventWriter
+        self.deviceIdentityProvider = deviceIdentityProvider ?? DeviceIdentityProvider()
     }
     
     /// 저장된 사용자 설정을 runtime monitor에 반영
@@ -192,6 +198,7 @@ final class IdleMonitor {
     /// 사용자 입력 기록. 유휴 타이머 리셋, 알림 중이면 쿨다운 시작
     func recordInput(at date: Date = .now) {
         let wasAlerting = runtimeStateController.snapshot.runtimeState == .alerting
+        let escalationStepBeforeRecovery = runtimeStateController.snapshot.alertEscalationStep
         
         lastInputAt = date
         runtimeStateController.handle(.userActivityDetected, at: date)
@@ -200,6 +207,12 @@ final class IdleMonitor {
         if wasAlerting {
             sessionTracker?.recordRecovery(at: date)
             registerAlertRecovery()
+            saveRemoteEscalationEvent(
+                escalationStep: escalationStepBeforeRecovery,
+                contentStateRawValue: NudgeWhipContentState.recovery.rawValue,
+                wasRecoveredWithinWindow: true,
+                recoveredAt: date
+            )
         }
         
         scheduleIdleDeadline(from: date)
@@ -323,6 +336,10 @@ final class IdleMonitor {
         guard let idleDeadlineAt, date >= idleDeadlineAt else { return }
         runtimeStateController.handle(.idleDeadlineReached, at: date)
         scheduleAlertSync()
+        saveRemoteEscalationEvent(
+            escalationStep: 1,
+            contentStateRawValue: NudgeWhipContentState.idleDetected.rawValue
+        )
         sessionTracker?.recordAlertStarted(at: date)
         self.idleDeadlineAt = nil
         idleDeadlineWorkItem?.cancel()
@@ -335,6 +352,11 @@ final class IdleMonitor {
         guard let alertEscalationDeadlineAt, date >= alertEscalationDeadlineAt else { return }
         runtimeStateController.handle(.alertEscalationDeadlineReached, at: date)
         scheduleAlertSync()
+        let currentSnapshot = runtimeStateController.snapshot
+        saveRemoteEscalationEvent(
+            escalationStep: currentSnapshot.alertEscalationStep,
+            contentStateRawValue: currentSnapshot.contentState.rawValue
+        )
         sessionTracker?.recordAlertEscalation(step: runtimeStateController.snapshot.alertEscalationStep, at: date)
         self.alertEscalationDeadlineAt = nil
         alertEscalationWorkItem?.cancel()
@@ -625,6 +647,30 @@ final class IdleMonitor {
         observedActivityProcessingWorkItem = nil
         self.pendingObservedActivityAt = nil
         recordInput(at: pendingObservedActivityAt)
+    }
+
+    private func saveRemoteEscalationEvent(
+        escalationStep: Int,
+        contentStateRawValue: String,
+        wasRecoveredWithinWindow: Bool? = nil,
+        recoveredAt: Date? = nil
+    ) {
+        guard let remoteEscalationEventWriter else { return }
+        let payload = RemoteEscalationEventPayload(
+            macDeviceID: deviceIdentityProvider.macDeviceID(),
+            occurredAt: Date(),
+            escalationStep: escalationStep,
+            contentStateRawValue: contentStateRawValue,
+            wasRecoveredWithinWindow: wasRecoveredWithinWindow,
+            recoveredAt: recoveredAt
+        )
+        Task {
+            do {
+                try await remoteEscalationEventWriter.save(payload)
+            } catch {
+                print("[IdleMonitor] RemoteEscalationEvent save failed: \(error)")
+            }
+        }
     }
 
     private func registerAlertRecovery() {

@@ -70,7 +70,7 @@ final class HomeViewModel {
         case "limitedNoAx":
             return String(localized: "ios.home.mac_state.offline")
         default:
-            return state.state
+            return String(localized: "ios.home.mac_state.unknown")
         }
     }
 
@@ -94,19 +94,16 @@ final class HomeViewModel {
         todayProjection = try? modelContext.fetch(dayDescriptor).first
     }
 
+    private static let durationFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.allowedUnits = [.hour, .minute, .second]
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
     private func formatDuration(seconds: Int64) -> String {
         guard seconds > 0 else { return "--" }
-        let hrs = seconds / 3600
-        let mins = (seconds % 3600) / 60
-        let secs = seconds % 60
-
-        if hrs > 0 {
-            return mins > 0 ? "\(hrs)h \(mins)m" : "\(hrs)h"
-        }
-        if mins > 0 {
-            return secs > 0 ? "\(mins)m \(secs)s" : "\(mins)m"
-        }
-        return "\(secs)s"
+        return Self.durationFormatter.string(from: TimeInterval(seconds)) ?? "--"
     }
 }
 #endif

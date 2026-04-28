@@ -71,25 +71,9 @@ final class AlertsViewModel {
         alerts = (try? modelContext.fetch(descriptor)) ?? []
     }
 
-    func formatDate(_ date: Date) -> String {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date.now)
-        let targetDay = calendar.startOfDay(for: date)
-        let daysBetween = calendar.dateComponents([.day], from: targetDay, to: today).day ?? 0
-
-        switch daysBetween {
-        case 0: return "Today"
-        case 1: return "Yesterday"
-        default:
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MMM d"
-            return formatter.string(from: date)
-        }
-    }
-
     func formatTime(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
+        formatter.timeStyle = .short
         return formatter.string(from: date)
     }
 

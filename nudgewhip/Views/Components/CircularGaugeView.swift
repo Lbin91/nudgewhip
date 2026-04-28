@@ -19,7 +19,7 @@ struct CircularGaugeView: View {
                 .rotationEffect(.degrees(-90))
                 .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: progress)
 
-            Text("\(Int(clampedProgress * 100))%")
+            Text(String(format: String(localized: "%lld%%"), Int(clampedProgress * 100)))
                 .font(.caption)
                 .monospacedDigit()
                 .foregroundStyle(Color.nudgewhipTextSecondary)

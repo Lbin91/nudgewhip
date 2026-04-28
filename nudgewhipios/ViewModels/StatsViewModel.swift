@@ -85,24 +85,28 @@ final class StatsViewModel {
         }
     }
 
+    private static let durationFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.allowedUnits = [.hour, .minute]
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
+    private static let secondsFormatter: DateComponentsFormatter = {
+        let f = DateComponentsFormatter()
+        f.allowedUnits = [.minute, .second]
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
     private func formatDuration(seconds: Int64) -> String {
         guard seconds > 0 else { return "--" }
-        let hrs = seconds / 3600
-        let mins = (seconds % 3600) / 60
-        if hrs > 0 {
-            return mins > 0 ? "\(hrs)h \(mins)m" : "\(hrs)h"
-        }
-        return mins > 0 ? "\(mins)m" : "--"
+        return Self.durationFormatter.string(from: TimeInterval(seconds)) ?? "--"
     }
 
     private func formatSeconds(seconds: Int64) -> String {
         guard seconds > 0 else { return "--" }
-        let mins = seconds / 60
-        let secs = seconds % 60
-        if mins > 0 {
-            return secs > 0 ? "\(mins)m \(secs)s" : "\(mins)m"
-        }
-        return "\(secs)s"
+        return Self.secondsFormatter.string(from: TimeInterval(seconds)) ?? "--"
     }
 }
 #endif

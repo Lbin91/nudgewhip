@@ -52,16 +52,17 @@ final class SettingsViewModel {
         escalationCount = (try? modelContext.fetchCount(escalationDescriptor)) ?? 0
     }
 
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
     private func formatRelativeTime(_ date: Date?) -> String {
         guard let date else { return "--" }
         let interval = Date.now.timeIntervalSince(date)
         if interval < 60 { return String(localized: "ios.sync.time.just_now") }
-        let minutes = Int(interval / 60)
-        if minutes < 60 {
-            return "\(minutes) min ago"
-        }
-        let hours = minutes / 60
-        return "\(hours) hr ago"
+        return Self.relativeFormatter.localizedString(for: date, relativeTo: Date.now)
     }
 }
 #endif
