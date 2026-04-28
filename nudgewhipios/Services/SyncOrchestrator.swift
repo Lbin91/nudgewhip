@@ -19,6 +19,10 @@ final class SyncOrchestrator {
 
     private static let macDeviceIDKey = "nudgewhip.ios.cached_mac_device_id"
 
+    static var cachedMacDeviceID: String? {
+        UserDefaults.standard.string(forKey: macDeviceIDKey)
+    }
+
     init(modelContext: ModelContext) {
         self.syncService = CloudKitCacheSyncService(modelContext: modelContext)
         startObservers()

@@ -3,7 +3,7 @@ import SwiftUI
 
 #if os(iOS)
 struct HomeView: View {
-    @State private var viewModel = HomeViewModel()
+    @State private var viewModel = HomeViewModel(macDeviceID: SyncOrchestrator.cachedMacDeviceID ?? "")
     @Environment(SyncOrchestrator.self) var sync
 
     var body: some View {

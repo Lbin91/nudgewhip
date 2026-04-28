@@ -216,7 +216,6 @@ final class RuntimeStateController {
     private(set) var transitionLog: [RuntimeTransitionLogEntry]
     private let macStateCloudKitWriter: MacStateCloudKitWriter?
     private let deviceIdentityProvider: DeviceIdentityProvider
-    private var macStateSequence: Int64 = 0
     
     init(
         snapshot: RuntimeSnapshot? = nil,
@@ -240,7 +239,6 @@ final class RuntimeStateController {
         }
         
         if snapshot.runtimeState != previousRuntimeState {
-            macStateSequence += 1
             saveMacState(at: date)
         }
     }
@@ -251,7 +249,7 @@ final class RuntimeStateController {
             macDeviceID: deviceIdentityProvider.macDeviceID(),
             state: snapshot.runtimeState.rawValue,
             stateChangedAt: date,
-            sequence: macStateSequence,
+            sequence: Int64(date.timeIntervalSince1970 * 1000),
             breakUntil: nil,
             lastAlertAt: snapshot.runtimeState == .alerting ? date : nil,
             schemaVersion: 1

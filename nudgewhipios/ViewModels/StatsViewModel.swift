@@ -13,16 +13,18 @@ final class StatsViewModel {
     }
 
     private let modelContext: ModelContext
+    let macDeviceID: String
 
     var selectedRange: Int = 0
     private(set) var projections: [CachedDayProjection] = []
 
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext, macDeviceID: String) {
         self.modelContext = modelContext
+        self.macDeviceID = macDeviceID
     }
 
-    convenience init() {
-        self.init(modelContext: iOSModelContainer.shared.mainContext)
+    convenience init(macDeviceID: String) {
+        self.init(modelContext: iOSModelContainer.shared.mainContext, macDeviceID: macDeviceID)
     }
 
     var totalFocusText: String {
@@ -72,13 +74,17 @@ final class StatsViewModel {
 
         if selectedRange == 0 {
             let descriptor = FetchDescriptor<CachedDayProjection>(
-                predicate: #Predicate { $0.localDayKey == localDayKey }
+                predicate: #Predicate {
+                    $0.macDeviceID == macDeviceID && $0.localDayKey == localDayKey
+                }
             )
             projections = (try? modelContext.fetch(descriptor)) ?? []
         } else {
             let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date.now) ?? Date.now
             let descriptor = FetchDescriptor<CachedDayProjection>(
-                predicate: #Predicate { $0.dayStart >= sevenDaysAgo },
+                predicate: #Predicate {
+                    $0.macDeviceID == macDeviceID && $0.dayStart >= sevenDaysAgo
+                },
                 sortBy: [SortDescriptor(\.dayStart, order: .forward)]
             )
             projections = (try? modelContext.fetch(descriptor)) ?? []

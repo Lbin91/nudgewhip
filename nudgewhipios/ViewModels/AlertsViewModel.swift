@@ -7,15 +7,17 @@ import SwiftUI
 @Observable
 final class AlertsViewModel {
     private let modelContext: ModelContext
+    let macDeviceID: String
 
     private(set) var alerts: [CachedRemoteEscalation] = []
 
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext, macDeviceID: String) {
         self.modelContext = modelContext
+        self.macDeviceID = macDeviceID
     }
 
-    convenience init() {
-        self.init(modelContext: iOSModelContainer.shared.mainContext)
+    convenience init(macDeviceID: String) {
+        self.init(modelContext: iOSModelContainer.shared.mainContext, macDeviceID: macDeviceID)
     }
 
     var hasAlerts: Bool {
@@ -64,7 +66,9 @@ final class AlertsViewModel {
         let cutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date.now) ?? Date.now
 
         var descriptor = FetchDescriptor<CachedRemoteEscalation>(
-            predicate: #Predicate { $0.occurredAt >= cutoff }
+            predicate: #Predicate {
+                $0.macDeviceID == macDeviceID && $0.occurredAt >= cutoff
+            }
         )
         descriptor.sortBy = [SortDescriptor(\.occurredAt, order: .reverse)]
 

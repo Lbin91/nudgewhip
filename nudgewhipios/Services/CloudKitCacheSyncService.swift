@@ -141,11 +141,18 @@ final class CloudKitCacheSyncService {
     }
 
     private func upsertMacState(_ payload: MacStatePayload) {
-        let descriptor = FetchDescriptor<CachedMacState>()
-        if let existing = try? modelContext.fetch(descriptor) {
-            for record in existing {
-                modelContext.delete(record)
-            }
+        let descriptor = FetchDescriptor<CachedMacState>(
+            predicate: #Predicate { $0.macDeviceID == payload.macDeviceID }
+        )
+        if let existing = try? modelContext.fetch(descriptor).first {
+            existing.state = payload.state
+            existing.stateChangedAt = payload.stateChangedAt
+            existing.sequence = payload.sequence
+            existing.breakUntil = payload.breakUntil
+            existing.lastAlertAt = payload.lastAlertAt
+            existing.schemaVersion = payload.schemaVersion
+            existing.fetchedAt = Date()
+            return
         }
         let cached = CachedMacState(
             macDeviceID: payload.macDeviceID,
@@ -161,7 +168,9 @@ final class CloudKitCacheSyncService {
 
     private func upsertProjection(_ payload: DashboardDayProjectionPayload) {
         let descriptor = FetchDescriptor<CachedDayProjection>(
-            predicate: #Predicate { $0.localDayKey == payload.localDayKey }
+            predicate: #Predicate {
+                $0.macDeviceID == payload.macDeviceID && $0.localDayKey == payload.localDayKey
+            }
         )
         if let existing = try? modelContext.fetch(descriptor).first {
             existing.macDeviceID = payload.macDeviceID

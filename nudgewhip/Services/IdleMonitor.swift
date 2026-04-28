@@ -215,6 +215,7 @@ final class IdleMonitor {
             saveRemoteEscalationEvent(
                 escalationStep: escalationStepBeforeRecovery,
                 contentStateRawValue: NudgeWhipContentState.recovery.rawValue,
+                occurredAt: date,
                 wasRecoveredWithinWindow: true,
                 recoveredAt: date
             )
@@ -343,7 +344,8 @@ final class IdleMonitor {
         scheduleAlertSync()
         saveRemoteEscalationEvent(
             escalationStep: 1,
-            contentStateRawValue: NudgeWhipContentState.idleDetected.rawValue
+            contentStateRawValue: NudgeWhipContentState.idleDetected.rawValue,
+            occurredAt: date
         )
         sessionTracker?.recordAlertStarted(at: date)
         self.idleDeadlineAt = nil
@@ -360,7 +362,8 @@ final class IdleMonitor {
         let currentSnapshot = runtimeStateController.snapshot
         saveRemoteEscalationEvent(
             escalationStep: currentSnapshot.alertEscalationStep,
-            contentStateRawValue: currentSnapshot.contentState.rawValue
+            contentStateRawValue: currentSnapshot.contentState.rawValue,
+            occurredAt: date
         )
         sessionTracker?.recordAlertEscalation(step: runtimeStateController.snapshot.alertEscalationStep, at: date)
         self.alertEscalationDeadlineAt = nil
@@ -657,13 +660,14 @@ final class IdleMonitor {
     private func saveRemoteEscalationEvent(
         escalationStep: Int,
         contentStateRawValue: String,
+        occurredAt: Date,
         wasRecoveredWithinWindow: Bool? = nil,
         recoveredAt: Date? = nil
     ) {
         guard let remoteEscalationEventWriter else { return }
         let payload = RemoteEscalationEventPayload(
             macDeviceID: deviceIdentityProvider.macDeviceID(),
-            occurredAt: Date(),
+            occurredAt: occurredAt,
             escalationStep: escalationStep,
             contentStateRawValue: contentStateRawValue,
             wasRecoveredWithinWindow: wasRecoveredWithinWindow,

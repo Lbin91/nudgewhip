@@ -2,7 +2,7 @@ import SwiftUI
 
 #if os(iOS)
 struct AlertsView: View {
-    @State private var viewModel = AlertsViewModel()
+    @State private var viewModel = AlertsViewModel(macDeviceID: SyncOrchestrator.cachedMacDeviceID ?? "")
     @Environment(SyncOrchestrator.self) var sync
 
     var body: some View {

@@ -133,10 +133,61 @@ struct CachedMacStateTests {
         #expect(results.first?.state == "alerting")
         #expect(results.first?.sequence == 2)
     }
+
+    @Test
+    func upsertPreservesMultipleMacs() throws {
+        let container = try iOSModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = CloudKitCacheSyncService(container: nil, modelContext: context)
+
+        service.performUpsertMacState(MacStatePayload(
+            macDeviceID: "mac-office",
+            state: "monitoring",
+            stateChangedAt: Date(),
+            sequence: 100
+        ))
+        try context.save()
+
+        service.performUpsertMacState(MacStatePayload(
+            macDeviceID: "mac-home",
+            state: "alerting",
+            stateChangedAt: Date(),
+            sequence: 50
+        ))
+        try context.save()
+
+        let results = try context.fetch(FetchDescriptor<CachedMacState>())
+        #expect(results.count == 2)
+        #expect(results.contains { $0.macDeviceID == "mac-office" && $0.state == "monitoring" })
+        #expect(results.contains { $0.macDeviceID == "mac-home" && $0.state == "alerting" })
+    }
 }
 
 @MainActor
-struct CachedDayProjectionTests {
+struct LimitedNoAXDisplayTests {
+
+    @Test
+    func homeViewModelShowsCorrectIconForLimitedNoAX() throws {
+        let container = try iOSModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+
+        let vm = HomeViewModel(modelContext: context, macDeviceID: "mac-001")
+        let macState = CachedMacState(
+            macDeviceID: "mac-001",
+            state: "limitedNoAX",
+            stateChangedAt: Date(),
+            sequence: 100
+        )
+        context.insert(macState)
+        try context.save()
+
+        vm.reloadData()
+        #expect(vm.macStateIcon == "hand.raised.slash")
+        #expect(vm.macStateText != String(localized: "ios.home.mac_state.unknown"))
+    }
+}
+
+@MainActor
 
     @Test
     func upsertInsertsMultipleProjections() throws {
@@ -190,6 +241,27 @@ struct CachedDayProjectionTests {
         let results = try context.fetch(FetchDescriptor<CachedDayProjection>())
         #expect(results.count == 1)
         #expect(results.first?.totalFocusDurationSeconds == 7200)
+    }
+
+    @Test
+    func upsertPreservesProjectionsFromDifferentMacs() throws {
+        let container = try iOSModelContainer.makeModelContainer(inMemory: true)
+        let context = container.mainContext
+        let service = CloudKitCacheSyncService(container: nil, modelContext: context)
+
+        let key = "2026-04-28@Asia/Seoul"
+        let payload1 = makeProjectionPayload(macDeviceID: "mac-office", localDayKey: key, totalFocus: 3600)
+        service.performUpsertProjection(payload1)
+        try context.save()
+
+        let payload2 = makeProjectionPayload(macDeviceID: "mac-home", localDayKey: key, totalFocus: 7200)
+        service.performUpsertProjection(payload2)
+        try context.save()
+
+        let results = try context.fetch(FetchDescriptor<CachedDayProjection>())
+        #expect(results.count == 2)
+        #expect(results.contains { $0.macDeviceID == "mac-office" && $0.totalFocusDurationSeconds == 3600 })
+        #expect(results.contains { $0.macDeviceID == "mac-home" && $0.totalFocusDurationSeconds == 7200 })
     }
 
     @Test
@@ -266,12 +338,13 @@ struct CachedDayProjectionTests {
     }
 
     private func makeProjectionPayload(
+        macDeviceID: String = "mac-001",
         localDayKey: String,
         totalFocus: Int64,
         dayStartOffset: Double = 0
     ) -> DashboardDayProjectionPayload {
         DashboardDayProjectionPayload(
-            macDeviceID: "mac-001",
+            macDeviceID: macDeviceID,
             localDayKey: localDayKey,
             dayStart: Date().addingTimeInterval(dayStartOffset),
             timeZoneIdentifier: "Asia/Seoul",

@@ -2,21 +2,34 @@ import Foundation
 import SwiftData
 import SwiftUI
 
+/// macOS RuntimeStateController.NudgeWhipRuntimeState.rawValue 와 동일한 상수
+enum MacRuntimeState {
+    static let limitedNoAX = "limitedNoAX"
+    static let monitoring = "monitoring"
+    static let pausedManual = "pausedManual"
+    static let pausedWhitelist = "pausedWhitelist"
+    static let alerting = "alerting"
+    static let pausedSchedule = "pausedSchedule"
+    static let suspendedSleepOrLock = "suspendedSleepOrLock"
+}
+
 #if os(iOS)
 @MainActor
 @Observable
 final class HomeViewModel {
     private let modelContext: ModelContext
+    let macDeviceID: String
 
     private(set) var macState: CachedMacState?
     private(set) var todayProjection: CachedDayProjection?
 
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext, macDeviceID: String) {
         self.modelContext = modelContext
+        self.macDeviceID = macDeviceID
     }
 
-    convenience init() {
-        self.init(modelContext: iOSModelContainer.shared.mainContext)
+    convenience init(macDeviceID: String) {
+        self.init(modelContext: iOSModelContainer.shared.mainContext, macDeviceID: macDeviceID)
     }
 
     var focusTimeText: String {
@@ -42,12 +55,12 @@ final class HomeViewModel {
     var macStateIcon: String {
         guard let state = macState else { return "desktopcomputer" }
         switch state.state {
-        case "monitoring": return "eye.circle"
-        case "pausedManual": return "pause.circle"
-        case "alerting": return "exclamationmark.circle"
-        case "pausedSchedule": return "clock.badge"
-        case "suspendedSleepOrLock": return "moon.zzz"
-        case "limitedNoAx": return "hand.raised.slash"
+        case MacRuntimeState.monitoring: return "eye.circle"
+        case MacRuntimeState.pausedManual: return "pause.circle"
+        case MacRuntimeState.alerting: return "exclamationmark.circle"
+        case MacRuntimeState.pausedSchedule: return "clock.badge"
+        case MacRuntimeState.suspendedSleepOrLock: return "moon.zzz"
+        case MacRuntimeState.limitedNoAX: return "hand.raised.slash"
         default: return "desktopcomputer"
         }
     }
@@ -57,17 +70,17 @@ final class HomeViewModel {
             return String(localized: "ios.home.status_unavailable")
         }
         switch state.state {
-        case "monitoring":
+        case MacRuntimeState.monitoring:
             return String(localized: "ios.home.mac_state.monitoring")
-        case "pausedManual":
+        case MacRuntimeState.pausedManual:
             return String(localized: "ios.home.mac_state.paused")
-        case "alerting":
+        case MacRuntimeState.alerting:
             return String(localized: "ios.home.mac_state.alerting")
-        case "pausedSchedule":
+        case MacRuntimeState.pausedSchedule:
             return String(localized: "ios.home.mac_state.paused")
-        case "suspendedSleepOrLock":
+        case MacRuntimeState.suspendedSleepOrLock:
             return String(localized: "ios.home.mac_state.offline")
-        case "limitedNoAx":
+        case MacRuntimeState.limitedNoAX:
             return String(localized: "ios.home.mac_state.offline")
         default:
             return String(localized: "ios.home.mac_state.unknown")
@@ -80,7 +93,9 @@ final class HomeViewModel {
     }
 
     func reloadData() {
-        let macDescriptor = FetchDescriptor<CachedMacState>()
+        let macDescriptor = FetchDescriptor<CachedMacState>(
+            predicate: #Predicate { $0.macDeviceID == macDeviceID }
+        )
         macState = try? modelContext.fetch(macDescriptor).first
 
         let formatter = DateFormatter()
@@ -89,7 +104,9 @@ final class HomeViewModel {
         let localDayKey = "\(datePart)@\(TimeZone.current.identifier)"
 
         let dayDescriptor = FetchDescriptor<CachedDayProjection>(
-            predicate: #Predicate { $0.localDayKey == localDayKey }
+            predicate: #Predicate {
+                $0.macDeviceID == macDeviceID && $0.localDayKey == localDayKey
+            }
         )
         todayProjection = try? modelContext.fetch(dayDescriptor).first
     }
