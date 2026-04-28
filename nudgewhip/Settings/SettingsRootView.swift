@@ -29,7 +29,6 @@ struct SettingsRootView: View {
                         monitoringSection
                         scheduleSection
                         recoveryReviewSection
-                        petSection
                         accessibilitySection
                         appSection
                     }
@@ -266,26 +265,6 @@ struct SettingsRootView: View {
 
                 secondaryButton(localizedAppString("recovery.review.open_button", defaultValue: "View Recovery Review"), action: {
                     // Will be wired to open RecoveryReviewView
-                    // For now, placeholder
-                })
-            }
-        }
-    }
-
-    private var petSection: some View {
-        SettingsSection(title: localizedAppString("settings.section.pet", defaultValue: "Pet"), systemImage: "pawprint.fill") {
-            VStack(alignment: .leading, spacing: NudgeWhipSpacing.s4) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(localizedAppString("settings.section.pet.desc_title", defaultValue: "Your focus companion"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.nudgewhipTextPrimary)
-                    Text(localizedAppString("settings.section.pet.desc", defaultValue: "A virtual pet that grows as you maintain focus. It never punishes — only rewards consistency."))
-                        .font(.caption)
-                        .foregroundStyle(Color.nudgewhipTextMuted)
-                }
-
-                secondaryButton(localizedAppString("settings.section.pet.open", defaultValue: "View Pet Status"), action: {
-                    // Will be wired to open PetDetailView
                     // For now, placeholder
                 })
             }

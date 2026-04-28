@@ -29,9 +29,7 @@ final class MenuBarViewModel {
     private(set) var appUsageSnapshot = AppUsageSnapshot.empty
     private(set) var activePresetName: String = ""
     private(set) var schedulePresets: [SchedulePreset] = []
-    private(set) var petState: PetState?
-    private var petProgressionService: PetProgressionService?
-    
+
     init(idleMonitor: IdleMonitor? = nil) {
         self.idleMonitor = idleMonitor ?? IdleMonitor()
         self.modelContext = NudgeWhipModelContainer.shared.mainContext
@@ -153,7 +151,6 @@ final class MenuBarViewModel {
 
         seedPresetsIfNeeded()
         loadSchedulePresets()
-        initializePetService()
     }
     
     /// 권한 새로고침 후 필요 시 모니터링 시작
@@ -459,35 +456,4 @@ final class MenuBarViewModel {
         )
     }
 
-    private func initializePetService() {
-        let petService = PetProgressionService(modelContext: modelContext)
-        self.petProgressionService = petService
-        self.petState = petService.fetchPetState()
-        petService.onStageUp = { [weak self] newStage in
-            self?.petState = petService.fetchPetState()
-
-            let petName = self?.petState?.name ?? "Whip"
-            let stageName = newStage.displayName
-            let content = UNMutableNotificationContent()
-            content.title = localizedAppString(
-                "pet.notification.level_up.title",
-                defaultValue: "Level Up!"
-            )
-            content.body = localizedAppString(
-                "pet.notification.level_up",
-                defaultValue: "\(petName) reached \(stageName)!"
-            )
-            content.sound = .default
-
-            let request = UNNotificationRequest(
-                identifier: "pet.levelup.\(newStage.rawValue)",
-                content: content,
-                trigger: nil
-            )
-            UNUserNotificationCenter.current().add(request)
-        }
-        idleMonitor.sessionTracker?.setPetProgressionService(petService)
-        petService.checkDailyActiveBonus()
-        self.petState = petService.fetchPetState()
-    }
 }
