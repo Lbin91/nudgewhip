@@ -56,6 +56,23 @@
 
 ---
 
+## 다음 버전으로 이관
+
+> 펫 시스템, 감정 시스템, 콘텐츠 기획서 전체는 다음 버전에서 다룸.
+> 기획서: `docs/content/pet-content-plan.md` (v1.1)
+
+- [ ] **PetState 데이터 모델 확장** — currentMoodRawValue, moodUpdatedAt 필드 추가
+- [ ] **PetMoodService 구현** — 감정 상태 전이표 기반 무드 계산
+- [ ] **펫 대사 슬롯 9개 추가** — KR/EN 각 3변형, 단계별 말투
+- [ ] **PetSummaryCard/PetDetailView mood 텍스트 반영** — SF Symbol + 배지
+- [ ] **스프라이트 에셋 34개 제작** — 정적 25 + 진화 4 + 아이들 5
+- [ ] **쓰다듬기/격려 인터랙션** — 클릭 + 쿨다운 + 일일 상한
+- [ ] **일일 펫 리포트** — PetDetailView 내부 카드
+- [ ] **커스터마이징** — 액세서리, 배경 테마
+- [ ] **주간 펫 리포트 + 펫 일기**
+
+---
+
 ## 이전 완료 작업 (참고용)
 
 <details>
