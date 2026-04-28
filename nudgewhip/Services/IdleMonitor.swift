@@ -71,10 +71,15 @@ final class IdleMonitor {
         scheduleStart: TimeInterval = 32400,
         scheduleEnd: TimeInterval = 61200,
         remoteEscalationEventWriter: RemoteEscalationEventWriter? = nil,
+        macStateCloudKitWriter: MacStateCloudKitWriter? = nil,
         deviceIdentityProvider: DeviceIdentityProvider? = nil
     ) {
+        let resolvedDeviceIdentity = deviceIdentityProvider ?? DeviceIdentityProvider()
         self.permissionManager = permissionManager ?? PermissionManager()
-        self.runtimeStateController = runtimeStateController ?? RuntimeStateController()
+        self.runtimeStateController = runtimeStateController ?? RuntimeStateController(
+            macStateCloudKitWriter: macStateCloudKitWriter,
+            deviceIdentityProvider: resolvedDeviceIdentity
+        )
         self.eventMonitor = eventMonitor ?? SystemEventMonitor()
         self.lifecycleMonitor = lifecycleMonitor ?? SystemLifecycleMonitor()
         self.frontmostAppProvider = frontmostAppProvider ?? FrontmostAppProvider()
@@ -91,7 +96,7 @@ final class IdleMonitor {
         self.scheduleStart = scheduleStart
         self.scheduleEnd = scheduleEnd
         self.remoteEscalationEventWriter = remoteEscalationEventWriter
-        self.deviceIdentityProvider = deviceIdentityProvider ?? DeviceIdentityProvider()
+        self.deviceIdentityProvider = resolvedDeviceIdentity
     }
     
     /// 저장된 사용자 설정을 runtime monitor에 반영

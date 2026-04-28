@@ -214,18 +214,54 @@ final class RuntimeStateController {
 
     private(set) var snapshot: RuntimeSnapshot
     private(set) var transitionLog: [RuntimeTransitionLogEntry]
+    private let macStateCloudKitWriter: MacStateCloudKitWriter?
+    private let deviceIdentityProvider: DeviceIdentityProvider
+    private var macStateSequence: Int64 = 0
     
-    init(snapshot: RuntimeSnapshot? = nil, transitionLog: [RuntimeTransitionLogEntry] = []) {
+    init(
+        snapshot: RuntimeSnapshot? = nil,
+        transitionLog: [RuntimeTransitionLogEntry] = [],
+        macStateCloudKitWriter: MacStateCloudKitWriter? = nil,
+        deviceIdentityProvider: DeviceIdentityProvider? = nil
+    ) {
         self.snapshot = snapshot ?? RuntimeSnapshot()
         self.transitionLog = transitionLog
+        self.macStateCloudKitWriter = macStateCloudKitWriter
+        self.deviceIdentityProvider = deviceIdentityProvider ?? DeviceIdentityProvider()
     }
     
     /// 이벤트를 처리해 스냅샷 갱신하고 전이 로그에 기록
     func handle(_ event: NudgeWhipRuntimeEvent, at date: Date = .now) {
+        let previousRuntimeState = snapshot.runtimeState
         snapshot = RuntimeStateReducer.reduce(snapshot, event: event, at: date)
         transitionLog.append(RuntimeTransitionLogEntry(event: event, snapshot: snapshot, occurredAt: date))
         if transitionLog.count > Self.transitionLogSoftLimit {
             transitionLog.removeFirst(Self.transitionLogTrimCount)
+        }
+        
+        if snapshot.runtimeState != previousRuntimeState {
+            macStateSequence += 1
+            saveMacState(at: date)
+        }
+    }
+    
+    private func saveMacState(at date: Date) {
+        guard let macStateCloudKitWriter else { return }
+        let payload = MacStatePayload(
+            macDeviceID: deviceIdentityProvider.macDeviceID(),
+            state: snapshot.runtimeState.rawValue,
+            stateChangedAt: date,
+            sequence: macStateSequence,
+            breakUntil: nil,
+            lastAlertAt: snapshot.runtimeState == .alerting ? date : nil,
+            schemaVersion: 1
+        )
+        Task {
+            do {
+                try await macStateCloudKitWriter.save(payload)
+            } catch {
+                print("[RuntimeStateController] MacState CloudKit 저장 실패: \(error.localizedDescription)")
+            }
         }
     }
 }
